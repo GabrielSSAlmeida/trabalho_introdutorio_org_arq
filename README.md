@@ -1,3 +1,3 @@
-# trabalho_introdutorio_org_arq
+# Trabalho Introdutório
 
 Trabalho da matéria "Organização de Arquivos" - USP São Carlos
