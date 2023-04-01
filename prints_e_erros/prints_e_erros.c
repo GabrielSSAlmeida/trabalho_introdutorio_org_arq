@@ -3,6 +3,7 @@
 
 void imprime_erro_padrao(void){
     printf("Erro\n");
+    exit(1);
 }
 
 void imprime_erro_alocacao(){
