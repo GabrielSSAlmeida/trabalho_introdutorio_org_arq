@@ -20,4 +20,4 @@ clean:
 	rm *.o programaTrab
 
 run:
-	valgrind ./programaTrab < entrada.in
+	./programaTrab 

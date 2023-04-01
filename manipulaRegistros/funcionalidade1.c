@@ -31,8 +31,22 @@ CABECALHO *criar_cabecalho(void){
     else{
         imprime_erro_alocacao();
     }
-    return (cabecalho);
+    return cabecalho;
 }
+
+DADOS *criar_registro(void){
+    DADOS *registro = (DADOS*) malloc(sizeof(DADOS));
+
+    if(registro != NULL){
+        registro->removido = 0;
+        registro->delimitador = '#';
+    }
+    else{
+        imprime_erro_alocacao();
+    }
+    return registro;
+}
+
 
 void desaloca_cabecalho(CABECALHO *cabecalho){
     if(cabecalho != NULL){
@@ -43,6 +57,90 @@ void desaloca_cabecalho(CABECALHO *cabecalho){
     }
 }
 
+char *ler_ate_virgula(FILE *arq){
+    char c;
+    char *vetor =NULL;
+    int num_carac = 0;
+
+    fscanf(arq, "%c", &c); 
+
+    if(c == ',')
+        return NULL;
+
+    while(c != ','){    
+        num_carac++;
+    
+        vetor = realloc(vetor, sizeof(char)* num_carac);
+        if (vetor == NULL)
+        {
+            printf("Erro");
+            exit(1);
+        }
+        vetor[num_carac-1] = c;
+
+
+        
+        if (fscanf(arq, "%c", &c) == EOF)
+        {
+            break;
+        }
+        
+    }
+
+    num_carac++;
+    
+    vetor = realloc(vetor, sizeof(char)* num_carac);
+    if (vetor == NULL)
+    {
+        printf("Erro");
+        exit(1);
+    }
+    vetor[num_carac-1] = '\0';
+
+    return vetor;    
+}
+
+void ler_data(FILE *arq, char *vetor){
+    char c;
+    int num_carac = 0;
+
+    fscanf(arq, "%c", &c); 
+
+    if(c == ','){
+        for(int i=0; i<10; i++){
+            vetor[i] = '$';
+        }
+    }
+
+    while(c != ','){    
+        num_carac++;
+    
+        vetor[num_carac-1] = c;
+        
+        if (fscanf(arq, "%c", &c) == EOF){
+            break;
+        }
+    }
+
+    vetor[9] = '\0';
+   
+}
+
+
+
+DADOS *LerRegCsv(FILE *arquivoCSV){
+    char vetorData[10];
+    int auxId;
+    DADOS *registro = criar_registro();
+
+    fscanf(arquivoCSV, "%d,", &auxId);
+    ler_data(arquivoCSV, vetorData);
+
+    printf("%d %s", auxId, registro->dataCrime);
+
+
+
+}
 
 /* void imprime_cabecalho(CABECALHO *cabecalho){
     printf("%ld %d %d", cabecalho->proxByteOffset, cabecalho->nroRegArq, cabecalho->nroRegRem);
