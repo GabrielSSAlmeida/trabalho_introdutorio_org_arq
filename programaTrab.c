@@ -1,7 +1,19 @@
+/*
+- Gabriel Sousa Santos de Almeida - 13837432
+- Luís Henrique Giorgetti Dantas - 13782369
+*/
+
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "auxiliares/auxiliar.h"
 #include "manipulaRegistros/registro.h"
+#include "prints_e_erros/prints_e_erros.h"
+
+
+
+
 
 int main(){
     int variaMenu;
@@ -18,13 +30,24 @@ int main(){
 
             CABECALHO *cabecalho_saida = criar_cabecalho();
             
-            //FILE *arqCsv = fopen(arqEntrada, "r");
-            //loop
-                //DADOS* registro = LerRegCsv(arqCsv);
-                //EscreverRegBin();
+            FILE *arqCsv = fopen(arqEntrada, "r");
+            FILE *arqBin = fopen(arqSaida, "wb+");
+            if(arqCsv == NULL || arqBin == NULL)
+                imprime_erro_padrao();
             
+            //Ler a primeira linha
+            fscanf(arqCsv, "%*[^\r\n]s"); 
+            fscanf(arqCsv, "%*[\r\n]s");
 
-            //fclose(arqCsv);
+            
+            while(feof(arqCsv) == 0){
+                DADOS *registro = LerRegCsv(arqCsv);
+                EscreverRegBin(arqBin, registro);
+                free(registro);
+            }
+            
+            fclose(arqBin);
+            fclose(arqCsv);
             desaloca_cabecalho(cabecalho_saida);
             break;
         }
