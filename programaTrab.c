@@ -33,7 +33,7 @@ int main(){
             FILE *arqCsv = fopen(arqEntrada, "r");
             FILE *arqBin = fopen(arqSaida, "wb+");
             if(arqCsv == NULL || arqBin == NULL)
-                imprime_erro_padrao();
+                imprime_erro_arquivo();
             
             //Ler a primeira linha
             fscanf(arqCsv, "%*[^\r\n]s"); 
@@ -41,19 +41,24 @@ int main(){
 
 
             while(feof(arqCsv) == 0){
-                DADOS *registro = LerRegCsv(arqCsv);
-                EscreverRegBin(arqBin, registro, cabecalho_saida);
+                int flag;
+                DADOS *registro = LerRegCsv(arqCsv, &flag);
+                if(flag != -1){
+                    EscreverRegBin(arqBin, registro, cabecalho_saida);
+                }
+
                 desaloca_registro(registro);
             }
 
             imprime_cabecalho(arqBin,cabecalho_saida);
 
-            binarioNaTela(arqSaida);
 
 
             fclose(arqCsv);
             fclose(arqBin);
             
+            binarioNaTela(arqSaida);
+
             desaloca_cabecalho(cabecalho_saida);
             break;
         }
