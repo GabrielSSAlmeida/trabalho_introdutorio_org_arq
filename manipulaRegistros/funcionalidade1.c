@@ -24,6 +24,7 @@ CABECALHO *criar_cabecalho(void){
     CABECALHO *cabecalho = (CABECALHO*) malloc(sizeof(CABECALHO));
 
     if(cabecalho != NULL){
+        cabecalho->status = '0';
         cabecalho->proxByteOffset = 0;
         cabecalho->nroRegArq = 0;
         cabecalho->nroRegRem = 0;
@@ -38,7 +39,7 @@ DADOS *criar_registro(void){
     DADOS *registro = (DADOS*) malloc(sizeof(DADOS));
 
     if(registro != NULL){
-        registro->removido = 0;
+        registro->removido = '0';
         registro->delimitador = '#';
     }
     else{
@@ -47,6 +48,16 @@ DADOS *criar_registro(void){
     return registro;
 }
 
+void desaloca_registro(DADOS *registro){
+    if(registro != NULL){
+        free(registro->lugarCrime);
+        free(registro->descricaoCrime);
+        free(registro);
+    }
+    else{
+        imprime_erro_padrao();
+    }
+}
 
 void desaloca_cabecalho(CABECALHO *cabecalho){
     if(cabecalho != NULL){
@@ -67,9 +78,9 @@ char *ler_ate_virgula(FILE *arq){
         imprime_erro_alocacao();
     }
 
-    fscanf(arq, "%c", &c); 
+    char retorno = fscanf(arq, "%c", &c); 
 
-    if(c == ','){
+    if(retorno == EOF || c == ','){
         *vetor = '|';
         return vetor;
     }
@@ -118,7 +129,7 @@ void ler_string_fixa(FILE *arq, char *vetor, int tamanho){
     //retorno serve para verificacao de EOF
     char retorno = fscanf(arq, "%c", &c);
 
-    while(c != ',' && c != '\n' && c != '\r' && retorno != EOF){    
+    while(retorno != EOF && c != ',' && c != '\n' && c != '\r'){    
         num_carac++;
     
         vetor[num_carac-1] = c;
@@ -132,18 +143,20 @@ void ler_string_fixa(FILE *arq, char *vetor, int tamanho){
 
 int ler_numeroArtigo(FILE *arq){
     char c;
-    char *vetor;
     int num_carac = 0;
+    char *vetor;
 
-    fscanf(arq, "%c", &c); 
+    char retorno = fscanf(arq, "%c", &c); 
 
     vetor = malloc(sizeof(char));
-    if(vetor == NULL){
+    if(vetor == NULL){ 
         imprime_erro_alocacao();
     }
 
-    if(c == ',')
+    if(retorno == EOF || c == ','){
+        free(vetor);
         return -1;
+    }
 
     while(c != ','){    
         num_carac++;
@@ -170,14 +183,21 @@ int ler_numeroArtigo(FILE *arq){
         imprime_erro_alocacao();
     }
     vetor[num_carac-1] = '\0';
+    
+    char estatico[num_carac];
+    for(int i=0; i<num_carac; i++)
+        estatico[i] = vetor[i];
 
-    return (atoi(vetor));
+    free(vetor);
+
+    return (atoi(estatico));
    
 }
 
 
 DADOS *LerRegCsv(FILE *arquivoCSV){
     DADOS *registro = criar_registro();
+
 
     fscanf(arquivoCSV, "%d,", &(registro->idCrime));
     ler_string_fixa(arquivoCSV, registro->dataCrime, 10);
@@ -186,36 +206,50 @@ DADOS *LerRegCsv(FILE *arquivoCSV){
     registro->descricaoCrime = ler_ate_virgula(arquivoCSV);
     ler_string_fixa(arquivoCSV, registro->marcaCelular, 12);
     
-    printf("\n\n%d %s %d %s %s %s\n\n", registro->idCrime, registro->dataCrime, 
-    registro->numeroArtigo, registro->lugarCrime, 
-    registro->descricaoCrime, registro->marcaCelular);
+    // printf("\n\n%d %s %d %s %s %s\n\n", registro->idCrime, registro->dataCrime, 
+    // registro->numeroArtigo, registro->lugarCrime, 
+    // registro->descricaoCrime, registro->marcaCelular);
 
     return registro;
 
 }
 
 
-void EscreverRegBin(FILE *arquivoBIN, DADOS *registro){
+void EscreverRegBin(FILE *arquivoBIN, DADOS *registro, CABECALHO *cabecalho){
     
-    fwrite(registro->removido, sizeof(char), 1, arquivoBIN);
-    fwrite(registro->idCrime, sizeof(int), 1, arquivoBIN);
-    fwrite(registro->dataCrime, sizeof(registro->dataCrime), 1, arquivoBIN);
-    fwrite(registro->numeroArtigo, sizeof(int), 1, arquivoBIN);
-    fwrite(registro->marcaCelular, sizeof(registro->marcaCelular), 1, arquivoBIN);
+    fwrite(&(registro->removido), sizeof(char), 1, arquivoBIN);
+    fwrite(&(registro->idCrime), sizeof(int), 1, arquivoBIN);
+    fwrite(&(registro->dataCrime), sizeof(registro->dataCrime), 1, arquivoBIN);
+    fwrite(&(registro->numeroArtigo), sizeof(int), 1, arquivoBIN);
+    fwrite(&(registro->marcaCelular), sizeof(registro->marcaCelular), 1, arquivoBIN);
     
     //tamanho variaveis
     int i;
 
     for(i=0; registro->lugarCrime[i] != '|'; i++)
-        fwrite(registro->lugarCrime[i], sizeof(char), 1, arquivoBIN);
-    fwrite(registro->lugarCrime[i], sizeof(char), 1, arquivoBIN);
+        fwrite(&(registro->lugarCrime[i]), sizeof(char), 1, arquivoBIN);
+    fwrite(&(registro->lugarCrime[i]), sizeof(char), 1, arquivoBIN);
 
     for(i=0; registro->descricaoCrime[i] != '|'; i++)
-        fwrite(registro->descricaoCrime[i], sizeof(char), 1, arquivoBIN);
-    fwrite(registro->descricaoCrime[i], sizeof(char), 1, arquivoBIN);
+        fwrite(&(registro->descricaoCrime[i]), sizeof(char), 1, arquivoBIN);
+    fwrite(&(registro->descricaoCrime[i]), sizeof(char), 1, arquivoBIN);
 
-    fwrite(registro->delimitador, sizeof(char), 1, arquivoBIN);
+    fwrite(&(registro->delimitador), sizeof(char), 1, arquivoBIN);
 
+    //atualiza cabecalho
+    cabecalho->proxByteOffset += sizeof(registro);
+    cabecalho->nroRegArq += 1; 
+
+}
+
+void imprime_cabecalho(FILE *arqBin, CABECALHO *cabecalho){
+    cabecalho->status = '1';
+    
+    fseek(arqBin, 0, SEEK_SET);
+    fwrite(&(cabecalho->status), sizeof(char), 1, arqBin);
+    fwrite(&(cabecalho->proxByteOffset), sizeof(long int), 1, arqBin);
+    fwrite(&(cabecalho->nroRegArq), sizeof(int), 1, arqBin);
+    fwrite(&(cabecalho->nroRegRem), sizeof(int), 1, arqBin);
 }
 
 //================================================================================

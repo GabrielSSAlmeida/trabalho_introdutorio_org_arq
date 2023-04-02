@@ -39,15 +39,21 @@ int main(){
             fscanf(arqCsv, "%*[^\r\n]s"); 
             fscanf(arqCsv, "%*[\r\n]s");
 
-            
+
             while(feof(arqCsv) == 0){
                 DADOS *registro = LerRegCsv(arqCsv);
-                EscreverRegBin(arqBin, registro);
-                free(registro);
+                EscreverRegBin(arqBin, registro, cabecalho_saida);
+                desaloca_registro(registro);
             }
-            
-            fclose(arqBin);
+
+            imprime_cabecalho(arqBin,cabecalho_saida);
+
+            binarioNaTela(arqSaida);
+
+
             fclose(arqCsv);
+            fclose(arqBin);
+            
             desaloca_cabecalho(cabecalho_saida);
             break;
         }
@@ -61,8 +67,6 @@ int main(){
             break;
         }
     }
-
-    //yolo
 
     return 0;
 }

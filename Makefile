@@ -20,4 +20,4 @@ clean:
 	rm *.o programaTrab
 
 run:
-	./programaTrab 
+	valgrind --leak-check=full ./programaTrab
