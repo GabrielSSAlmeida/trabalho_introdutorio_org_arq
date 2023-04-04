@@ -13,8 +13,8 @@
     void DesalocaRegistro(DADOS *registro);
     
     //Funções para a funcionalidade 1
-    DADOS *LerRegCsv(FILE *arquivoCSV, int *flagFuncionou);
-    void EscreverRegBin(FILE *arquivoBIN, DADOS *registro, CABECALHO *cabecalho);
+    DADOS *LerRegistroCsv(FILE *arquivoCSV, int *flagFuncionou);
+    void EscreverRegistroBin(FILE *arquivoBIN, DADOS *registro, CABECALHO *cabecalho);
     void EscreveCabecalho(FILE *arqBin, CABECALHO *cabecalho, char status);
 
     //Funções para a funcionalidade 2

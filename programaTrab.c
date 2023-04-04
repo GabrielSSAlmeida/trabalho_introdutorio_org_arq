@@ -45,12 +45,12 @@ int main(){
             EscreveCabecalho(arqBin,cabecalho_saida, '0');
 
             //leitura dos registros no arquivo CSV
+            int flag;
             while(feof(arqCsv) == 0){
-                int flag;
-                DADOS *registro = LerRegCsv(arqCsv, &flag);
-                if(flag != -1){
-                    EscreverRegBin(arqBin, registro, cabecalho_saida);
-                }
+                DADOS *registro = LerRegistroCsv(arqCsv, &flag);
+                //se não conseguir ler registro, desaloca (trata o erro de uma linha ter só "\n")
+                if(flag != -1)
+                    EscreverRegistroBin(arqBin, registro, cabecalho_saida);
 
                 DesalocaRegistro(registro);
             }

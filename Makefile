@@ -1,11 +1,11 @@
-﻿all: prints_e_erros.o funcionalidade1.o fornecidas.o auxiliares.o programaTrab.o
-	gcc programaTrab.o auxiliares.o fornecidas.o funcionalidade1.o prints_e_erros.o -o programaTrab -g -Wall
+﻿all: prints_e_erros.o registro.o fornecidas.o auxiliares.o programaTrab.o
+	gcc programaTrab.o auxiliares.o fornecidas.o registro.o prints_e_erros.o -o programaTrab -g -Wall
 
 prints_e_erros.o:
 	gcc -c -g prints_e_erros/prints_e_erros.c -o prints_e_erros.o
 
-funcionalidade1.o:
-	gcc -c -g manipulaRegistros/funcionalidade1.c -o funcionalidade1.o
+registro.o:
+	gcc -c -g manipulaRegistros/registro.c -o registro.o
 
 fornecidas.o:
 	gcc -c -g auxiliares/funcoesFornecidas.c -o fornecidas.o
@@ -20,4 +20,4 @@ clean:
 	rm *.o programaTrab
 
 run:
-	valgrind --leak-check=full --track-origins=yes ./programaTrab
+	./programaTrab

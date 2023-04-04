@@ -1,4 +1,5 @@
 #include "registro.h"
+#include "../auxiliares/auxiliar.h"
 #include "../prints_e_erros/prints_e_erros.h"
 
 struct cabecalho{
@@ -23,6 +24,7 @@ struct dados{
 CABECALHO *CabecalhoCriar(void){
     CABECALHO *cabecalho = (CABECALHO*) malloc(sizeof(CABECALHO));
 
+    //sizeof(CABECALHO) não funciona corretamente, então somamos os bytes
     long int somaBytes = sizeof(cabecalho->status) + sizeof(cabecalho->proxByteOffset) + sizeof(cabecalho->nroRegArq) + sizeof(cabecalho->nroRegRem); 
 
     //inicializa cabecalho
@@ -87,85 +89,80 @@ void DesalocaCabecalho(CABECALHO *cabecalho){
 }
 
 char *LerStringVariavel(FILE *arq){
-    char c;
+    char caracter;
     char *vetor = NULL;
-    int num_carac = 0;
+    int numeroCaracteres = 0;
 
+    //aloca e inicializa vetor usada na leitura
     vetor = calloc(1, sizeof(char));
     if(vetor == NULL){
         ErroAlocacao();
     }
 
-    char retorno = fscanf(arq, "%c", &c); 
+    char retorno = fscanf(arq, "%c", &caracter); 
 
     //trata o caso de campo vazio ou fim de arquivo
-    if(retorno == EOF || c == ','){
+    if(retorno == EOF || caracter == ','){
         *vetor = '|';
         return vetor;
     }
 
     //lê até o fim do campo adicionando ao vetor
-    while(c != ','){    
-        num_carac++;
+    while(caracter != ','){    
+        numeroCaracteres++;
     
-        vetor = (char *) realloc(vetor, sizeof(char)* num_carac);
+        vetor = (char *) realloc(vetor, sizeof(char)* numeroCaracteres);
         if (vetor == NULL){
             ErroAlocacao();
         }
-        vetor[num_carac-1] = c;
-
-
+        vetor[numeroCaracteres-1] = caracter;
         
-        if (fscanf(arq, "%c", &c) == EOF)
+        if (fscanf(arq, "%c", &caracter) == EOF)
         {
             break;
         }
-        
     }
 
     //adiciona o "|" no final do campo
-    num_carac++;
+    numeroCaracteres++;
     
-    vetor = (char *) realloc(vetor, sizeof(char)* num_carac);
+    vetor = (char *) realloc(vetor, sizeof(char)* numeroCaracteres);
     if (vetor == NULL)
     {
         ErroAlocacao();
     }
-    vetor[num_carac-1] = '|';  
+    vetor[numeroCaracteres-1] = '|';  
 
     return vetor;    
 }
 
 void LerStringFixa(FILE *arq, char *vetor, int tamanho){
-    char c;
-    int num_carac = 0;
-
-    //preenche vetor com $ para tratar vazios
-    for(int i=0; i<tamanho; i++){
-        vetor[i] = '$';
-    }
+    char caracter;
+    int numeroCaracteres = 0;
 
     //retorno serve para verificação de EOF
-    char retorno = fscanf(arq, "%c", &c);
+    char retorno = fscanf(arq, "%c", &caracter);
 
-    while(retorno != EOF && c != ',' && c != '\n' && c != '\r'){    
-        num_carac++;
+    //lê char por char até fim do campo, adicionando ao vetor
+    while(retorno != EOF && caracter != ',' && caracter != '\n' && caracter != '\r'){    
+        numeroCaracteres++;
     
-        vetor[num_carac-1] = c;
+        vetor[numeroCaracteres-1] = caracter;
         
-        if (fscanf(arq, "%c", &c) == EOF){
+        if (fscanf(arq, "%c", &caracter) == EOF){
             break;
         }
     }
    
 }
 
+//lê um inteiro como string e converte novamente para inteiro (necessária para tratar o caso de um inteiro nulo no Nro do Artigo)
 int LerInteiroVariavel(FILE *arq){
-    char c;
-    int num_carac = 0;
+    char caracter;
+    int numeroCaracteres = 0;
     char *vetor;
 
-    char retorno = fscanf(arq, "%c", &c); 
+    char retorno = fscanf(arq, "%c", &caracter); 
 
     vetor = calloc(1, sizeof(char));
     if(vetor == NULL){ 
@@ -173,73 +170,67 @@ int LerInteiroVariavel(FILE *arq){
     }
 
     //trata campos vazios
-    if(retorno == EOF || c == ','){
+    if(retorno == EOF || caracter == ','){
         free(vetor);
         return -1;
     }
 
     //lê até o fim do campo e adiciona no vetor
-    while(c != ','){    
-        num_carac++;
+    while(caracter != ','){    
+        numeroCaracteres++;
         
-        vetor = (char *) realloc(vetor, sizeof(char) * num_carac);
+        vetor = (char *) realloc(vetor, sizeof(char) * numeroCaracteres);
         if (vetor == NULL){
             ErroAlocacao();
         }
-        vetor[num_carac-1] = c;
+        vetor[numeroCaracteres-1] = caracter;
 
-
-        
-        if (fscanf(arq, "%c", &c) == EOF)
+        if (fscanf(arq, "%c", &caracter) == EOF)
         {
             break;
-        }
-        
+        } 
     }
 
     //adiciona o "\0 na string"
-    num_carac++;
+    numeroCaracteres++;
     
-    vetor = (char *) realloc(vetor, sizeof(char)* num_carac);
+    vetor = (char *) realloc(vetor, sizeof(char)* numeroCaracteres);
     if (vetor == NULL){
         ErroAlocacao();
     }
-    vetor[num_carac-1] = '\0';
+    vetor[numeroCaracteres-1] = '\0';
     
-    //copia a string e converte para um inteiro ao retornar
-    char estatico[num_carac];
-    for(int i=0; i<num_carac; i++)
+    //copia a string e converte para um inteiro ao retornar da função
+    char estatico[numeroCaracteres];
+    for(int i=0; i<numeroCaracteres; i++)
         estatico[i] = vetor[i];
 
     free(vetor);
 
-    return (atoi(estatico));
-   
+    return (atoi(estatico));  
 }
 
 //Essa função faz a leitura de um registro do arquivo CSV
-DADOS *LerRegCsv(FILE *arquivoCSV, int *flagFuncionou){
+DADOS *LerRegistroCsv(FILE *arquivoCSV, int *flagFuncionou){
     DADOS *registro = RegistroCriar();
 
+    //se retornar -1 a leitura não funcionou, ou seja, não há registro
+    *flagFuncionou = fscanf(arquivoCSV, "%d,", &(registro->idCrime));
 
-    int retorno = fscanf(arquivoCSV, "%d,", &(registro->idCrime));
     LerStringFixa(arquivoCSV, registro->dataCrime, 10);
     registro->numeroArtigo = LerInteiroVariavel(arquivoCSV);
     registro->lugarCrime = LerStringVariavel(arquivoCSV);
     registro->descricaoCrime = LerStringVariavel(arquivoCSV);
     LerStringFixa(arquivoCSV, registro->marcaCelular, 12);
-    
-
-    *flagFuncionou = retorno;
 
     return registro;
 }
 
 //Essa função escreve um registro no arquivo binário
-void EscreverRegBin(FILE *arquivoBIN, DADOS *registro, CABECALHO *cabecalho){
+void EscreverRegistroBin(FILE *arquivoBIN, DADOS *registro, CABECALHO *cabecalho){
     long int somaBytes = 0;
 
-    //campos de tamanho fixo
+    //escreve campos de tamanho fixo
     fwrite(&(registro->removido), sizeof(char), 1, arquivoBIN);
     fwrite(&(registro->idCrime), sizeof(int), 1, arquivoBIN);
     fwrite(&(registro->dataCrime), sizeof(registro->dataCrime), 1, arquivoBIN);
@@ -247,9 +238,10 @@ void EscreverRegBin(FILE *arquivoBIN, DADOS *registro, CABECALHO *cabecalho){
     fwrite(&(registro->marcaCelular), sizeof(registro->marcaCelular), 1, arquivoBIN);
     somaBytes+= 31; //Nro de bytes dos campos de tamanho fixo
 
-    //campos de tamanho variável
+    //escreve campos de tamanho variável
     int i;
 
+        //escreve lugar do crime
     for(i=0; registro->lugarCrime[i] != '|'; i++){
         fwrite(&(registro->lugarCrime[i]), sizeof(char), 1, arquivoBIN);
         somaBytes++;
@@ -257,6 +249,7 @@ void EscreverRegBin(FILE *arquivoBIN, DADOS *registro, CABECALHO *cabecalho){
     fwrite(&(registro->lugarCrime[i]), sizeof(char), 1, arquivoBIN);
     somaBytes++;
 
+        //escreve descricao do crime
     for(i=0; registro->descricaoCrime[i] != '|'; i++){
         fwrite(&(registro->descricaoCrime[i]), sizeof(char), 1, arquivoBIN);
         somaBytes++;
@@ -264,19 +257,22 @@ void EscreverRegBin(FILE *arquivoBIN, DADOS *registro, CABECALHO *cabecalho){
     fwrite(&(registro->descricaoCrime[i]), sizeof(char), 1, arquivoBIN);
     somaBytes++;
 
+        //escreve o delimitador do registro
     fwrite(&(registro->delimitador), sizeof(char), 1, arquivoBIN);
     somaBytes++;
 
-
+        //atualiza dados do cabecalho
     (cabecalho->proxByteOffset) += somaBytes;
     (cabecalho->nroRegArq) += 1; 
-
 }
 
 void EscreveCabecalho(FILE *arqBin, CABECALHO *cabecalho, char status){
-    cabecalho->status = '1';
+    //atualiza o status do cabecalho
+    cabecalho->status = status;
     
+    //volta para o inicio do arquivo para atualizar o cabecalho
     fseek(arqBin, 0, SEEK_SET);
+
     fwrite(&(cabecalho->status), sizeof(char), 1, arqBin);
     fwrite(&(cabecalho->proxByteOffset), sizeof(long int), 1, arqBin);
     fwrite(&(cabecalho->nroRegArq), sizeof(int), 1, arqBin);
@@ -293,9 +289,8 @@ void ImprimirBinario(FILE *arqBin){
     int numeroArtigo;
     char marcaCelular[12];
 
-    
-    fread(cabecalho, 17, 1, arqBin); //Ler e ignorar o cabeçalho
-
+    //Ler e ignorar o cabeçalho
+    fread(cabecalho, 17, 1, arqBin); 
     
     while(fread(&removido, 1, 1, arqBin)!=0){
         fread(&idCrime, 4, 1, arqBin);
@@ -303,46 +298,43 @@ void ImprimirBinario(FILE *arqBin){
         fread(&numeroArtigo, 4, 1, arqBin);
         fread(marcaCelular, 12, 1, arqBin);
 
-
-        printf("\n %c %d %d ", removido, idCrime, numeroArtigo);
+        printf("\n %d, ", idCrime);
 
         //imprime data do crime
         for (int i = 0; i < 10; i++){
-                if(dataCrime[i] == '$')
+                if(dataCrime[i] == '$'){
+                    printf("NULO");
                     break;
+                }
+                    
                 printf("%c", dataCrime[i]);
         }
-        printf(" ");
+        printf(", ");
+
+        //imprime Numero do Artigo
+        (numeroArtigo == -1) ? printf("NULO, "):printf("%d, ", numeroArtigo);
+
+        char caracter;
+
+        //imprime cidade
+        ImprimeCampoVariavel(arqBin, &caracter);
+
+        //imprime descricao
+        ImprimeCampoVariavel(arqBin, &caracter);
 
         //imprime marca do celular
         for (int i = 0; i < 12; i++){
-                if(marcaCelular[i] == '$')
-                    break;
-                printf("%c", marcaCelular[i]);
+            if(marcaCelular[i] == '$'){
+                if(i==0)
+                    printf("NULO");
+                break;
+            }    
+                    
+            printf("%c", marcaCelular[i]);
         }
 
-            printf(" ");
-        char charCidade;
-
-        //imprime cidade
-        do{
-            fread(&charCidade, 1, 1, arqBin);
-            if(charCidade == '|')
-                break;
-            printf("%c", charCidade);
-        }while(charCidade != '|');
-
-            printf(" ");
-
-        //imprime descricao
-        do{
-            fread(&charCidade, 1, 1, arqBin);
-            if(charCidade == '|')
-                break;
-            printf("%c", charCidade);
-        }while(charCidade != '|');
-
-        fread(&charCidade, 1, 1, arqBin);
+        //lê o delimitador do registro
+        fread(&caracter, 1, 1, arqBin);
     }
 
     printf("\n");
