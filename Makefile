@@ -20,4 +20,4 @@ clean:
 	rm *.o programaTrab
 
 run:
-	valgrind --leak-check=full --track-origins=yes ./programaTrab < entrada.in
+	valgrind --leak-check=full --track-origins=yes ./programaTrab

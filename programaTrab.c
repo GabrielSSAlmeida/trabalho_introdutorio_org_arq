@@ -14,35 +14,37 @@
 
 
 int main(){
-    int variaMenu;
+    int variavelMenu;
 
-    scanf("%d", &variaMenu);
+    scanf("%d", &variavelMenu);
 
-    switch(variaMenu){
+    switch(variavelMenu){
         case 1:{
             char arqEntrada[32], arqSaida[32];
         
+            //abertura dos arquivos para funcionalidade 1
             RecebeEntradaFunc1(arqEntrada, arqSaida);
-
             
             FILE *arqCsv = fopen(arqEntrada, "r");
             if(arqCsv == NULL)
-                imprime_erro_arquivo();
+                ErroArquivo();
 
             FILE *arqBin = fopen(arqSaida, "wb+");
             if(arqCsv == NULL){
                 fclose(arqCsv);
-                imprime_erro_arquivo();
+                ErroArquivo();
             }
             
-            CABECALHO *cabecalho_saida = criar_cabecalho();
+            CABECALHO *cabecalho_saida = CabecalhoCriar();
 
-            //Ler a primeira linha
+            //Ler e ignorar a primeira linha do arquivo CSV
             fscanf(arqCsv, "%*[^\r\n]s"); 
             fscanf(arqCsv, "%*[\r\n]s");
 
-            imprime_cabecalho(arqBin,cabecalho_saida, '0');
+            //escreve cabecalho no arquivo binario
+            EscreveCabecalho(arqBin,cabecalho_saida, '0');
 
+            //leitura dos registros no arquivo CSV
             while(feof(arqCsv) == 0){
                 int flag;
                 DADOS *registro = LerRegCsv(arqCsv, &flag);
@@ -50,28 +52,31 @@ int main(){
                     EscreverRegBin(arqBin, registro, cabecalho_saida);
                 }
 
-                desaloca_registro(registro);
+                DesalocaRegistro(registro);
             }
 
-            imprime_cabecalho(arqBin,cabecalho_saida, '1');
+            //atualiza o cabecalho
+            EscreveCabecalho(arqBin,cabecalho_saida, '1');
 
-
+            //fecha arquivos
             fclose(arqCsv);
             fclose(arqBin);
             
             binarioNaTela(arqSaida);
 
-            desaloca_cabecalho(cabecalho_saida);
+            DesalocaCabecalho(cabecalho_saida);
             break;
         }
         case 2:{   
             char arqEntrada[32];
 
+            //abre arquivo binario para funcionalidade 2
             RecebeEntradaFunc2(arqEntrada);
             FILE *arqBin = fopen(arqEntrada, "rb");
             if(arqBin == NULL)
-                imprime_erro_arquivo();
+                ErroArquivo();
 
+            //imprime os registro do arquivo binario na tela
             ImprimirBinario(arqBin);
 
             fclose(arqBin);
