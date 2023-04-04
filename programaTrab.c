@@ -13,8 +13,6 @@
 
 
 
-
-
 int main(){
     int variaMenu;
 
@@ -26,19 +24,24 @@ int main(){
         
             RecebeEntradaFunc1(arqEntrada, arqSaida);
 
-            printf("%s %s\n", arqEntrada, arqSaida);
-
-            CABECALHO *cabecalho_saida = criar_cabecalho();
             
             FILE *arqCsv = fopen(arqEntrada, "r");
-            FILE *arqBin = fopen(arqSaida, "wb+");
-            if(arqCsv == NULL || arqBin == NULL)
+            if(arqCsv == NULL)
                 imprime_erro_arquivo();
+
+            FILE *arqBin = fopen(arqSaida, "wb+");
+            if(arqCsv == NULL){
+                fclose(arqCsv);
+                imprime_erro_arquivo();
+            }
             
+            CABECALHO *cabecalho_saida = criar_cabecalho();
+
             //Ler a primeira linha
             fscanf(arqCsv, "%*[^\r\n]s"); 
             fscanf(arqCsv, "%*[\r\n]s");
 
+            imprime_cabecalho(arqBin,cabecalho_saida, '0');
 
             while(feof(arqCsv) == 0){
                 int flag;
@@ -50,8 +53,7 @@ int main(){
                 desaloca_registro(registro);
             }
 
-            imprime_cabecalho(arqBin,cabecalho_saida);
-
+            imprime_cabecalho(arqBin,cabecalho_saida, '1');
 
 
             fclose(arqCsv);
@@ -66,8 +68,13 @@ int main(){
             char arqEntrada[32];
 
             RecebeEntradaFunc2(arqEntrada);
+            FILE *arqBin = fopen(arqEntrada, "rb");
+            if(arqBin == NULL)
+                imprime_erro_arquivo();
 
-            //ImprimirBinario();
+            ImprimirBinario(arqBin);
+
+            fclose(arqBin);
 
             break;
         }

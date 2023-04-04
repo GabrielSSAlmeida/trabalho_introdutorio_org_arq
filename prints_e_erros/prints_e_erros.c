@@ -17,6 +17,6 @@ void imprime_erro_alocacao(void){
 }
 
 void imprime_erro_arquivo(void){
-    printf("Falha no processamento do arquivo.");
+    printf("Falha no processamento do arquivo.\n");
     exit(1);
 }

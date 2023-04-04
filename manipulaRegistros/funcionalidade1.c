@@ -222,9 +222,6 @@ DADOS *LerRegCsv(FILE *arquivoCSV, int *flagFuncionou){
     registro->descricaoCrime = ler_ate_virgula(arquivoCSV);
     ler_string_fixa(arquivoCSV, registro->marcaCelular, 12);
     
-    // printf("\n\n%d %s %d %s %s %s\n\n", registro->idCrime, registro->dataCrime, 
-    // registro->numeroArtigo, registro->lugarCrime, 
-    // registro->descricaoCrime, registro->marcaCelular);
 
     *flagFuncionou = retorno;
 
@@ -235,16 +232,9 @@ DADOS *LerRegCsv(FILE *arquivoCSV, int *flagFuncionou){
 void EscreverRegBin(FILE *arquivoBIN, DADOS *registro, CABECALHO *cabecalho){
     long int somaBytes = 0;
 
-    printf("%c\n", *(&(registro->removido)));
-    printf("%d\n", *(&(registro->idCrime)));
-    printf("%s\n", *(&(registro->dataCrime)));
-    printf("%d\n", *(&(registro->numeroArtigo)));
-    printf("%s\n", *(&(registro->marcaCelular)));
-    
 
-    int retorno = fwrite(&(registro->removido), sizeof(char), 1, arquivoBIN);
-    printf("RETORNO: %d", retorno);
-    printf("\n\n\n");
+
+    fwrite(&(registro->removido), sizeof(char), 1, arquivoBIN);
     fwrite(&(registro->idCrime), sizeof(int), 1, arquivoBIN);
     fwrite(&(registro->dataCrime), sizeof(registro->dataCrime), 1, arquivoBIN);
     fwrite(&(registro->numeroArtigo), sizeof(int), 1, arquivoBIN);
@@ -271,25 +261,78 @@ void EscreverRegBin(FILE *arquivoBIN, DADOS *registro, CABECALHO *cabecalho){
     fwrite(&(registro->delimitador), sizeof(char), 1, arquivoBIN);
     somaBytes++;
 
-    //atualiza cabecalho
-    //printf("\nBYTE OFFSET ANTES: %ld\n", cabecalho->proxByteOffset);
-    //printf("\nSOMA BYTE: %ld\n", somaBytes);
+
     (cabecalho->proxByteOffset) += somaBytes;
-    //printf("\nBYTE OFFSET: %ld\n", cabecalho->proxByteOffset);
     (cabecalho->nroRegArq) += 1; 
 
 }
 
-void imprime_cabecalho(FILE *arqBin, CABECALHO *cabecalho){
+void imprime_cabecalho(FILE *arqBin, CABECALHO *cabecalho, char status){
     cabecalho->status = '1';
 
-    //printf("\nBYTE OFFSET AO FINAL DE TUDO: %ld\n", cabecalho->proxByteOffset);
     
     fseek(arqBin, 0, SEEK_SET);
     fwrite(&(cabecalho->status), sizeof(char), 1, arqBin);
     fwrite(&(cabecalho->proxByteOffset), sizeof(long int), 1, arqBin);
     fwrite(&(cabecalho->nroRegArq), sizeof(int), 1, arqBin);
     fwrite(&(cabecalho->nroRegRem), sizeof(int), 1, arqBin);
+}
+
+
+void ImprimirBinario(FILE *arqBin){
+    char cabecalho[17];
+
+    char removido;
+    int idCrime;
+    char dataCrime[10];
+    int numeroArtigo;
+    char marcaCelular[12];
+
+    
+    fread(cabecalho, 17, 1, arqBin); //Ler e ignorar o cabeçalho
+
+    
+
+    fread(&removido, 1, 1, arqBin);
+    fread(&idCrime, 4, 1, arqBin);
+    fread(dataCrime, 10, 1, arqBin);
+    fread(&numeroArtigo, 4, 1, arqBin);
+    fread(marcaCelular, 12, 1, arqBin);
+
+
+   printf("\n %c %d %d ", removido, idCrime, numeroArtigo);
+
+   for (int i = 0; i < 10; i++){
+        if(dataCrime[i] == '$')
+            break;
+        printf("%c", dataCrime[i]);
+   }
+   printf(" ");
+
+   for (int i = 0; i < 12; i++){
+        if(marcaCelular[i] == '$')
+            break;
+        printf("%c", marcaCelular[i]);
+   }
+
+    printf(" ");
+   char charCidade;
+
+   do{
+    fread(&charCidade, 1, 1, arqBin);
+    if(charCidade == '|')
+        break;
+    printf("%c", charCidade);
+   }while(charCidade != '|');
+
+    printf(" ");
+   do{
+    fread(&charCidade, 1, 1, arqBin);
+    if(charCidade == '|')
+        break;
+    printf("%c", charCidade);
+   }while(charCidade != '|');
+   
 }
 
 //================================================================================

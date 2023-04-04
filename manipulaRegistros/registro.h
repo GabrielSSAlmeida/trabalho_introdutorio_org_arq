@@ -16,7 +16,8 @@
     //Funções para a funcionalidade 1
     DADOS *LerRegCsv(FILE *arquivoCSV, int *flagFuncionou);
     void EscreverRegBin(FILE *arquivoBIN, DADOS *registro, CABECALHO *cabecalho);
-    void imprime_cabecalho(FILE *arqBin, CABECALHO *cabecalho);
+    void imprime_cabecalho(FILE *arqBin, CABECALHO *cabecalho, char status);
+    void ImprimirBinario(FILE *arqBin);
 
 
 #endif
