@@ -344,6 +344,8 @@ void ImprimirBinario(FILE *arqBin){
 
         fread(&charCidade, 1, 1, arqBin);
     }
+
+    printf("\n");
 }
 
 //================================================================================
