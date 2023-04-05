@@ -26,13 +26,16 @@ int main(){
             RecebeEntradaFunc1(arqEntrada, arqSaida);
             
             FILE *arqCsv = fopen(arqEntrada, "r");
-            if(arqCsv == NULL)
+            if(arqCsv == NULL){
                 ErroArquivo();
+                break;
+            }   
 
             FILE *arqBin = fopen(arqSaida, "wb+");
             if(arqCsv == NULL){
                 fclose(arqCsv);
                 ErroArquivo();
+                break;
             }
             
             CABECALHO *cabecalho_saida = CabecalhoCriar();
@@ -73,8 +76,10 @@ int main(){
             //abre arquivo binario para funcionalidade 2
             RecebeEntradaFunc2(arqEntrada);
             FILE *arqBin = fopen(arqEntrada, "rb");
-            if(arqBin == NULL)
+            if(arqBin == NULL){
                 ErroArquivo();
+                break;
+            }
 
             //imprime os registro do arquivo binario na tela
             ImprimirBinario(arqBin);

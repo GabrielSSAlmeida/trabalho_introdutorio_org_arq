@@ -9,8 +9,6 @@
     void ErroAlocacao(void); //Imprime e exit(1)
     void ErroDesalocar(void);
     void ErroArquivo(void);
+    void ErroRegistro(void);
     
-
-
-
 #endif

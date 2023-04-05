@@ -12,5 +12,6 @@
     void RecebeEntradaFunc1(char str1[], char str2[]);
     void RecebeEntradaFunc2(char str1[]);
     void ImprimeCampoVariavel(FILE *arqBin, char *caracter);
+    void LerCampoVariavel(FILE *arqBin, char *caracter);
 
 #endif

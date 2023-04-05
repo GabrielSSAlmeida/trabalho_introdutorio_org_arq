@@ -25,3 +25,14 @@ void ImprimeCampoVariavel(FILE *arqBin, char *caracter){
         
     printf(", ");
 }
+
+//Serve para avançar o cursor nos campos de tamanho variavel sem imprimir
+void LerCampoVariavel(FILE *arqBin, char *caracter){
+    fread(caracter, 1, 1, arqBin);
+    do{
+        if(*caracter == '|'){
+            break;
+        }
+        fread(caracter, 1, 1, arqBin);
+    }while(*caracter != '|');
+}

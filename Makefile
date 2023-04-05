@@ -1,4 +1,4 @@
-﻿all: prints_e_erros.o registro.o fornecidas.o auxiliares.o programaTrab.o
+all: prints_e_erros.o registro.o fornecidas.o auxiliares.o programaTrab.o
 	gcc programaTrab.o auxiliares.o fornecidas.o registro.o prints_e_erros.o -o programaTrab -g -Wall
 
 prints_e_erros.o:

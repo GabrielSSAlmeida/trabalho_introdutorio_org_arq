@@ -281,7 +281,10 @@ void EscreveCabecalho(FILE *arqBin, CABECALHO *cabecalho, char status){
 
 //Essa função imprime os registros do arquivo binário na tela
 void ImprimirBinario(FILE *arqBin){
-    char cabecalho[17];
+    char status;
+    long int proxByteOffset;  
+    int nroRegArq;                           
+    int nroRegRem;
 
     char removido;
     int idCrime;
@@ -290,54 +293,75 @@ void ImprimirBinario(FILE *arqBin){
     char marcaCelular[12];
 
     //Ler e ignorar o cabeçalho
-    fread(cabecalho, 17, 1, arqBin); 
+    fread(&status, sizeof(char), 1, arqBin); 
+    fread(&proxByteOffset, sizeof(long int), 1, arqBin); 
+    fread(&nroRegArq, sizeof(int), 1, arqBin); 
+    fread(&nroRegRem, sizeof(int), 1, arqBin); 
     
-    while(fread(&removido, 1, 1, arqBin)!=0){
+    if(status == '0'){
+        ErroArquivo();
+        return;
+    }
+
+    int i;
+    for(i=0; fread(&removido, 1, 1, arqBin)!=0; i++){
+        
         fread(&idCrime, 4, 1, arqBin);
         fread(dataCrime, 10, 1, arqBin);
         fread(&numeroArtigo, 4, 1, arqBin);
         fread(marcaCelular, 12, 1, arqBin);
 
-        printf("\n %d, ", idCrime);
-
-        //imprime data do crime
-        for (int i = 0; i < 10; i++){
-                if(dataCrime[i] == '$'){
-                    printf("NULO");
-                    break;
-                }
-                    
-                printf("%c", dataCrime[i]);
-        }
-        printf(", ");
-
-        //imprime Numero do Artigo
-        (numeroArtigo == -1) ? printf("NULO, "):printf("%d, ", numeroArtigo);
-
         char caracter;
+        
+        if(removido == '0'){
+            printf("%d, ", idCrime);
 
-        //imprime cidade
-        ImprimeCampoVariavel(arqBin, &caracter);
+            //imprime data do crime
+            for (int i = 0; i < 10; i++){
+                    if(dataCrime[i] == '$'){
+                        printf("NULO");
+                        break;
+                    }
+                        
+                    printf("%c", dataCrime[i]);
+            }
+            printf(", ");
 
-        //imprime descricao
-        ImprimeCampoVariavel(arqBin, &caracter);
+            //imprime Numero do Artigo
+            (numeroArtigo == -1) ? printf("NULO, "):printf("%d, ", numeroArtigo);
 
-        //imprime marca do celular
-        for (int i = 0; i < 12; i++){
-            if(marcaCelular[i] == '$'){
-                if(i==0)
-                    printf("NULO");
-                break;
-            }    
-                    
-            printf("%c", marcaCelular[i]);
+            //imprime cidade
+            ImprimeCampoVariavel(arqBin, &caracter);
+
+            //imprime descricao
+            ImprimeCampoVariavel(arqBin, &caracter);
+
+            //imprime marca do celular
+            for (int i = 0; i < 12; i++){
+                if(marcaCelular[i] == '$'){
+                    if(i==0)
+                        printf("NULO");
+                    break;
+                }    
+                        
+                printf("%c", marcaCelular[i]);
+            }
+
+            printf("\n");
+
+        }else{
+            //Serve para avançar o cursor nos campos de tamanho variavel sem imprimir
+            LerCampoVariavel(arqBin, &caracter);
+            LerCampoVariavel(arqBin, &caracter);
         }
 
         //lê o delimitador do registro
         fread(&caracter, 1, 1, arqBin);
+         
     }
+    if(i==0)
+        ErroRegistro();
 
-    printf("\n");
 }
 
 //================================================================================

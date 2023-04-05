@@ -18,5 +18,9 @@ void ErroAlocacao(void){
 
 void ErroArquivo(void){
     printf("Falha no processamento do arquivo.\n");
-    exit(1);
+    //exit(1);
+}
+
+void ErroRegistro(void){
+    printf("Registro inexistente.\n");
 }
