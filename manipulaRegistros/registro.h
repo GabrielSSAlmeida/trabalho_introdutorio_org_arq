@@ -7,7 +7,7 @@
 
     typedef struct dados DADOS;
 
-    int LerRegistroBinario(FILE *arqBin, DADOS *registro);
+    int LerCamposFixosRegBinario(FILE *arqBin, DADOS *registro);
     void DesalocaRegistro(DADOS *registro);
     
     //Funções para a funcionalidade 1
@@ -17,6 +17,7 @@
 
     //Função para a funcionalidade 2
     bool ImprimirBinario(FILE *arqBin);
+    void ImprimeRegistroBinario(FILE *arqBin, DADOS *registro);
 
 
 #endif

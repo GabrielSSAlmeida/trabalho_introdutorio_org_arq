@@ -111,7 +111,7 @@ void EscreverRegistroBin(FILE *arquivoBIN, DADOS *registro, CABECALHO *cabecalho
 }
 
 
-int LerRegistroBinario(FILE *arqBin, DADOS *registro){
+int LerCamposFixosRegBinario(FILE *arqBin, DADOS *registro){
     int aux = fread(&(registro->removido), 1, 1, arqBin);
     if(registro->removido == '1'){
         return aux;
@@ -120,57 +120,121 @@ int LerRegistroBinario(FILE *arqBin, DADOS *registro){
     fread((registro->dataCrime), 10, 1, arqBin);
     fread(&(registro->numeroArtigo), 4, 1, arqBin);
     fread((registro->marcaCelular), 12, 1, arqBin);
-    fread(&(registro->delimitador), 1, 1, arqBin);
+    //fread(&(registro->delimitador), 1, 1, arqBin);
 
     return aux;
 }
 
 
 //Essa função imprime os registros do arquivo binário na tela
+// bool ImprimirBinario(FILE *arqBin){
+//     CABECALHO *cabecalho_aux = CabecalhoCriar();
+//     DADOS *registro_aux = RegistroCriar();
+
+//     LeCabecalhoDoArqBinario(cabecalho_aux, arqBin);
+    
+//     if(!VerificaStatus(cabecalho_aux)) return false;
+
+//     //Se flag == 0 não conseguiu ler o id(acabou a leitura do arquivo)
+//     int flag = LerCamposFixosRegBinario(arqBin, registro_aux);
+//     int i;
+//     for(i=0; flag !=0 ; i++){
+        
+//         if(registro_aux->removido == '0'){
+//             //imprime o id do crime
+//             printf("%d, ", registro_aux->idCrime);
+
+//             ImprimeDataCrime(registro_aux->dataCrime);
+
+//             //imprime Numero do Artigo
+//             (registro_aux->numeroArtigo == -1) ? printf("NULO, "):printf("%d, ", registro_aux->numeroArtigo);
+
+//             //imprime cidade
+//             ImprimeCampoVariavel(arqBin);
+
+//             //imprime descricao
+//             ImprimeCampoVariavel(arqBin);
+
+//             ImprimeMarcaCelular(registro_aux->marcaCelular);
+
+//         }else{
+//             char caracter = ' ';
+//             //Serve para avançar o cursor nos campos de tamanho variavel sem imprimir
+//             LerCampoVariavel(arqBin);
+//             LerCampoVariavel(arqBin);
+//             fread(&caracter, 1, 1, arqBin);
+//         }
+
+//         LerCamposFixosRegBinario(arqBin, registro_aux);
+         
+//     }
+//     if(i==0)
+//         ErroRegistro();
+
+//     return true;
+// }
+
+void ImprimeRegistroBinario(FILE *arqBin, DADOS *registro){
+    if(registro->removido == '0'){
+        //imprime o id do crime
+        printf("%d, ", registro->idCrime);
+
+        //imprime data do crime
+        ImprimeDataCrime(registro->dataCrime);
+
+        //imprime Numero do Artigo
+        (registro->numeroArtigo == -1) ? printf("NULO, "):printf("%d, ", registro->numeroArtigo);
+
+        //imprime cidade
+        ImprimeCampoVariavel(arqBin);
+
+        //imprime descricao
+        ImprimeCampoVariavel(arqBin);
+
+        //imprime marca do celular
+        ImprimeMarcaCelular(registro->marcaCelular);
+
+    }else{
+        //Serve para avançar o cursor nos campos de tamanho variavel sem imprimir
+        LerCampoVariavel(arqBin);
+        LerCampoVariavel(arqBin);
+    }
+}
+
 bool ImprimirBinario(FILE *arqBin){
+    //alocacao de auxiliares
     CABECALHO *cabecalho_aux = CabecalhoCriar();
     DADOS *registro_aux = RegistroCriar();
-
+    
+    //le o cabecalho do arquivo binario
     LeCabecalhoDoArqBinario(cabecalho_aux, arqBin);
     
+    //verifica se o status do arquivo é consistente
     if(!VerificaStatus(cabecalho_aux)) return false;
 
-    //Se flag == 0 não conseguiu ler o id(acabou a leitura do arquivo)
-    int flag = LerRegistroBinario(arqBin, registro_aux);
+
+    int flag = LerCamposFixosRegBinario(arqBin, registro_aux);
+
     int i;
-    for(i=0; flag !=0 ; i++){
+    for(i=0; flag!=0; i++){
         
-        if(registro_aux->removido == '0'){
-            printf("%d, ", registro_aux->idCrime);
+        ImprimeRegistroBinario(arqBin, registro_aux);
 
-            ImprimeDataCrime(registro_aux->dataCrime);
+        //lê o delimitador do registro
+        fread(&(registro_aux->delimitador), 1, 1, arqBin);
 
-            //imprime Numero do Artigo
-            (registro_aux->numeroArtigo == -1) ? printf("NULO, "):printf("%d, ", registro_aux->numeroArtigo);
-
-            //imprime cidade
-            ImprimeCampoVariavel(arqBin);
-
-            //imprime descricao
-            ImprimeCampoVariavel(arqBin);
-
-            ImprimeMarcaCelular(registro_aux->marcaCelular);
-
-        }else{
-            char caracter = ' ';
-            //Serve para avançar o cursor nos campos de tamanho variavel sem imprimir
-            LerCampoVariavel(arqBin);
-            LerCampoVariavel(arqBin);
-            fread(&caracter, 1, 1, arqBin);
-        }
-
-        LerRegistroBinario(arqBin, registro_aux);
+        flag = LerCamposFixosRegBinario(arqBin, registro_aux);
          
     }
-    if(i==0)
-        ErroRegistro();
 
+    //se nao existem registros no arquivo
+    if(i==0) ErroRegistro();
+
+    //desaloca os auxiliares criados
+    DesalocaCabecalho(cabecalho_aux);
+    DesalocaRegistro(registro_aux);
     return true;
+
 }
 
 //================================================================================
