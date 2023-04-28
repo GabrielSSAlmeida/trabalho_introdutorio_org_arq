@@ -2,6 +2,10 @@
     "files.associations": {
         "auxiliar.h": "c",
         "stdlib.h": "c",
-        "cstdio": "c"
+        "cstdio": "c",
+        "arquivos.h": "c",
+        "utils.h": "c",
+        "funcionalidades.h": "c",
+        "prints_e_erros.h": "c"
     }
 }

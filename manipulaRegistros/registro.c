@@ -1,13 +1,6 @@
 #include "registro.h"
-#include "../auxiliares/auxiliar.h"
+#include "../utils/utils.h"
 #include "../prints_e_erros/prints_e_erros.h"
-
-struct cabecalho{
-    char status;                    //indica consistencia do arquivo (0 - inconsistente, 1 - consistente) 
-    long int proxByteOffset;        //indica o valor do proximo ByteOffset 
-    int nroRegArq;                  // armazena o numero de registros no arquivo (total, inclusive removidos)                
-    int nroRegRem;                  // armazena o numero de registros removidos
-};
 
 struct dados{
     char removido;                  //indica se a struct foi removida (1 = removido, 0 = nao)
@@ -20,26 +13,7 @@ struct dados{
     char delimitador;               //delimitador do fim da struct
 };
 
-//================================================================================
-CABECALHO *CabecalhoCriar(void){
-    CABECALHO *cabecalho = (CABECALHO*) malloc(sizeof(CABECALHO));
 
-    //sizeof(CABECALHO) não funciona corretamente, então somamos os bytes
-    long int somaBytes = sizeof(cabecalho->status) + sizeof(cabecalho->proxByteOffset) + sizeof(cabecalho->nroRegArq) + sizeof(cabecalho->nroRegRem); 
-
-    //inicializa cabecalho
-    if(cabecalho != NULL){
-        cabecalho->status = '0';
-        cabecalho->proxByteOffset = somaBytes;
-        cabecalho->nroRegArq = 0;
-        cabecalho->nroRegRem = 0;
-
-    }
-    else{
-        ErroAlocacao();
-    }
-    return cabecalho;
-}
 
 DADOS *RegistroCriar(void){
     DADOS *registro = (DADOS*) calloc(1, sizeof(DADOS));
@@ -79,136 +53,6 @@ void DesalocaRegistro(DADOS *registro){
     }
 }
 
-void DesalocaCabecalho(CABECALHO *cabecalho){
-    if(cabecalho != NULL){
-        free(cabecalho);
-    }
-    else{
-        ErroDesalocar();
-    }
-}
-
-char *LerStringVariavel(FILE *arq){
-    char caracter;
-    char *vetor = NULL;
-    int numeroCaracteres = 0;
-
-    //aloca e inicializa vetor usada na leitura
-    vetor = calloc(1, sizeof(char));
-    if(vetor == NULL){
-        ErroAlocacao();
-    }
-
-    char retorno = fscanf(arq, "%c", &caracter); 
-
-    //trata o caso de campo vazio ou fim de arquivo
-    if(retorno == EOF || caracter == ','){
-        *vetor = '|';
-        return vetor;
-    }
-
-    //lê até o fim do campo adicionando ao vetor
-    while(caracter != ','){    
-        numeroCaracteres++;
-    
-        vetor = (char *) realloc(vetor, sizeof(char)* numeroCaracteres);
-        if (vetor == NULL){
-            ErroAlocacao();
-        }
-        vetor[numeroCaracteres-1] = caracter;
-        
-        if (fscanf(arq, "%c", &caracter) == EOF)
-        {
-            break;
-        }
-    }
-
-    //adiciona o "|" no final do campo
-    numeroCaracteres++;
-    
-    vetor = (char *) realloc(vetor, sizeof(char)* numeroCaracteres);
-    if (vetor == NULL)
-    {
-        ErroAlocacao();
-    }
-    vetor[numeroCaracteres-1] = '|';  
-
-    return vetor;    
-}
-
-void LerStringFixa(FILE *arq, char *vetor, int tamanho){
-    char caracter;
-    int numeroCaracteres = 0;
-
-    //retorno serve para verificação de EOF
-    char retorno = fscanf(arq, "%c", &caracter);
-
-    //lê char por char até fim do campo, adicionando ao vetor
-    while(retorno != EOF && caracter != ',' && caracter != '\n' && caracter != '\r'){    
-        numeroCaracteres++;
-    
-        vetor[numeroCaracteres-1] = caracter;
-        
-        if (fscanf(arq, "%c", &caracter) == EOF){
-            break;
-        }
-    }
-   
-}
-
-//lê um inteiro como string e converte novamente para inteiro (necessária para tratar o caso de um inteiro nulo no Nro do Artigo)
-int LerInteiroVariavel(FILE *arq){
-    char caracter;
-    int numeroCaracteres = 0;
-    char *vetor;
-
-    char retorno = fscanf(arq, "%c", &caracter); 
-
-    vetor = calloc(1, sizeof(char));
-    if(vetor == NULL){ 
-        ErroAlocacao();
-    }
-
-    //trata campos vazios
-    if(retorno == EOF || caracter == ','){
-        free(vetor);
-        return -1;
-    }
-
-    //lê até o fim do campo e adiciona no vetor
-    while(caracter != ','){    
-        numeroCaracteres++;
-        
-        vetor = (char *) realloc(vetor, sizeof(char) * numeroCaracteres);
-        if (vetor == NULL){
-            ErroAlocacao();
-        }
-        vetor[numeroCaracteres-1] = caracter;
-
-        if (fscanf(arq, "%c", &caracter) == EOF)
-        {
-            break;
-        } 
-    }
-
-    //adiciona o "\0 na string"
-    numeroCaracteres++;
-    
-    vetor = (char *) realloc(vetor, sizeof(char)* numeroCaracteres);
-    if (vetor == NULL){
-        ErroAlocacao();
-    }
-    vetor[numeroCaracteres-1] = '\0';
-    
-    //copia a string e converte para um inteiro ao retornar da função
-    char estatico[numeroCaracteres];
-    for(int i=0; i<numeroCaracteres; i++)
-        estatico[i] = vetor[i];
-
-    free(vetor);
-
-    return (atoi(estatico));  
-}
 
 //Essa função faz a leitura de um registro do arquivo CSV
 DADOS *LerRegistroCsv(FILE *arquivoCSV, int *flagFuncionou){
@@ -262,106 +106,71 @@ void EscreverRegistroBin(FILE *arquivoBIN, DADOS *registro, CABECALHO *cabecalho
     somaBytes++;
 
         //atualiza dados do cabecalho
-    (cabecalho->proxByteOffset) += somaBytes;
-    (cabecalho->nroRegArq) += 1; 
+    AtualizaByteOffset(cabecalho, GetByteOffset(cabecalho)+somaBytes); 
+    AtualizaNroRegArq(cabecalho, GetNroRegArq(cabecalho)+1);
 }
 
-void EscreveCabecalho(FILE *arqBin, CABECALHO *cabecalho, char status){
-    //atualiza o status do cabecalho
-    cabecalho->status = status;
-    
-    //volta para o inicio do arquivo para atualizar o cabecalho
-    fseek(arqBin, 0, SEEK_SET);
 
-    fwrite(&(cabecalho->status), sizeof(char), 1, arqBin);
-    fwrite(&(cabecalho->proxByteOffset), sizeof(long int), 1, arqBin);
-    fwrite(&(cabecalho->nroRegArq), sizeof(int), 1, arqBin);
-    fwrite(&(cabecalho->nroRegRem), sizeof(int), 1, arqBin);
+int LerRegistroBinario(FILE *arqBin, DADOS *registro){
+    int aux = fread(&(registro->removido), 1, 1, arqBin);
+    if(registro->removido == '1'){
+        return aux;
+    }
+    fread(&(registro->idCrime), 4, 1, arqBin);
+    fread((registro->dataCrime), 10, 1, arqBin);
+    fread(&(registro->numeroArtigo), 4, 1, arqBin);
+    fread((registro->marcaCelular), 12, 1, arqBin);
+    fread(&(registro->delimitador), 1, 1, arqBin);
+
+    return aux;
 }
+
 
 //Essa função imprime os registros do arquivo binário na tela
-void ImprimirBinario(FILE *arqBin){
-    char status;
-    long int proxByteOffset;  
-    int nroRegArq;                           
-    int nroRegRem;
+bool ImprimirBinario(FILE *arqBin){
+    CABECALHO *cabecalho_aux = CabecalhoCriar();
+    DADOS *registro_aux = RegistroCriar();
 
-    char removido;
-    int idCrime;
-    char dataCrime[10];
-    int numeroArtigo;
-    char marcaCelular[12];
-
-    //Ler e ignorar o cabeçalho
-    fread(&status, sizeof(char), 1, arqBin); 
-    fread(&proxByteOffset, sizeof(long int), 1, arqBin); 
-    fread(&nroRegArq, sizeof(int), 1, arqBin); 
-    fread(&nroRegRem, sizeof(int), 1, arqBin); 
+    LeCabecalhoDoArqBinario(cabecalho_aux, arqBin);
     
-    if(status == '0'){
-        ErroArquivo();
-        return;
-    }
+    if(!VerificaStatus(cabecalho_aux)) return false;
 
+    //Se flag == 0 não conseguiu ler o id(acabou a leitura do arquivo)
+    int flag = LerRegistroBinario(arqBin, registro_aux);
     int i;
-    for(i=0; fread(&removido, 1, 1, arqBin)!=0; i++){
+    for(i=0; flag !=0 ; i++){
         
-        fread(&idCrime, 4, 1, arqBin);
-        fread(dataCrime, 10, 1, arqBin);
-        fread(&numeroArtigo, 4, 1, arqBin);
-        fread(marcaCelular, 12, 1, arqBin);
+        if(registro_aux->removido == '0'){
+            printf("%d, ", registro_aux->idCrime);
 
-        char caracter;
-        
-        if(removido == '0'){
-            printf("%d, ", idCrime);
-
-            //imprime data do crime
-            for (int i = 0; i < 10; i++){
-                    if(dataCrime[i] == '$'){
-                        printf("NULO");
-                        break;
-                    }
-                        
-                    printf("%c", dataCrime[i]);
-            }
-            printf(", ");
+            ImprimeDataCrime(registro_aux->dataCrime);
 
             //imprime Numero do Artigo
-            (numeroArtigo == -1) ? printf("NULO, "):printf("%d, ", numeroArtigo);
+            (registro_aux->numeroArtigo == -1) ? printf("NULO, "):printf("%d, ", registro_aux->numeroArtigo);
 
             //imprime cidade
-            ImprimeCampoVariavel(arqBin, &caracter);
+            ImprimeCampoVariavel(arqBin);
 
             //imprime descricao
-            ImprimeCampoVariavel(arqBin, &caracter);
+            ImprimeCampoVariavel(arqBin);
 
-            //imprime marca do celular
-            for (int i = 0; i < 12; i++){
-                if(marcaCelular[i] == '$'){
-                    if(i==0)
-                        printf("NULO");
-                    break;
-                }    
-                        
-                printf("%c", marcaCelular[i]);
-            }
-
-            printf("\n");
+            ImprimeMarcaCelular(registro_aux->marcaCelular);
 
         }else{
+            char caracter = ' ';
             //Serve para avançar o cursor nos campos de tamanho variavel sem imprimir
-            LerCampoVariavel(arqBin, &caracter);
-            LerCampoVariavel(arqBin, &caracter);
+            LerCampoVariavel(arqBin);
+            LerCampoVariavel(arqBin);
+            fread(&caracter, 1, 1, arqBin);
         }
 
-        //lê o delimitador do registro
-        fread(&caracter, 1, 1, arqBin);
+        LerRegistroBinario(arqBin, registro_aux);
          
     }
     if(i==0)
         ErroRegistro();
 
+    return true;
 }
 
 //================================================================================

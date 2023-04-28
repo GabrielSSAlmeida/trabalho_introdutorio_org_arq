@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "auxiliar.h"
+#include "utils.h"
 
 void readline(char *string) {
     char c = 0;

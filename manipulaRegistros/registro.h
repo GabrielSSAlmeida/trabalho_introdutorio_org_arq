@@ -3,22 +3,20 @@
     #include <stdio.h>
     #include <stdlib.h>
     #include <string.h>
+    #include "../cabecalho/cabecalho.h"
 
-    typedef struct cabecalho CABECALHO;
     typedef struct dados DADOS;
 
-    //Funções para o cabecalho
-    CABECALHO *CabecalhoCriar(void);
-    void DesalocaCabecalho(CABECALHO *cabecalho);
+    int LerRegistroBinario(FILE *arqBin, DADOS *registro);
     void DesalocaRegistro(DADOS *registro);
     
     //Funções para a funcionalidade 1
     DADOS *LerRegistroCsv(FILE *arquivoCSV, int *flagFuncionou);
     void EscreverRegistroBin(FILE *arquivoBIN, DADOS *registro, CABECALHO *cabecalho);
-    void EscreveCabecalho(FILE *arqBin, CABECALHO *cabecalho, char status);
+   
 
-    //Funções para a funcionalidade 2
-    void ImprimirBinario(FILE *arqBin);
+    //Função para a funcionalidade 2
+    bool ImprimirBinario(FILE *arqBin);
 
 
 #endif
