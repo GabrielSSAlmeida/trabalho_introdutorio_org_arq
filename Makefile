@@ -29,4 +29,4 @@ clean:
 	rm *.o programaTrab
 
 run:
-	valgrind ./programaTrab < 5.in
+	valgrind --leak-check=full --track-origins=yes ./programaTrab < 6.in > saida.out

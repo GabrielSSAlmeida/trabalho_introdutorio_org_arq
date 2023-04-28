@@ -17,7 +17,7 @@
 
     //Função para a funcionalidade 2
     bool ImprimirBinario(FILE *arqBin);
-    void ImprimeRegistroBinario(FILE *arqBin, DADOS *registro);
+    void ImprimeRegistroBinario(DADOS *registro);
 
 
 #endif
