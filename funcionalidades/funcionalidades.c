@@ -6,9 +6,6 @@ bool funcionalidade1(){
     FILE *arqCsv;
     FILE *arqBin;
 
-    //Cria o cabecalho que será usado no arquivo binario
-    CABECALHO *cabecalho_saida = CabecalhoCriar();
-
     //abertura dos arquivos para funcionalidade 1
     RecebeEntradaFunc1(arqEntrada, arqSaida);
     
@@ -16,6 +13,9 @@ bool funcionalidade1(){
     //Se a abertura falhar para o código 
     if(!AbreArquivo(&arqCsv, arqEntrada, "r", NULL)) return false;
     if(!AbreArquivo(&arqBin, arqSaida, "wb+", arqCsv, NULL)) return false;
+
+    //Cria o cabecalho que será usado no arquivo binario
+    CABECALHO *cabecalho_saida = CabecalhoCriar();
     
     //Ler e ignorar a primeira linha do arquivo CSV
     IgnoraLinha(arqCsv);
@@ -57,7 +57,10 @@ bool funcionalidade2(){
     if(!AbreArquivo(&arqBin, arqEntrada, "rb", NULL)) return false;
 
     //imprime os registro do arquivo binario na tela
-    if(!ImprimirBinario(arqBin)) return false;
+    if(!ImprimirBinario(arqBin)){
+        fclose(arqBin);
+        return false;
+    }
 
     fclose(arqBin);
 

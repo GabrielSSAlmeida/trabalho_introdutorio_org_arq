@@ -45,7 +45,7 @@ void ImprimeDataCrime(char dataCrime[]){
 
 
 //imprime campos variaveis na funcionalidade 2
-void ImprimeCampoVariavel(FILE *arqBin){
+void ImprimeCampoVariavel(FILE *arqBin, int id){
     char caracter = ' ';
     fread(&caracter, 1, 1, arqBin);
     do{
@@ -61,7 +61,10 @@ void ImprimeCampoVariavel(FILE *arqBin){
 }
 
 //Serve para avançar o cursor nos campos de tamanho variavel sem imprimir
-void LerCampoVariavel(FILE *arqBin){
+void LerCampoVariavel(FILE *arqBin, int id){
+    if(id == 636){
+        printf(" ");
+    }
     char caracter = ' ';
     fread(&caracter, 1, 1, arqBin);
     do{

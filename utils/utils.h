@@ -11,10 +11,10 @@
     //Funções criadas
     void RecebeEntradaFunc1(char str1[], char str2[]);
     void RecebeEntradaFunc2(char str1[]);
-    void ImprimeCampoVariavel(FILE *arqBin);
+    void ImprimeCampoVariavel(FILE *arqBin, int id);
     void ImprimeMarcaCelular(char marcaCelular[]);
     void ImprimeDataCrime(char dataCrime[]);
-    void LerCampoVariavel(FILE *arqBin);
+    void LerCampoVariavel(FILE *arqBin, int id);
 
 
     char *LerStringVariavel(FILE *arq);
