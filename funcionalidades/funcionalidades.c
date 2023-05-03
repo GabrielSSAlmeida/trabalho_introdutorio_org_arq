@@ -99,6 +99,9 @@ bool funcionalidade3(){
             CriaIndiceString(arqEntrada, arqSaida, campo);
             break;
         }
+        default:
+            return false;
+            break;
     }
 
     return true;

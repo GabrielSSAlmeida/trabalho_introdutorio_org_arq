@@ -30,7 +30,7 @@ bool CriaIndiceInteiro(char arqEntrada[], char arqSaida[], char campo[]){
     //abre novamente para uso
     if(!AbreArquivo(&arqIndice, arqSaida, "wb+", NULL)) return false;
 
-    //ajusta o ponteiro para dps do cabecalho
+    //ajusta o ponteiro para depois do cabecalho
     fseek(arqBin, 5, SEEK_SET);
 
 }
