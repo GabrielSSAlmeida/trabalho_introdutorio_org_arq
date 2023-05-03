@@ -12,6 +12,10 @@ void RecebeEntradaFunc2(char str1[]){
     scanf("%s", str1);
 }
 
+void RecebeEntradaFunc3(char arqEntrada[], char campo[], char dado[], char arqIndice[]){
+    scanf("%s %s %s %s", arqEntrada, campo, dado, arqIndice);
+}
+
 
 void ImprimeMarcaCelular(char marcaCelular[]){
     //imprime marca do celular
@@ -204,4 +208,10 @@ int LerInteiroVariavel(FILE *arq){
 void IgnoraLinha(FILE *arq){
     fscanf(arq, "%*[^\r\n]s"); 
     fscanf(arq, "%*[\r\n]s");
+}
+
+//verifica se o tipo de dado é string ou int (return 0 == int) (return 1 == string)
+int VerificaDado(char dado[]){
+    if(strcmp(dado, "inteiro") == 0) return 0;
+    if(strcmp(dado, "string") == 0) return 1;
 }

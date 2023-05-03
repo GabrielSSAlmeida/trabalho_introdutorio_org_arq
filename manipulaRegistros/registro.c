@@ -149,6 +149,9 @@ void ImprimeRegistroBinario(FILE *arqBin, DADOS *registro){
         LerCampoVariavel(arqBin, registro->idCrime);
         LerCampoVariavel(arqBin, registro->idCrime);
     }
+
+    //lê o delimitador do registro
+    fread(&(registro->delimitador), 1, 1, arqBin);
 }
 
 bool ImprimirBinario(FILE *arqBin){
@@ -174,9 +177,6 @@ bool ImprimirBinario(FILE *arqBin){
     for(i=0; flag!=0; i++){
         
         ImprimeRegistroBinario(arqBin, registro_aux);
-
-        //lê o delimitador do registro
-        fread(&(registro_aux->delimitador), 1, 1, arqBin);
 
         flag = LerCamposFixosRegBinario(arqBin, registro_aux);
          

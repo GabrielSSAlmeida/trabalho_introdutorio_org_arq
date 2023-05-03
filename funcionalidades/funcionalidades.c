@@ -26,6 +26,15 @@ bool funcionalidade1(){
     //escreve cabecalho no arquivo binario
     EscreveCabecalho(arqBin,cabecalho_saida);
 
+    //fecha arquivo para salvar status
+    fclose(arqBin);
+
+    //abre o arquivo novamente
+    if(!AbreArquivo(&arqBin, arqSaida, "wb+", NULL)) return false;
+
+    //ajusta o ponteiro para dps do cabecalho
+    fseek(arqBin, GetByteOffset(cabecalho_saida), SEEK_SET);
+
     //Le registros do csv e escreve no binario
     CsvParaBin(arqCsv, arqBin, cabecalho_saida);
     
@@ -33,6 +42,7 @@ bool funcionalidade1(){
     AtualizaStatus(cabecalho_saida, '1');
     
     //atualiza o cabecalho
+    fseek(arqBin, 0, SEEK_SET);
     EscreveCabecalho(arqBin,cabecalho_saida);
 
     //fecha arquivos
@@ -63,6 +73,33 @@ bool funcionalidade2(){
     }
 
     fclose(arqBin);
+
+    return true;
+}
+
+bool funcionalidade3(){
+    char arqEntrada[32];
+    char arqSaida[32];
+    char campo[32];
+    char dado[32];
+
+    RecebeEntradaFunc3(arqEntrada, campo, dado, arqSaida);
+
+    //verifica se o tipo de dado é string ou int
+    int dadoVerificado = VerificaDado(dado);
+
+    switch(dadoVerificado){
+        //caso int
+        case 0:{
+            CriaIndiceInteiro(arqEntrada, arqSaida, campo);
+            break;
+        }
+        //caso string
+        case 1:{
+            CriaIndiceString(arqEntrada, arqSaida, campo);
+            break;
+        }
+    }
 
     return true;
 }

@@ -14,7 +14,8 @@ CABECALHO *CabecalhoCriar(void){
     CABECALHO *cabecalho = (CABECALHO*) malloc(sizeof(CABECALHO));
 
     //sizeof(CABECALHO) não funciona corretamente, então somamos os bytes
-    long int somaBytes = sizeof(cabecalho->status) + sizeof(cabecalho->proxByteOffset) + sizeof(cabecalho->nroRegArq) + sizeof(cabecalho->nroRegRem); 
+    long int somaBytes = sizeof(cabecalho->status) + sizeof(cabecalho->proxByteOffset) 
+    + sizeof(cabecalho->nroRegArq) + sizeof(cabecalho->nroRegRem); 
 
     //inicializa cabecalho
     if(cabecalho != NULL){
@@ -32,9 +33,6 @@ CABECALHO *CabecalhoCriar(void){
 
 //Escreve o cabecalho no arquivo binário
 void EscreveCabecalho(FILE *arqBin, CABECALHO *cabecalho){
-    //volta para o inicio do arquivo para atualizar o cabecalho
-    fseek(arqBin, 0, SEEK_SET);
-
     fwrite(&(cabecalho->status), sizeof(char), 1, arqBin);
     fwrite(&(cabecalho->proxByteOffset), sizeof(long int), 1, arqBin);
     fwrite(&(cabecalho->nroRegArq), sizeof(int), 1, arqBin);

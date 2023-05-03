@@ -24,6 +24,10 @@ int main(){
             funcionalidade2();
             break;
         }
+        case 3:{
+            funcionalidade3();
+            break;
+        }
     }
 
     return 0;
