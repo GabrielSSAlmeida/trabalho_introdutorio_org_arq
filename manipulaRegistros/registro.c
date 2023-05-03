@@ -42,10 +42,21 @@ DADOS *RegistroCriar(void){
     return registro;
 }
 
+
+void DesalocaCamposVariaveis(DADOS *registro){
+    if(registro != NULL){
+        if(registro->lugarCrime != NULL && registro->descricaoCrime != NULL){
+            free(registro->lugarCrime);
+            free(registro->descricaoCrime);
+            registro->lugarCrime = NULL;
+            registro->descricaoCrime = NULL;
+        }
+    }
+}
+
 void DesalocaRegistro(DADOS *registro){
     if(registro != NULL){
-        free(registro->lugarCrime);
-        free(registro->descricaoCrime);
+        DesalocaCamposVariaveis(registro);
         free(registro);
     }
     else{
@@ -111,13 +122,22 @@ void EscreverRegistroBin(FILE *arquivoBIN, DADOS *registro, CABECALHO *cabecalho
 }
 
 
-int LerCamposFixosRegBinario(FILE *arqBin, DADOS *registro){
+int LerRegBinario(FILE *arqBin, DADOS *registro){
     int aux = fread(&(registro->removido), 1, 1, arqBin);
-    
+
+    if(aux == 0){
+        return aux;
+    }
     fread(&(registro->idCrime), 4, 1, arqBin);
     fread((registro->dataCrime), 10, 1, arqBin);
     fread(&(registro->numeroArtigo), 4, 1, arqBin);
     fread((registro->marcaCelular), 12, 1, arqBin);
+
+    registro->lugarCrime = LerCampoVariavel(arqBin);
+    registro->descricaoCrime = LerCampoVariavel(arqBin);
+
+    //lê o delimitador do registro
+    fread(&(registro->delimitador), 1, 1, arqBin);
 
     return aux;
 }
@@ -136,22 +156,16 @@ void ImprimeRegistroBinario(FILE *arqBin, DADOS *registro){
         (registro->numeroArtigo == -1) ? printf("NULO, "):printf("%d, ", registro->numeroArtigo);
 
         //imprime cidade
-        ImprimeCampoVariavel(arqBin, registro->idCrime);
+        ImprimeCampoVariavel(registro->lugarCrime);
 
         //imprime descricao
-        ImprimeCampoVariavel(arqBin, registro->idCrime);
+        ImprimeCampoVariavel(registro->descricaoCrime);
 
         //imprime marca do celular
         ImprimeMarcaCelular(registro->marcaCelular);
 
-    }else{
-        //Serve para avançar o cursor nos campos de tamanho variavel sem imprimir
-        LerCampoVariavel(arqBin, registro->idCrime);
-        LerCampoVariavel(arqBin, registro->idCrime);
     }
-
-    //lê o delimitador do registro
-    fread(&(registro->delimitador), 1, 1, arqBin);
+    
 }
 
 bool ImprimirBinario(FILE *arqBin){
@@ -171,16 +185,17 @@ bool ImprimirBinario(FILE *arqBin){
     }
 
 
-    int flag = LerCamposFixosRegBinario(arqBin, registro_aux);
+    int flag = LerRegBinario(arqBin, registro_aux);
 
     int i;
     for(i=0; flag!=0; i++){
         
         ImprimeRegistroBinario(arqBin, registro_aux);
+        DesalocaCamposVariaveis(registro_aux);
 
-        flag = LerCamposFixosRegBinario(arqBin, registro_aux);
-         
+        flag = LerRegBinario(arqBin, registro_aux); 
     }
+
 
     //desaloca os auxiliares criados
     DesalocaCabecalho(cabecalho_aux);
@@ -192,4 +207,11 @@ bool ImprimirBinario(FILE *arqBin){
     
     return true;
 
+}
+
+char GetRegistroRemovido(DADOS *registro){
+    if(registro != NULL){
+        return (registro->removido);
+    }
+    return '\0';
 }

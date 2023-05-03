@@ -49,34 +49,49 @@ void ImprimeDataCrime(char dataCrime[]){
 
 
 //imprime campos variaveis na funcionalidade 2
-void ImprimeCampoVariavel(FILE *arqBin, int id){
-    char caracter = ' ';
-    fread(&caracter, 1, 1, arqBin);
+void ImprimeCampoVariavel(char *string){
+    int contador = 0;
     do{
-        if(caracter == '|'){
+        if(string[contador] == '|'){
             printf("NULO");
             break;
         }
-        printf("%c", caracter);
-        fread(&caracter, 1, 1, arqBin);
-    }while(caracter != '|');
+        printf("%c", string[contador]);
+        contador++;
+    }while(string[contador] != '|');
         
     printf(", ");
 }
 
 //Serve para avançar o cursor nos campos de tamanho variavel sem imprimir
-void LerCampoVariavel(FILE *arqBin, int id){
-    if(id == 636){
-        printf(" ");
+char *LerCampoVariavel(FILE *arqBin){
+    char caracter;
+    char *vetor = NULL;
+    int numeroCaracteres = 0;
+
+    //aloca e inicializa vetor usada na leitura
+    vetor = calloc(1, sizeof(char));
+    if(vetor == NULL){
+        ErroAlocacao();
     }
-    char caracter = ' ';
+
+
     fread(&caracter, 1, 1, arqBin);
+    vetor[0] = caracter;
     do{
+        numeroCaracteres++;
         if(caracter == '|'){
             break;
         }
         fread(&caracter, 1, 1, arqBin);
+        vetor = (char *) realloc(vetor, sizeof(char)* numeroCaracteres+1);
+        if (vetor == NULL){
+            ErroAlocacao();
+        }
+        vetor[numeroCaracteres] = caracter;
     }while(caracter != '|');
+
+    return vetor;
 }
 
 
