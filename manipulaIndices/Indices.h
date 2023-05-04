@@ -13,6 +13,7 @@
     bool CriaIndiceString(char arqEntrada[], char arqSaida[], char campo[]);
     DADOS_INT *RegistroDadosIntCriar(void);
 
-    bool InsereCampoEmIndices(DADOS_INT *vetor, DADOS *registro_auxiliar, int posicao, int campo, int byteoffset);
-
+    bool InsereCampoIntEmIndices(DADOS_INT *vetor, DADOS *registro_auxiliar, int posicao, int campo, int byteoffset);
+    bool InsereCampoStringEmIndices(DADOS_STR *vetor, DADOS *registro_auxiliar, int posicao, int campo, int byteoffset);
+    
 #endif

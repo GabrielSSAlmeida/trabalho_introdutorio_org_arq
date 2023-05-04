@@ -232,3 +232,10 @@ int VerificaDado(char dado[]){
     if(strcmp(dado, "inteiro") == 0) return 0;
     if(strcmp(dado, "string") == 0) return 1;
 }
+
+//strncpy sem copiar o /0
+void strncpySem0(char *string1, char *string2, int n){
+    for(int i=0; i<n; i++)
+        string1[i] = string2[i];
+
+}

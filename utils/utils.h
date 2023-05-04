@@ -26,6 +26,8 @@
 
     int VerificaDado(char dado[]);
 
+    void strncpySem0(char *string1, char *string2, int n);
+
     //Ler e ignorar a primeira linha do arquivo
     void IgnoraLinha(FILE *arq);
 #endif
