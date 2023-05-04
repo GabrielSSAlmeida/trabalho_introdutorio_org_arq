@@ -57,11 +57,12 @@ bool CriaIndiceInteiro(char arqEntrada[], char arqSaida[], char campo[]){
 
 
     //Percorre arquivo binario lendo os registros
-    int flag = LerRegBinario(arqBin, registro_auxiliar);
+    int offsetlido = 0;
+    int flag = LerRegBinario(arqBin, registro_auxiliar, &offsetlido);
     int i;
     for(i=0; flag!=0; i++){
         if(GetRegistroRemovido(registro_auxiliar) == '0'){
-            InsereCampoEmIndices(indices, registro_auxiliar, i, tipoCampo);
+            InsereCampoEmIndices(indices, registro_auxiliar, i, tipoCampo, offsetlido);
         }
 
         
@@ -69,7 +70,7 @@ bool CriaIndiceInteiro(char arqEntrada[], char arqSaida[], char campo[]){
 
         DesalocaCamposVariaveis(registro_auxiliar);
 
-        flag = LerRegBinario(arqBin, registro_auxiliar); 
+        flag = LerRegBinario(arqBin, registro_auxiliar, &offsetlido); 
     }
 
 
@@ -82,20 +83,27 @@ bool CriaIndiceInteiro(char arqEntrada[], char arqSaida[], char campo[]){
     return true;
 }
 
-bool InsereCampoEmIndices(DADOS_INT *vetor, DADOS *registro_auxiliar, int posicao, int campo){
+bool InsereCampoEmIndices(DADOS_INT *vetor, DADOS *registro_auxiliar, int posicao, int campo, int byteoffset){
     DADOS_INT *registroDados = RegistroDadosIntCriar();
     
     switch(campo){
         //caso idCrime
         case 0:{
             registroDados->chaveBusca = GetRegistroIdCrime(registro_auxiliar);
+            registroDados->byteOffset = byteoffset;
 
+            vetor[posicao].chaveBusca = registroDados->chaveBusca;
+            vetor[posicao].byteOffset = registroDados->byteOffset;
             break;   
         }
             
         //caso numeroArtigo
         case 1:{
+            registroDados->chaveBusca = GetRegistroNroArtigo(registro_auxiliar);
+            registroDados->byteOffset = byteoffset;
 
+            vetor[posicao].chaveBusca = registroDados->chaveBusca;
+            vetor[posicao].byteOffset = registroDados->byteOffset;
             break;    
         }     
     }

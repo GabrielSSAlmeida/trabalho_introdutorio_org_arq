@@ -8,8 +8,9 @@
     typedef struct dados DADOS;
 
     DADOS *RegistroCriar(void);
-    int LerRegBinario(FILE *arqBin, DADOS *registro);
+    int LerRegBinario(FILE *arqBin, DADOS *registro, int *offsetlido);
     void DesalocaRegistro(DADOS *registro);
+    void DesalocaCamposVariaveis(DADOS *registro);
     
     //Funções para a funcionalidade 1
     DADOS *LerRegistroCsv(FILE *arquivoCSV, int *flagFuncionou);
@@ -23,4 +24,5 @@
     //Função Get
     char GetRegistroRemovido(DADOS *registro);
     int GetRegistroIdCrime(DADOS *registro);
+    int GetRegistroNroArtigo(DADOS *registro);
 #endif

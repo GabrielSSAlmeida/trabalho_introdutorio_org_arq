@@ -122,22 +122,24 @@ void EscreverRegistroBin(FILE *arquivoBIN, DADOS *registro, CABECALHO *cabecalho
 }
 
 
-int LerRegBinario(FILE *arqBin, DADOS *registro){
+int LerRegBinario(FILE *arqBin, DADOS *registro, int *offsetlido){
     int aux = fread(&(registro->removido), 1, 1, arqBin);
 
     if(aux == 0){
         return aux;
     }
-    fread(&(registro->idCrime), 4, 1, arqBin);
-    fread((registro->dataCrime), 10, 1, arqBin);
-    fread(&(registro->numeroArtigo), 4, 1, arqBin);
-    fread((registro->marcaCelular), 12, 1, arqBin);
 
-    registro->lugarCrime = LerCampoVariavel(arqBin);
-    registro->descricaoCrime = LerCampoVariavel(arqBin);
+    *offsetlido += aux;
+    *offsetlido += fread(&(registro->idCrime), 4, 1, arqBin);
+    *offsetlido += fread((registro->dataCrime), 10, 1, arqBin);
+    *offsetlido += fread(&(registro->numeroArtigo), 4, 1, arqBin);
+    *offsetlido += fread((registro->marcaCelular), 12, 1, arqBin);
+
+    registro->lugarCrime = LerCampoVariavel(arqBin, offsetlido);
+    registro->descricaoCrime = LerCampoVariavel(arqBin, offsetlido);
 
     //lê o delimitador do registro
-    fread(&(registro->delimitador), 1, 1, arqBin);
+    *offsetlido += fread(&(registro->delimitador), 1, 1, arqBin);
 
     return aux;
 }
@@ -184,8 +186,10 @@ bool ImprimirBinario(FILE *arqBin){
         return false;
     }
 
+    //é passado no parametro da funcao, mas nao sera utilizado nesse momento
+    int aux;
 
-    int flag = LerRegBinario(arqBin, registro_aux);
+    int flag = LerRegBinario(arqBin, registro_aux, &aux);
 
     int i;
     for(i=0; flag!=0; i++){
@@ -193,7 +197,7 @@ bool ImprimirBinario(FILE *arqBin){
         ImprimeRegistroBinario(arqBin, registro_aux);
         DesalocaCamposVariaveis(registro_aux);
 
-        flag = LerRegBinario(arqBin, registro_aux); 
+        flag = LerRegBinario(arqBin, registro_aux, &aux); 
     }
 
 
@@ -219,6 +223,13 @@ char GetRegistroRemovido(DADOS *registro){
 int GetRegistroIdCrime(DADOS *registro){
     if(registro != NULL){
         return (registro->idCrime);
+    }
+    return -1;
+}
+
+int GetRegistroNroArtigo(DADOS *registro){
+    if(registro != NULL){
+        return (registro->numeroArtigo);
     }
     return -1;
 }

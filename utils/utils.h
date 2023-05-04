@@ -17,7 +17,7 @@
     void ImprimeCampoVariavel(char *string);
     void ImprimeMarcaCelular(char marcaCelular[]);
     void ImprimeDataCrime(char dataCrime[]);
-    char *LerCampoVariavel(FILE *arqBin);
+    char *LerCampoVariavel(FILE *arqBin, int *offsetlido);
 
 
     char *LerStringVariavel(FILE *arq);
