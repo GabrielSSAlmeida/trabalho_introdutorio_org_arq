@@ -61,7 +61,7 @@ bool CriaIndiceInteiro(char arqEntrada[], char arqSaida[], char campo[]){
     int i;
     for(i=0; flag!=0; i++){
         if(GetRegistroRemovido(registro_auxiliar) == '0'){
-            
+            InsereCampoEmIndices(indices, registro_auxiliar, i, tipoCampo);
         }
 
         
@@ -80,6 +80,41 @@ bool CriaIndiceInteiro(char arqEntrada[], char arqSaida[], char campo[]){
     //se nao existem registros no arquivo
     if(i==0) ErroArquivo();
     return true;
+}
+
+bool InsereCampoEmIndices(DADOS_INT *vetor, DADOS *registro_auxiliar, int posicao, int campo){
+    DADOS_INT *registroDados = RegistroDadosIntCriar();
+    
+    switch(campo){
+        //caso idCrime
+        case 0:{
+            registroDados->chaveBusca = GetRegistroIdCrime(registro_auxiliar);
+
+            break;   
+        }
+            
+        //caso numeroArtigo
+        case 1:{
+
+            break;    
+        }     
+    }
+
+    free(registroDados);
+}
+
+DADOS_INT *RegistroDadosIntCriar(void){
+    DADOS_INT *registro = (DADOS_INT*) calloc(1, sizeof(DADOS_INT));
+
+    //inicializa registro
+    if(registro != NULL){
+        registro->chaveBusca = 0;
+        registro->byteOffset = 0;
+    }
+    else{
+        ErroAlocacao();
+    }
+    return registro;
 }
 
 bool CriaIndiceString(char arqEntrada[], char arqSaida[], char campo[]){

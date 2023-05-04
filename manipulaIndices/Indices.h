@@ -10,5 +10,6 @@
 
     bool CriaIndiceInteiro(char arqEntrada[], char arqSaida[], char campo[]);
     bool CriaIndiceString(char arqEntrada[], char arqSaida[], char campo[]);
+    DADOS_INT *RegistroDadosIntCriar(void);
 
 #endif

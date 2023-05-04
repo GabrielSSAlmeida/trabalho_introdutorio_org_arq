@@ -22,4 +22,5 @@
 
     //Função Get
     char GetRegistroRemovido(DADOS *registro);
+    int GetRegistroIdCrime(DADOS *registro);
 #endif

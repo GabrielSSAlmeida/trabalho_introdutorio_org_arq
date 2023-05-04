@@ -215,3 +215,10 @@ char GetRegistroRemovido(DADOS *registro){
     }
     return '\0';
 }
+
+int GetRegistroIdCrime(DADOS *registro){
+    if(registro != NULL){
+        return (registro->idCrime);
+    }
+    return -1;
+}
