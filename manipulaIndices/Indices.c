@@ -73,8 +73,10 @@ DADOS_STR *VetorIndicesStringCriar(int tamanho){
 }
 
 void EscreveArqIndiceInt(FILE* arqIndice, DADOS_INT indice){
-    fwrite(&(indice.chaveBusca), sizeof(int), 1, arqIndice);
-    fwrite(&(indice.byteOffset), sizeof(long int), 1, arqIndice);
+    if(indice.chaveBusca != -1){
+        fwrite(&(indice.chaveBusca), sizeof(int), 1, arqIndice);
+        fwrite(&(indice.byteOffset), sizeof(long int), 1, arqIndice);
+    }
 }
 
 
@@ -137,9 +139,6 @@ bool CriaIndiceInteiro(char arqEntrada[], char arqSaida[], char campo[]){
             InsereCampoIntEmIndices(indices, registro_auxiliar, i, tipoCampo, offsetanterior);
         }
 
-      
-
-
         DesalocaCamposVariaveis(registro_auxiliar);
 
         offsetanterior = offsetlido;
@@ -150,8 +149,6 @@ bool CriaIndiceInteiro(char arqEntrada[], char arqSaida[], char campo[]){
     //ordenar
     mergeSortIndice(indices, 0, nroRegistros-1);
     //escrever no binario
-
-
     for (int i = 0; i < nroRegistros; i++)
     {
         EscreveArqIndiceInt(arqIndice, indices[i]);
@@ -177,10 +174,13 @@ bool CriaIndiceInteiro(char arqEntrada[], char arqSaida[], char campo[]){
 
     free(indices);
 
+    binarioNaTela(arqSaida);
+
     fclose(arqBin);
     fclose(arqIndice);
     //se nao existem registros no arquivo
     if(i==0) ErroArquivo();
+
     return true;
 }
 

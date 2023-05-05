@@ -129,18 +129,20 @@ int LerRegBinario(FILE *arqBin, DADOS *registro, int *offsetlido){
         return aux;
     }
 
-    *offsetlido += aux;
-    *offsetlido += fread(&(registro->idCrime), 4, 1, arqBin);
-    *offsetlido += fread((registro->dataCrime), 10, 1, arqBin);
-    *offsetlido += fread(&(registro->numeroArtigo), 4, 1, arqBin);
-    *offsetlido += fread((registro->marcaCelular), 12, 1, arqBin);
+    fread(&(registro->idCrime), 4, 1, arqBin);
+    fread((registro->dataCrime), 10, 1, arqBin);
+    fread(&(registro->numeroArtigo), 4, 1, arqBin);
+    fread((registro->marcaCelular), 12, 1, arqBin);
+    
 
     registro->lugarCrime = LerCampoVariavel(arqBin, offsetlido);
     registro->descricaoCrime = LerCampoVariavel(arqBin, offsetlido);
 
     //lê o delimitador do registro
-    *offsetlido += fread(&(registro->delimitador), 1, 1, arqBin);
+    fread(&(registro->delimitador), 1, 1, arqBin);
 
+    *offsetlido += 32;
+    
     return aux;
 }
 
