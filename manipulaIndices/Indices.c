@@ -174,13 +174,14 @@ bool CriaIndiceInteiro(char arqEntrada[], char arqSaida[], char campo[]){
 
     free(indices);
 
-    binarioNaTela(arqSaida);
 
     fclose(arqBin);
     fclose(arqIndice);
     //se nao existem registros no arquivo
     if(i==0) ErroArquivo();
 
+    binarioNaTela(arqSaida);
+    
     return true;
 }
 
