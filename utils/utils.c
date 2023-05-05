@@ -1,6 +1,7 @@
 #include "utils.h"
 #include "../prints_e_erros/prints_e_erros.h"
 
+
 //recebe nome dos arquivos na funcionalidade 1
 void RecebeEntradaFunc1(char str1[], char str2[]){
     scanf("%s", str1);
@@ -235,7 +236,7 @@ int VerificaDado(char dado[]){
 
 //strncpy sem copiar o /0
 void strncpySem0(char *string1, char *string2, int n){
-    for(int i=0; i<n; i++)
+    for(int i=0; i<n && string2[i] != '|'; i++)
         string1[i] = string2[i];
 
 }

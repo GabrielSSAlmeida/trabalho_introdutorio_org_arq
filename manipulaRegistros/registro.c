@@ -233,3 +233,31 @@ int GetRegistroNroArtigo(DADOS *registro){
     }
     return -1;
 }
+
+char *GetRegistroDataCrime(DADOS *registro){
+    if(registro != NULL){
+        return (registro->dataCrime);
+    }
+    return NULL;
+}
+
+char *GetRegistroMarcaCelular(DADOS *registro){
+    if(registro != NULL){
+        return (registro->marcaCelular);
+    }
+    return NULL;
+}
+
+char *GetRegistroLugarCrime(DADOS *registro){
+    if(registro != NULL){
+        return (registro->lugarCrime);
+    }
+    return NULL;
+}
+
+char *GetRegistroDescricaoCrime(DADOS *registro){
+    if(registro != NULL){
+        return (registro->descricaoCrime);
+    }
+    return NULL;
+}

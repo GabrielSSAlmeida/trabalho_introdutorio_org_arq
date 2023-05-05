@@ -12,8 +12,14 @@
     bool CriaIndiceInteiro(char arqEntrada[], char arqSaida[], char campo[]);
     bool CriaIndiceString(char arqEntrada[], char arqSaida[], char campo[]);
     DADOS_INT *RegistroDadosIntCriar(void);
+    DADOS_INT *VetorIndicesIntCriar(int tamanho);
+    DADOS_STR *RegistroDadosStringCriar(void);
+    DADOS_STR *VetorIndicesStringCriar(int tamanho);
 
     bool InsereCampoIntEmIndices(DADOS_INT *vetor, DADOS *registro_auxiliar, int posicao, int campo, int byteoffset);
     bool InsereCampoStringEmIndices(DADOS_STR *vetor, DADOS *registro_auxiliar, int posicao, int campo, int byteoffset);
     
+    void mergeSortIndice(DADOS_INT* vetor, int inicio, int fim);
+
+
 #endif

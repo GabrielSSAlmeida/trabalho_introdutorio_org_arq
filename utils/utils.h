@@ -3,6 +3,7 @@
     #include <stdio.h>
     #include <stdlib.h>
     #include <string.h>
+    #include "../manipulaIndices/Indices.h"
 
     //Funções fornecidas
     void readline(char *string);

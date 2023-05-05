@@ -21,8 +21,12 @@
     bool ImprimirBinario(FILE *arqBin);
     void ImprimeRegistroBinario(FILE *arqBin, DADOS *registro);
 
-    //Função Get
+    //Funções Get do registro de Dados
     char GetRegistroRemovido(DADOS *registro);
     int GetRegistroIdCrime(DADOS *registro);
     int GetRegistroNroArtigo(DADOS *registro);
+    char *GetRegistroDataCrime(DADOS *registro);
+    char *GetRegistroMarcaCelular(DADOS *registro);
+    char *GetRegistroLugarCrime(DADOS *registro);
+    char *GetRegistroDescricaoCrime(DADOS *registro);
 #endif
