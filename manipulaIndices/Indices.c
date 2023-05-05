@@ -118,18 +118,8 @@ bool CriaIndiceInteiro(char arqEntrada[], char arqSaida[], char campo[]){
     DADOS_INT *indices = VetorIndicesIntCriar(nroRegistros);
 
 
-    //Decide qual o tipo da chave de busca (talvez por em utils)
-    int tipoCampo = -1;
-    if(strcmp(campo, "idCrime") == 0){
-        tipoCampo = 0;
-    }else if(strcmp(campo, "numeroArtigo") == 0){
-        tipoCampo = 1;
-    }else{
-        ErroArquivo();
-        return false;
-    }
-
-
+    //Decide qual o tipo da chave de busca 
+    int tipoCampo = TipoChaveBusca(campo);
 
     //Percorre arquivo binario lendo os registros
     int offsetlido = 17; //será o offset do proximo registro durante o loop
@@ -149,17 +139,19 @@ bool CriaIndiceInteiro(char arqEntrada[], char arqSaida[], char campo[]){
         flag = LerRegBinario(arqBin, registro_auxiliar, &offsetlido); 
     }
 
+    //se nao existem registros no arquivo
+    if(i==0) ErroArquivo();
+
     //ordenar
     mergeSortIndiceInt(indices, 0, nroRegistros-1);
     int copiaNroRegistro = nroRegistros;
     //escrever no binario
-    for (int i = 0; i < nroRegistros; i++)
+    for (int j = 0; j < nroRegistros; j++)
     {
-        EscreveArqIndiceInt(arqIndice, indices[i], &copiaNroRegistro);
+        EscreveArqIndiceInt(arqIndice, indices[j], &copiaNroRegistro);
     }
+
     
-
-
     //ATUALIZA CABECALHO INDICE
     AtualizaStatusIndice(cabecalho, '1');
     AtualizaNroRegArqIndice(cabecalho, copiaNroRegistro);
@@ -180,8 +172,7 @@ bool CriaIndiceInteiro(char arqEntrada[], char arqSaida[], char campo[]){
 
     fclose(arqBin);
     fclose(arqIndice);
-    //se nao existem registros no arquivo
-    if(i==0) ErroArquivo();
+    
 
     binarioNaTela(arqSaida);
     
@@ -259,21 +250,10 @@ bool CriaIndiceString(char arqEntrada[], char arqSaida[], char campo[]){
     int nroRegistros = GetNroRegArq(cabecalho_registro) - GetNroRegRem(cabecalho_registro);
     DADOS_STR *indices = VetorIndicesStringCriar(nroRegistros);
 
-    int tipoCampo = -1;
-    if(strcmp(campo, "dataCrime") == 0){
-        tipoCampo = 0;
-    }else if(strcmp(campo, "marcaCelular") == 0){
-        tipoCampo = 1;
-    }else if(strcmp(campo, "lugarCrime") == 0){
-        tipoCampo = 2;
-    }else if(strcmp(campo, "descricaoCrime") == 0){
-        tipoCampo = 3;
-    }else{
-        ErroArquivo();
-        return false;
-    }
 
-
+    //Decide qual o tipo da chave de busca 
+    int tipoCampo = TipoChaveBusca(campo);
+    
 
     //Percorre arquivo binario lendo os registros
     int offsetlido = 17; //será o offset do próximo registro durante o loop
@@ -292,6 +272,8 @@ bool CriaIndiceString(char arqEntrada[], char arqSaida[], char campo[]){
 
         flag = LerRegBinario(arqBin, registro_auxiliar, &offsetlido); 
     }
+    //se nao existem registros no arquivo
+    if(i==0) ErroArquivo();
 
 
     //ordenar
@@ -321,8 +303,7 @@ bool CriaIndiceString(char arqEntrada[], char arqSaida[], char campo[]){
 
     fclose(arqBin);
     fclose(arqIndice);
-    //se nao existem registros no arquivo
-    if(i==0) ErroArquivo();
+    
 
     binarioNaTela(arqSaida);
 
@@ -335,7 +316,7 @@ bool InsereCampoStringEmIndices(DADOS_STR *vetor, DADOS *registro_auxiliar, int 
     
     switch(campo){
         //caso dataCrime
-        case 0:{
+        case 2:{
             strncpySem0(registroDados->chaveBusca, GetRegistroDataCrime(registro_auxiliar), 10);
             registroDados->byteOffset = byteoffset;
 
@@ -345,7 +326,7 @@ bool InsereCampoStringEmIndices(DADOS_STR *vetor, DADOS *registro_auxiliar, int 
         }
             
         //caso marcaCelular
-        case 1:{
+        case 3:{
             strncpySem0(registroDados->chaveBusca, GetRegistroMarcaCelular(registro_auxiliar), 12);
             registroDados->byteOffset = byteoffset;
 
@@ -355,7 +336,7 @@ bool InsereCampoStringEmIndices(DADOS_STR *vetor, DADOS *registro_auxiliar, int 
         }    
 
         //caso lugarCrime
-        case 2:{
+        case 4:{
             strncpySem0(registroDados->chaveBusca, GetRegistroLugarCrime(registro_auxiliar), 12);
             registroDados->byteOffset = byteoffset;
 
@@ -365,7 +346,7 @@ bool InsereCampoStringEmIndices(DADOS_STR *vetor, DADOS *registro_auxiliar, int 
         }  
 
         //caso descricaoCrime
-        case 3:{
+        case 5:{
             strncpySem0(registroDados->chaveBusca, GetRegistroDescricaoCrime(registro_auxiliar), 12);
             registroDados->byteOffset = byteoffset;
 

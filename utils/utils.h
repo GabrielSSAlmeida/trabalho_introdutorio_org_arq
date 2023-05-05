@@ -26,6 +26,7 @@
     int LerInteiroVariavel(FILE *arq);
 
     int VerificaDado(char dado[]);
+    int TipoChaveBusca(char campo[]);
 
     void strncpySem0(char *string1, char *string2, int n);
 

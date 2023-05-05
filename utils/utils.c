@@ -234,6 +234,27 @@ int VerificaDado(char dado[]){
     if(strcmp(dado, "string") == 0) return 1;
 }
 
+int TipoChaveBusca(char campo[]){
+    int tipoCampo = -1;
+    if(strcmp(campo, "idCrime") == 0){
+        tipoCampo = 0;
+    }else if(strcmp(campo, "numeroArtigo") == 0){
+        tipoCampo = 1;
+    }else if(strcmp(campo, "dataCrime") == 0){
+        tipoCampo = 2;
+    }else if(strcmp(campo, "marcaCelular") == 0){
+        tipoCampo = 3;
+    }else if(strcmp(campo, "lugarCrime") == 0){
+        tipoCampo = 4;
+    }else if(strcmp(campo, "descricaoCrime") == 0){
+        tipoCampo = 5;
+    }else{
+        ErroArquivo();
+    }
+
+    return tipoCampo;
+}
+
 //strncpy sem copiar o /0
 void strncpySem0(char *string1, char *string2, int n){
     for(int i=0; i<n && string2[i] != '|'; i++)
