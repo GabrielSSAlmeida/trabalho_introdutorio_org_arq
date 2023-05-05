@@ -72,10 +72,13 @@ DADOS_STR *VetorIndicesStringCriar(int tamanho){
     }
 }
 
-void EscreveArqIndiceInt(FILE* arqIndice, DADOS_INT indice){
+//Escreve os indices no binario e atualiza o numero de registros para os casos de chaves nulas
+void EscreveArqIndiceInt(FILE* arqIndice, DADOS_INT indice, int*nroRegistros){
     if(indice.chaveBusca != -1){
         fwrite(&(indice.chaveBusca), sizeof(int), 1, arqIndice);
         fwrite(&(indice.byteOffset), sizeof(long int), 1, arqIndice);
+    }else{
+        (*nroRegistros)--;
     }
 }
 
@@ -147,19 +150,19 @@ bool CriaIndiceInteiro(char arqEntrada[], char arqSaida[], char campo[]){
     }
 
     //ordenar
-    mergeSortIndice(indices, 0, nroRegistros-1);
+    mergeSortIndiceInt(indices, 0, nroRegistros-1);
+    int copiaNroRegistro = nroRegistros;
     //escrever no binario
     for (int i = 0; i < nroRegistros; i++)
     {
-        EscreveArqIndiceInt(arqIndice, indices[i]);
-        printf("%d %ld\n", indices[i].chaveBusca, indices[i].byteOffset);
+        EscreveArqIndiceInt(arqIndice, indices[i], &copiaNroRegistro);
     }
     
 
 
     //ATUALIZA CABECALHO INDICE
     AtualizaStatusIndice(cabecalho, '1');
-    AtualizaNroRegArqIndice(cabecalho, nroRegistros);
+    AtualizaNroRegArqIndice(cabecalho, copiaNroRegistro);
     //Coloca o cursor no começo do arq para sobrescrever o cabcecalho
     fseek(arqIndice, 0, SEEK_SET); 
     EscreveCabecalhoIndice(arqIndice, cabecalho);
@@ -212,6 +215,16 @@ bool InsereCampoIntEmIndices(DADOS_INT *vetor, DADOS *registro_auxiliar, int pos
     }
 
     free(registroDados);
+}
+
+//Escreve os indices no binario e atualiza o numero de registros para os casos de chaves nulas
+void EscreveArqIndiceString(FILE* arqIndice, DADOS_STR indice, int* nroRegistro){
+    if(indice.chaveBusca[0] != '$'){
+        fwrite(&(indice.chaveBusca), sizeof(char), 12, arqIndice);
+        fwrite(&(indice.byteOffset), sizeof(long int), 1, arqIndice);
+    }else{
+        (*nroRegistro)--;
+    }
 }
 
 
@@ -273,9 +286,6 @@ bool CriaIndiceString(char arqEntrada[], char arqSaida[], char campo[]){
             InsereCampoStringEmIndices(indices, registro_auxiliar, i, tipoCampo, offsetanterior);
         }
 
-        
-
-
         DesalocaCamposVariaveis(registro_auxiliar);
 
         offsetanterior = offsetlido;
@@ -283,20 +293,20 @@ bool CriaIndiceString(char arqEntrada[], char arqSaida[], char campo[]){
         flag = LerRegBinario(arqBin, registro_auxiliar, &offsetlido); 
     }
 
+
+    //ordenar
+    mergeSortIndiceString(indices, 0, nroRegistros-1);
+
+    int copiaNroRegistro = nroRegistros;
     for (int i = 0; i < nroRegistros; i++)
     {
-        for (int j = 0; j < 12; j++)
-        {
-            printf("%c", indices[i].chaveBusca[j]);
-        }
-        
-        printf(" %ld\n", indices[i].byteOffset);
+        EscreveArqIndiceString(arqIndice, indices[i], &copiaNroRegistro);
     }
-
+    
 
     //ATUALIZA CABECALHO INDICE
     AtualizaStatusIndice(cabecalho, '1');
-    AtualizaNroRegArqIndice(cabecalho, nroRegistros);
+    AtualizaNroRegArqIndice(cabecalho, copiaNroRegistro);
     //Coloca o cursor no começo do arq para sobrescrever o cabcecalho
     fseek(arqIndice, 0, SEEK_SET); 
     EscreveCabecalhoIndice(arqIndice, cabecalho);
@@ -313,6 +323,9 @@ bool CriaIndiceString(char arqEntrada[], char arqSaida[], char campo[]){
     fclose(arqIndice);
     //se nao existem registros no arquivo
     if(i==0) ErroArquivo();
+
+    binarioNaTela(arqSaida);
+
     return true;
 
 }
@@ -368,7 +381,7 @@ bool InsereCampoStringEmIndices(DADOS_STR *vetor, DADOS *registro_auxiliar, int 
 
 
 
-void intercala(DADOS_INT* vetor, int inicio, int centro, int fim){
+void intercalaInt(DADOS_INT* vetor, int inicio, int centro, int fim){
 	DADOS_INT* vetorAux = VetorIndicesIntCriar((fim-inicio)+1);
 
 	int i = inicio;	// indice da primeira lista ordenada
@@ -418,16 +431,81 @@ void intercala(DADOS_INT* vetor, int inicio, int centro, int fim){
 }
 
 //Método de ordenação MergeSort
-void mergeSortIndice(DADOS_INT* vetor, int inicio, int fim){
+void mergeSortIndiceInt(DADOS_INT* vetor, int inicio, int fim){
 	//caso base
 	if (fim <= inicio) return;
 
 	//processo de divis�o
 	int centro = (int)((inicio+fim)/2.0);
-	mergeSortIndice(vetor, inicio, centro);
-	mergeSortIndice(vetor, centro+1, fim);
+	mergeSortIndiceInt(vetor, inicio, centro);
+	mergeSortIndiceInt(vetor, centro+1, fim);
 
 	//processo de conquista
-	intercala(vetor, inicio, centro, fim);
+	intercalaInt(vetor, inicio, centro, fim);
+}
+
+
+
+void intercalaString(DADOS_STR* vetor, int inicio, int centro, int fim){
+	DADOS_STR* vetorAux = VetorIndicesStringCriar((fim-inicio)+1);
+
+	int i = inicio;	// indice da primeira lista ordenada
+	int j = centro+1; //indice da segunda lista ordenada
+	int k = 0; //indice do vetor auxiliar
+
+	//compara e intercala os elementos do menor para o maior
+	while(i <= centro && j <= fim){
+		if (strncmp(vetor[i].chaveBusca, vetor[j].chaveBusca, 12) < 0){
+            //verifica qual � o elemento menor entre as duas listas
+			vetorAux[k] = vetor[i];
+			i++; //proximo elemento da primeira metade
+		}else if(strncmp(vetor[i].chaveBusca, vetor[j].chaveBusca, 12) == 0){
+            if (vetor[i].byteOffset <= vetor[j].byteOffset){
+                
+                vetorAux[k] = vetor[i];
+                i++; //proximo elemento da primeira metade
+            }
+            else{
+                vetorAux[k] = vetor[j];
+                j++; //proximo elemento da segunda metade
+            }
+        }
+		else{
+			vetorAux[k] = vetor[j];
+			j++; //proximo elemento da segunda metade
+		}
+		k++;
+	}
+
+	while(i <= centro){//h� elementos na primeira metade ainda?
+		vetorAux[k] = vetor[i];
+		i++;
+		k++;
+	}
+
+	while(j <= fim){//h� elementos na segunda metade ainda?
+		vetorAux[k] = vetor[j];
+		j++;
+		k++;
+	}
+
+	//atualizando o vetor original com o vetor auxiliar(ordenado)
+	for(i = inicio, k = 0; i <= fim; i++,k++)
+		vetor[i] = vetorAux[k];
+	free(vetorAux);
+}
+
+//Método de ordenação MergeSort
+void mergeSortIndiceString(DADOS_STR* vetor, int inicio, int fim){
+	//caso base
+	if (fim <= inicio) return;
+
+	//processo de divis�o
+	int centro = (int)((inicio+fim)/2.0);
+	mergeSortIndiceString(vetor, inicio, centro);
+	mergeSortIndiceString(vetor, centro+1, fim);
+
+	//processo de conquista
+	intercalaString(vetor, inicio, centro, fim);
 }
 

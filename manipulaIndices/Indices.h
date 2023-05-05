@@ -19,7 +19,8 @@
     bool InsereCampoIntEmIndices(DADOS_INT *vetor, DADOS *registro_auxiliar, int posicao, int campo, int byteoffset);
     bool InsereCampoStringEmIndices(DADOS_STR *vetor, DADOS *registro_auxiliar, int posicao, int campo, int byteoffset);
     
-    void mergeSortIndice(DADOS_INT* vetor, int inicio, int fim);
+    void mergeSortIndiceInt(DADOS_INT* vetor, int inicio, int fim);
+    void mergeSortIndiceString(DADOS_STR* vetor, int inicio, int fim);
 
 
 #endif
