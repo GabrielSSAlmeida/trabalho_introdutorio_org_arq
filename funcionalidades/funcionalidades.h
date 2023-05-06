@@ -9,7 +9,8 @@
     #include "../prints_e_erros/prints_e_erros.h"
     #include "../arquivos/arquivos.h"
     #include "../cabecalho/cabecalho.h"
-    #include "../manipulaIndices/Indices.h"
+    #include "../manipulaIndices/inteiro/indiceInteiro.h"
+    #include "../manipulaIndices/string/indiceString.h"
 
     
 

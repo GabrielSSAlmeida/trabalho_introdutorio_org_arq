@@ -7,6 +7,8 @@
         "utils.h": "c",
         "funcionalidades.h": "c",
         "prints_e_erros.h": "c",
-        "indices.h": "c"
+        "indices.h": "c",
+        "cabecalhoindice.h": "c",
+        "indicestring.h": "c"
     }
 }
