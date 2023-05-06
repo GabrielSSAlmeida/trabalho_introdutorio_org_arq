@@ -1,8 +1,11 @@
-all: prints_e_erros.o indiceString.o indiceInteiro.o cabecalhoIndice.o cabecalho.o arquivos.o funcionalidades.o registro.o fornecidas.o utils.o programaTrab.o
+all: prints_e_erros.o parBusca.o indiceString.o indiceInteiro.o cabecalhoIndice.o cabecalho.o arquivos.o funcionalidades.o registro.o fornecidas.o utils.o programaTrab.o
 	gcc *.o -o programaTrab -g -Wall
 
 prints_e_erros.o:
 	gcc -c -g prints_e_erros/prints_e_erros.c -o prints_e_erros.o
+
+parBusca.o:
+	gcc -c -g parBusca/parBusca.c -o parBusca.o
 
 indiceInteiro.o:
 	gcc -c -g manipulaIndices/inteiro/indiceInteiro.c -o indiceInteiro.o
@@ -38,4 +41,4 @@ clean:
 	rm *.o programaTrab
 
 run:
-	valgrind --leak-check=full --show-leak-kinds=all ./programaTrab < 4.in
+	valgrind --leak-check=full --show-leak-kinds=all -s ./programaTrab < 4.in

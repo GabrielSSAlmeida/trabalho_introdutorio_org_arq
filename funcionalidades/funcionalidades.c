@@ -110,15 +110,57 @@ bool funcionalidade3(){
 bool funcionalidade4(){
     char arqEntrada[32];
     char arqSaida[32];
-    char campo[32];
+    char campoIndexado[32];
     char dado[32];
     int qtdBuscas;
 
-    RecebeEntradaFunc4(arqEntrada, campo, dado, arqSaida, &qtdBuscas);
+    RecebeEntradaFunc4(arqEntrada, campoIndexado, dado, arqSaida, &qtdBuscas);
 
     //verifica se o tipo de dado é string(1) ou int(0)
     int dadoVerificado = VerificaDado(dado);
 
+
+    for (int i = 0; i < qtdBuscas; i++)
+    {
+        int qtdPares;
+        scanf("%d ", &qtdPares);
+
+        PARES_BUSCA *paresBusca = VetorParesBuscaCriar(qtdBuscas);
+
+        for (int j = 0; j < qtdPares; j++)
+        {
+            char *nomeCampo = GetNomeCampo(paresBusca, j);
+            scanf("%s ", nomeCampo);
+
+            printf("%s ", nomeCampo);
+            int tipoCampo = TipoChaveBusca(nomeCampo);
+
+            if (tipoCampo == 0 || tipoCampo == 1){ //O campo é do tipo int
+                int valorCampoInt;
+                scanf("%d ", &valorCampoInt);
+                AtualizaValorCampoInt(paresBusca, j, valorCampoInt);
+
+                printf("%d ", valorCampoInt);
+            }else if(tipoCampo >= 2){
+                scan_quote_string(GetValorCampoString(paresBusca, j));
+                getchar(); //Ler o espaço depois das aspas.
+
+                printf("%s ", GetValorCampoString(paresBusca, j));
+            }else{//Caso seja -1
+                ErroArquivo();
+            }
+
+        } 
+        
+        
+        DecideOrdemBusca(paresBusca, qtdPares, campoIndexado); 
+
+
+
+        DesalocaParesBusca(paresBusca);
+    }
+    
+    
     
 
     return true;
