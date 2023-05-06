@@ -15,6 +15,7 @@
     void RecebeEntradaFunc1(char str1[], char str2[]);
     void RecebeEntradaFunc2(char str1[]);
     void RecebeEntradaFunc3(char arqEntrada[], char campo[], char dado[], char arqIndice[]);
+    void RecebeEntradaFunc4(char arqEntrada[], char campo[], char dado[], char arqIndice[], int *qtdBuscas);
 
     void ImprimeCampoVariavel(char *string);
     void ImprimeMarcaCelular(char marcaCelular[]);

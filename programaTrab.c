@@ -28,6 +28,10 @@ int main(){
             funcionalidade3();
             break;
         }
+        case 4:{
+            funcionalidade4();
+            break;
+        }
     }
 
     return 0;

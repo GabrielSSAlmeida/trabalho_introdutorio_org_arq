@@ -106,3 +106,20 @@ bool funcionalidade3(){
 
     return true;
 }
+
+bool funcionalidade4(){
+    char arqEntrada[32];
+    char arqSaida[32];
+    char campo[32];
+    char dado[32];
+    int qtdBuscas;
+
+    RecebeEntradaFunc4(arqEntrada, campo, dado, arqSaida, &qtdBuscas);
+
+    //verifica se o tipo de dado é string(1) ou int(0)
+    int dadoVerificado = VerificaDado(dado);
+
+    
+
+    return true;
+}

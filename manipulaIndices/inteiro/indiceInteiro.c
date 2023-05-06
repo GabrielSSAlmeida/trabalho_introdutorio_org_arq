@@ -148,7 +148,7 @@ bool CriaIndiceInteiro(char arqEntrada[], char arqSaida[], char campo[]){
     }
 
     //se nao existem registros no arquivo
-    if(i==0) ErroRegistro();
+    if(i==0) ErroArquivo();
 
     
     //ATUALIZA CABECALHO INDICE

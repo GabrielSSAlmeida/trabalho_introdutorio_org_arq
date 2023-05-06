@@ -103,7 +103,7 @@ bool CriaIndiceString(char arqEntrada[], char arqSaida[], char campo[]){
         flag = LerRegBinario(arqBin, registro_auxiliar, &offsetlido); 
     }
     //se nao existem registros no arquivo
-    if(i==0) ErroRegistro();
+    if(i==0) ErroArquivo();
 
 
     //ordenar
