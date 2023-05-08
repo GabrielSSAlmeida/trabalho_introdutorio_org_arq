@@ -4,12 +4,14 @@
     #include <stdlib.h>
     #include <string.h>
     #include "../cabecalho/cabecalho.h"
+    #include "../arquivos/arquivos.h"
 
     typedef struct dados DADOS;
 
     DADOS *RegistroCriar(void);
     int LerRegBinario(FILE *arqBin, DADOS *registro, int *offsetlido);
     void DesalocaRegistro(DADOS *registro);
+    void DesalocaVetorRegistro(DADOS **registro, int tamanho);
     void DesalocaCamposVariaveis(DADOS *registro);
     
     //Funções para a funcionalidade 1
@@ -19,7 +21,12 @@
 
     //Função para a funcionalidade 2
     bool ImprimirBinario(FILE *arqBin);
-    void ImprimeRegistroBinario(FILE *arqBin, DADOS *registro);
+    void ImprimeRegistroBinario(DADOS *registro);
+
+    //Funcionalidade 4
+    DADOS *LeRegistroPorByteOffset(FILE *arqBin, long int byteOffset);
+    DADOS **BuscaSequencialBinarioInt(char *nomeArqBin, int valorBuscado, int tipoCampo, int *tamanhoVetor);
+    DADOS **BuscaSequencialBinarioString(char *nomeArqBin, char *valorBuscado, int tipoCampo, int *tamanhoVetor);
 
     //Funções Get do registro de Dados
     char GetRegistroRemovido(DADOS *registro);

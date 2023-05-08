@@ -42,6 +42,21 @@ DADOS *RegistroCriar(void){
     return registro;
 }
 
+DADOS **VetorRegistroCriar(int tamanho){
+    DADOS **registro = (DADOS**) calloc(tamanho, sizeof(DADOS *));
+
+    //inicializa registro
+    if(registro != NULL){
+        for (int i = 0; i < tamanho; i++)
+        {
+            registro[i] == NULL;
+        }
+    }
+    else{
+        ErroAlocacao();
+    }
+    return registro;
+}
 
 void DesalocaCamposVariaveis(DADOS *registro){
     if(registro != NULL){
@@ -57,6 +72,20 @@ void DesalocaCamposVariaveis(DADOS *registro){
 void DesalocaRegistro(DADOS *registro){
     if(registro != NULL){
         DesalocaCamposVariaveis(registro);
+        free(registro);
+    }
+    else{
+        ErroDesalocar();
+    }
+}
+
+void DesalocaVetorRegistro(DADOS **registro, int tamanho){
+    if(registro != NULL){
+        for (int i = 0; i < tamanho; i++)
+        {
+            DesalocaCamposVariaveis(registro[i]);
+            free(registro[i]);
+        }
         free(registro);
     }
     else{
@@ -147,7 +176,7 @@ int LerRegBinario(FILE *arqBin, DADOS *registro, int *offsetlido){
 }
 
 
-void ImprimeRegistroBinario(FILE *arqBin, DADOS *registro){
+void ImprimeRegistroBinario(DADOS *registro){
     if(registro->removido == '0'){
 
         //imprime o id do crime
@@ -196,7 +225,7 @@ bool ImprimirBinario(FILE *arqBin){
     int i;
     for(i=0; flag!=0; i++){
         
-        ImprimeRegistroBinario(arqBin, registro_aux);
+        ImprimeRegistroBinario(registro_aux);
         DesalocaCamposVariaveis(registro_aux);
 
         flag = LerRegBinario(arqBin, registro_aux, &aux); 
@@ -214,6 +243,167 @@ bool ImprimirBinario(FILE *arqBin){
     return true;
 
 }
+
+
+DADOS *LeRegistroPorByteOffset(FILE *arqBin, long int byteOffset){
+    //vai ate o byteoffset do registro buscado
+    fseek(arqBin, byteOffset, SEEK_SET);
+
+    DADOS *registro = RegistroCriar();
+
+    int tamanho_registro;
+    int flag = LerRegBinario(arqBin, registro, &tamanho_registro);
+
+    if(flag == 0){
+        ErroArquivo();
+        return NULL;
+    }
+
+    return registro;
+}
+
+
+DADOS **BuscaSequencialBinarioInt(char *nomeArqBin, int valorBuscado, int tipoCampo, int *tamanhoVetor){
+    FILE *arqBin;
+    if(!AbreArquivo(&arqBin, nomeArqBin, "r", NULL)) return NULL;
+
+    CABECALHO *cabecalho_aux = CabecalhoCriar();
+
+    //le o cabecalho do arquivo binario
+    LeCabecalhoDoArqBinario(cabecalho_aux, arqBin);
+
+    DADOS *registro_aux = RegistroCriar();
+    int aux;
+    int flag = LerRegBinario(arqBin, registro_aux, &aux);
+
+    DADOS **vetorRegistros = VetorRegistroCriar(1);
+    int i;
+    int passou = 0;
+    for(i=0; flag!=0; i++){
+        
+        switch (tipoCampo)
+        {
+            case 0:
+                if(valorBuscado == registro_aux->idCrime){
+                    passou = 1;
+                    vetorRegistros[i] = registro_aux;
+                }
+                break;
+            
+            case 1:
+                if(valorBuscado == registro_aux->numeroArtigo){
+                    passou = 1;
+                    vetorRegistros[i] = registro_aux;
+                }
+                break;
+
+            default:
+                break;
+        }
+        registro_aux = RegistroCriar();
+        vetorRegistros = (DADOS **) realloc(vetorRegistros, sizeof(DADOS*) * i+1);
+
+        flag = LerRegBinario(arqBin, registro_aux, &aux); 
+    }
+
+    *tamanhoVetor = i;
+
+    //desaloca os auxiliares criados
+    DesalocaCabecalho(cabecalho_aux);
+    DesalocaRegistro(registro_aux);
+
+    //se nao existem registros no arquivo
+    if(i==0 || passou == 0) ErroRegistro();
+    fclose(arqBin);
+    return vetorRegistros;
+}
+
+
+
+DADOS **BuscaSequencialBinarioString(char *nomeArqBin, char *valorBuscado, int tipoCampo, int *tamanhoVetor){
+    FILE *arqBin;
+    if(!AbreArquivo(&arqBin, nomeArqBin, "r", NULL)) return NULL;
+
+    CABECALHO *cabecalho_aux = CabecalhoCriar();
+    DADOS *registro_aux = RegistroCriar();
+
+    //le o cabecalho do arquivo binario
+    LeCabecalhoDoArqBinario(cabecalho_aux, arqBin);
+
+    int aux;
+    int flag = LerRegBinario(arqBin, registro_aux, &aux);
+
+
+    DADOS **vetorRegistros = VetorRegistroCriar(1);
+
+    int i;
+    int passou = 0;
+    for(i=0; flag!=0; i++){
+        
+        switch (tipoCampo)
+        {
+            case 2:
+                if(strncmp(valorBuscado, registro_aux->dataCrime, 10)){
+                    passou = 1;
+                    vetorRegistros[i] = registro_aux;
+                }else{
+                    vetorRegistros[i] = NULL;
+                }
+                break;
+            
+            case 3:
+                if(strncmp(valorBuscado, registro_aux->marcaCelular, 12)){
+                    passou = 1;
+                    vetorRegistros[i] = registro_aux;
+                }else{
+                    vetorRegistros[i] = NULL;
+                }
+                break;
+            
+            case 4:
+                if(strcmpAtePipe(registro_aux->lugarCrime, valorBuscado)){
+                    passou = 1;
+                    vetorRegistros[i] = registro_aux;
+                }else{
+                    vetorRegistros[i] = NULL;
+                }
+                break;
+            case 5:
+                if(strcmpAtePipe(registro_aux->descricaoCrime, valorBuscado)){
+                    passou = 1;
+                    vetorRegistros[i] = registro_aux;
+                }else{
+                    vetorRegistros[i] = NULL;
+                }
+                break;
+            default:
+                break;
+        }
+        registro_aux = RegistroCriar();
+        vetorRegistros = (DADOS **) realloc(vetorRegistros, sizeof(DADOS*) * i+1);
+
+        flag = LerRegBinario(arqBin, registro_aux, &aux); 
+    }
+
+    *tamanhoVetor = i;
+
+    //desaloca os auxiliares criados
+    DesalocaCabecalho(cabecalho_aux);
+    DesalocaRegistro(registro_aux);
+
+    //se nao existem registros no arquivo
+    if(i==0 || passou == 0) ErroRegistro();
+    fclose(arqBin);
+    return vetorRegistros;
+}
+
+
+
+
+
+
+
+
 
 char GetRegistroRemovido(DADOS *registro){
     if(registro != NULL){

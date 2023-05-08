@@ -12,7 +12,7 @@ struct dadosIndiceInt{
 
 //Criação das Structs
 //aloca um registro de indice do tipo inteiro
-DADOS_INT *RegistroDadosIntCriar(void){
+DADOS_INT *IndiceDadosIntCriar(void){
     DADOS_INT *registro = (DADOS_INT*) calloc(1, sizeof(DADOS_INT));
 
     //inicializa registro
@@ -38,6 +38,13 @@ DADOS_INT *VetorIndicesIntCriar(int tamanho){
     }
 }
 
+DADOS_INT LerRegIndiceInt(FILE *arqIndice, DADOS_INT *registroIndice){
+    fread(&(registroIndice->chaveBusca), sizeof(int), 1, arqIndice);
+    fread(&(registroIndice->byteOffset), sizeof(long int), 1, arqIndice);
+
+    return (*registroIndice);
+}
+
 
 //Escreve os indices no binario e atualiza o numero de registros para os casos de chaves nulas
 void EscreveArqIndiceInt(FILE* arqIndice, DADOS_INT indice, int*nroRegistros){
@@ -52,7 +59,7 @@ void EscreveArqIndiceInt(FILE* arqIndice, DADOS_INT indice, int*nroRegistros){
 
 //Preenche o vetor de indices, ou seja, insere os campos chaveBusca e byteOffset em cada pos do vetor
 bool InsereCampoIntEmIndices(DADOS_INT *vetor, DADOS *registro_auxiliar, int posicao, int campo, int byteoffset){
-    DADOS_INT *registroDados = RegistroDadosIntCriar();
+    DADOS_INT *registroDados = IndiceDadosIntCriar();
     
     switch(campo){
         //caso idCrime
@@ -230,6 +237,7 @@ void intercalaInt(DADOS_INT* vetor, int inicio, int centro, int fim){
 
 //ordena o vetor de indices do tipo inteiro
 void mergeSortIndiceInt(DADOS_INT* vetor, int inicio, int fim){
+
 	//caso base
 	if (fim <= inicio) return;
 
@@ -241,3 +249,91 @@ void mergeSortIndiceInt(DADOS_INT* vetor, int inicio, int fim){
 	//processo de conquista
 	intercalaInt(vetor, inicio, centro, fim);
 }
+
+
+
+long int* buscaBinaria_iterativa_int(DADOS_INT* vetor, int posicaoInicial, int posicaoFinal, int chave, long int *vetorByteOffset){
+    int posInicialGlobal = posicaoInicial;
+    int posFinalGlobal = posicaoFinal;
+    int tam_vetor = 1;
+	while(posicaoInicial <= posicaoFinal){
+		int centro = (int)((posicaoInicial+posicaoFinal)/2);
+		
+	
+		if (chave == vetor[centro].chaveBusca) {
+            int centroAux = centro;
+            
+
+            //volta ate o primeiro que satisfaz
+            while (centroAux >= posInicialGlobal && chave == vetor[centroAux].chaveBusca )
+            {
+                centroAux--;
+            }
+            
+            centroAux++;
+
+            //ao encontrar um que satisfaz, verifica todos acima dele que sejam iguais 
+            while (centroAux <= posFinalGlobal && chave == vetor[centroAux].chaveBusca )
+            {
+                vetorByteOffset[tam_vetor-1] = vetor[centroAux].byteOffset;
+                tam_vetor++;
+                vetorByteOffset = (long int *) realloc(vetorByteOffset, sizeof(long int) * tam_vetor);
+                centroAux++;
+            } 
+            
+              
+            break;
+        }
+			
+		else if (chave < vetor[centro].chaveBusca) 
+			posicaoFinal = centro - 1;
+		else if (chave > vetor[centro].chaveBusca) 
+			posicaoInicial = centro + 1;
+	}
+
+    //Coloca o -1 para saber qual é o ultimo elemento
+    vetorByteOffset[tam_vetor-1] = -1;
+    return vetorByteOffset;
+}
+
+
+
+long int* BuscaBinariaIndiceInt(char *nomeArqIndice, int valorBuscado, long int *vetorByteOffset){
+    FILE *arqIndice;
+    CABECALHO_INDICE *cabecalho_aux = CabecalhoIndiceCriar();
+    DADOS_INT *registroIndice_aux= IndiceDadosIntCriar();
+
+
+    //abre o arquivo de indice
+    if(!AbreArquivo(&arqIndice, nomeArqIndice, "r", NULL)) return NULL;
+
+    LeCabecalhoDoArqIndice(cabecalho_aux, arqIndice);
+
+    int nroReg = GetNroRegArqIndice(cabecalho_aux);
+
+    DADOS_INT *vetorIndices = VetorIndicesIntCriar(nroReg);
+
+    //Preenche o vetor de indices
+    for (int i = 0; i < nroReg; i++)
+    {
+        vetorIndices[i] = LerRegIndiceInt(arqIndice, registroIndice_aux);
+    }
+
+
+    vetorByteOffset = buscaBinaria_iterativa_int(vetorIndices, 0, nroReg, valorBuscado, vetorByteOffset);
+
+    DesalocaCabecalhoIndice(cabecalho_aux);
+    free(registroIndice_aux);
+    fclose(arqIndice);
+
+    
+    free(vetorIndices);
+    return vetorByteOffset;
+}
+
+
+
+
+
+
+

@@ -1,6 +1,7 @@
 /*
 - Gabriel Sousa Santos de Almeida - 13837432
 - Luís Henrique Giorgetti Dantas - 13782369
+- João Gabriel Manfre Nazar - 13733652
 */
 
 

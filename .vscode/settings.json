@@ -11,6 +11,7 @@
         "cabecalhoindice.h": "c",
         "indicestring.h": "c",
         "parbusca.h": "c",
-        "registro.h": "c"
+        "registro.h": "c",
+        "cstddef": "c"
     }
 }

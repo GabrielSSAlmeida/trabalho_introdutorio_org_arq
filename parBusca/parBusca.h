@@ -12,6 +12,9 @@
     PARES_BUSCA *VetorParesBuscaCriar(int tamanho);
     char *GetNomeCampo(PARES_BUSCA *vetor, int pos);
     char *GetValorCampoString(PARES_BUSCA *vetor, int pos);
+    int GetTipoCampo(PARES_BUSCA *vetor, int pos);
+    void AtualizaTipoCampo(PARES_BUSCA *vetor, int pos, int valor);
+    int GetValorCampoInt(PARES_BUSCA *vetor, int pos);
     void AtualizaValorCampoInt(PARES_BUSCA *vetor, int pos, int valor);
     bool DecideOrdemBusca(PARES_BUSCA *vetor, int tamanho, char *campoIndexado);
     void DesalocaParesBusca(PARES_BUSCA *vetor);

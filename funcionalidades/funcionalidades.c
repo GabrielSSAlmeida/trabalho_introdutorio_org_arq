@@ -109,12 +109,14 @@ bool funcionalidade3(){
 
 bool funcionalidade4(){
     char arqEntrada[32];
-    char arqSaida[32];
+    char nomeArqIndice[32];
     char campoIndexado[32];
     char dado[32];
     int qtdBuscas;
 
-    RecebeEntradaFunc4(arqEntrada, campoIndexado, dado, arqSaida, &qtdBuscas);
+    RecebeEntradaFunc4(arqEntrada, campoIndexado, dado, nomeArqIndice, &qtdBuscas);
+
+
 
     //verifica se o tipo de dado é string(1) ou int(0)
     int dadoVerificado = VerificaDado(dado);
@@ -125,43 +127,184 @@ bool funcionalidade4(){
         int qtdPares;
         scanf("%d ", &qtdPares);
 
-        PARES_BUSCA *paresBusca = VetorParesBuscaCriar(qtdBuscas);
+        PARES_BUSCA *paresBusca = VetorParesBuscaCriar(qtdPares);
+
 
         for (int j = 0; j < qtdPares; j++)
         {
             char *nomeCampo = GetNomeCampo(paresBusca, j);
             scanf("%s ", nomeCampo);
-
-            printf("%s ", nomeCampo);
             int tipoCampo = TipoChaveBusca(nomeCampo);
 
+            AtualizaTipoCampo(paresBusca, j, tipoCampo);
             if (tipoCampo == 0 || tipoCampo == 1){ //O campo é do tipo int
                 int valorCampoInt;
                 scanf("%d ", &valorCampoInt);
                 AtualizaValorCampoInt(paresBusca, j, valorCampoInt);
 
-                printf("%d ", valorCampoInt);
             }else if(tipoCampo >= 2){
                 scan_quote_string(GetValorCampoString(paresBusca, j));
-                getchar(); //Ler o espaço depois das aspas.
 
-                printf("%s ", GetValorCampoString(paresBusca, j));
             }else{//Caso seja -1
                 ErroArquivo();
             }
-
         } 
         
+
         
-        DecideOrdemBusca(paresBusca, qtdPares, campoIndexado); 
+
+        printf("Resposta para a busca %d\n", i+1);
+        int contador = 0;
+        
+        //Vai indicar os byteOffset dos registros encontrados
+        //-1 indica o fim do vetor
+        //0 indica o byteOffset que não passou em todos os casos de busca
+        long int *vetorByteOffset  = calloc(1, sizeof(long int));
+
+        //Primeira busca eh binaria
+        if(DecideOrdemBusca(paresBusca, qtdPares, campoIndexado)){
+
+            FILE *arqBin;
+            if(!AbreArquivo(&arqBin, arqEntrada, "r", NULL)) return false;
+
+            int tipoCampo = GetTipoCampo(paresBusca, 0);
+
+            if (tipoCampo == 0 || tipoCampo == 1){ //O campo é do tipo int
+                vetorByteOffset =  BuscaBinariaIndiceInt(nomeArqIndice, GetValorCampoInt(paresBusca, 0), vetorByteOffset);
+
+            }else if(tipoCampo >= 2){ //O campo é do tipo string
+               vetorByteOffset =  BuscaBinariaIndiceString(nomeArqIndice, GetValorCampoString(paresBusca, 0), vetorByteOffset);
+            }
+
+            contador++;
+
+            /*  A partir das buscas retornadas da busca binaria, verifica se esses campos
+                satisfazem os outros criterios de busca
+            */
+            while (contador < qtdPares){
+                int tipoCampo = GetTipoCampo(paresBusca, contador);
+
+                for (int j = 0; vetorByteOffset[j] != -1 ; j++)
+                {
+                    DADOS *registro_aux = LeRegistroPorByteOffset(arqBin, vetorByteOffset[j]);
+
+                    switch (tipoCampo)
+                    {
+                        case 0:
+                            if(GetRegistroIdCrime(registro_aux) != GetValorCampoInt(paresBusca, contador)){
+                                vetorByteOffset[j] = 0;
+                            }
+                            break;
+                        
+                        case 1:
+                            if(GetRegistroNroArtigo(registro_aux) != GetValorCampoInt(paresBusca, contador)){
+                                vetorByteOffset[j] = 0;
+                            }
+                            break;
+                        
+                        case 2:
+                            if(strncmp(GetRegistroDataCrime(registro_aux), 
+                            GetValorCampoString(paresBusca, contador), 10) != 0){
+                                vetorByteOffset[j] = 0;
+                            }
+                            break;
+
+                        case 3:
+                            if(strncmp(GetRegistroMarcaCelular(registro_aux), 
+                            GetValorCampoString(paresBusca, contador), 12) !=0){
+                                vetorByteOffset[j] = 0;
+                            }
+                            break;
+
+                        case 4:
+                            if(strcmpAtePipe(GetRegistroLugarCrime(registro_aux), 
+                            GetValorCampoString(paresBusca, contador))!= 0){
+                                vetorByteOffset[j] = 0;
+                            }
+                            break;
+                        
+                        case 5:
+                            if(strcmpAtePipe(GetRegistroDescricaoCrime(registro_aux), 
+                            GetValorCampoString(paresBusca, contador)) != 0){
+                                vetorByteOffset[j] = 0;
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+
+                    DesalocaRegistro(registro_aux);
+                }
+                
+                contador++;
+            }
+
+            //Não encontrou o registro
+            if(vetorByteOffset[0] == -1){
+                ErroRegistro();
+            }else{
+                int passou = 0;
+                int tamanho = 0;
+                //Percorre vetor de byteoffset e le os registros
+                for (int j = 0; vetorByteOffset[j] != -1; j++)
+                {
+                    if(vetorByteOffset[j] != 0){
+                        passou = 1;
+                        DADOS *registro_aux = LeRegistroPorByteOffset(arqBin, vetorByteOffset[j]);
+                        ImprimeRegistroBinario(registro_aux);
+
+                        DesalocaRegistro(registro_aux);
+                    }
+                }
+                
+                if(!passou){
+                    ErroRegistro();
+                }
+            }
+
+            
+            fclose(arqBin);
+        }else{
+            //todos os casos são busca sequencial
+            //ErroRegistro();
+
+            //Serve para saber o tamanho final do vetor
+            int tamanhoVetor = 0;
+            DADOS **vetorRegistros;
+            for (int i = 0; i < qtdPares; i++)
+            {
+                int tipoCampo = GetTipoCampo(paresBusca, i);
+                if (tipoCampo == 0 || tipoCampo == 1){ //O campo é do tipo int
+                    vetorRegistros = BuscaSequencialBinarioInt(arqEntrada, GetValorCampoInt(paresBusca, i), tipoCampo, &tamanhoVetor);
+                }else if(tipoCampo >= 2){ //O campo é do tipo string
+                    vetorRegistros = BuscaSequencialBinarioString(arqEntrada, GetValorCampoString(paresBusca, i), tipoCampo, &tamanhoVetor);
+                }
+                
+            }
+
+            for (int i = 0; i < tamanhoVetor; i++)
+            {
+                if(vetorRegistros[i] != NULL){
+                    ImprimeRegistroBinario(vetorRegistros[i]);
+                }
+            }
+            
+            DesalocaVetorRegistro(vetorRegistros, tamanhoVetor);
+            
+        }
+        
+
+
+        
 
 
 
+
+
+        free(vetorByteOffset);
         DesalocaParesBusca(paresBusca);
+        
     }
     
-    
-    
-
     return true;
 }
