@@ -266,10 +266,7 @@ bool funcionalidade4(){
             fclose(arqBin);
         }else{
             //todos os casos são busca sequencial
-            //ErroRegistro();
-
             BuscaSequencialBinario(arqEntrada, paresBusca, qtdPares);
-            
             
         }
         

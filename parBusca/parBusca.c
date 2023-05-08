@@ -97,3 +97,79 @@ bool DecideOrdemBusca(PARES_BUSCA *vetor, int tamanho, char *campoIndexado){
     return false;
     
 }
+
+
+void BuscaSequencialBinario(char *nomeArqBin, PARES_BUSCA *paresBusca, int qtdPares){
+    FILE *arqBin;
+    if(!AbreArquivo(&arqBin, nomeArqBin, "r", NULL)) return ;
+
+    CABECALHO *cabecalho_aux = CabecalhoCriar();
+
+    //le o cabecalho do arquivo binario
+    LeCabecalhoDoArqBinario(cabecalho_aux, arqBin);
+
+    DADOS *registro_aux = RegistroCriar();
+
+    //não usa
+    int aux;
+    int flag = LerRegBinario(arqBin, registro_aux, &aux);
+    int i;
+    int qtdRegistrosImpressos = 0;
+    for(i=0; flag!=0; i++){
+        int passou = 1;//Verifica se passou em todos os criterios de busca
+        
+        for (int j = 0; j < qtdPares; j++)
+        {
+            int tipoCampo = GetTipoCampo(paresBusca, j);
+            int len = strlen(GetValorCampoString(paresBusca, j));
+
+            switch (tipoCampo)
+            {
+                case 0:
+                    if(GetRegistroIdCrime(registro_aux) != GetValorCampoInt(paresBusca, j))
+                        passou = 0;
+                    break;
+                case 1:
+                    if(GetRegistroNroArtigo(registro_aux) != GetValorCampoInt(paresBusca, j))
+                        passou = 0;
+                    break;
+                case 2:
+                    if(strncmp(GetRegistroDataCrime(registro_aux), GetValorCampoString(paresBusca, j), len) != 0 )
+                        passou = 0;
+                    break;
+                case 3:
+                    if(strncmp(GetRegistroMarcaCelular(registro_aux), GetValorCampoString(paresBusca, j), len) != 0 )
+                        passou = 0;
+                    break;
+                case 4:
+                    if(strcmpAtePipe(GetRegistroLugarCrime(registro_aux), GetValorCampoString(paresBusca, j)) != 0 )
+                        passou = 0;
+                    break;
+                case 5:
+                    if(strcmpAtePipe(GetRegistroDescricaoCrime(registro_aux), GetValorCampoString(paresBusca, j)) != 0 )
+                        passou = 0;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        if(passou){
+            ImprimeRegistroBinario(registro_aux);
+            qtdRegistrosImpressos++;
+        }
+        
+        DesalocaCamposVariaveis(registro_aux);
+
+        flag = LerRegBinario(arqBin, registro_aux, &aux); 
+    }
+
+
+    //desaloca os auxiliares criados
+    DesalocaCabecalho(cabecalho_aux);
+    DesalocaRegistro(registro_aux);
+
+    //se nao existem registros no arquivo
+    if(i==0 || qtdRegistrosImpressos == 0) ErroRegistro();
+    fclose(arqBin);
+}

@@ -5,7 +5,6 @@
     #include <string.h>
     #include "../cabecalho/cabecalho.h"
     #include "../arquivos/arquivos.h"
-    #include "../parBusca/parBusca.h"
 
     typedef struct dados DADOS;
 
@@ -26,7 +25,7 @@
 
     //Funcionalidade 4
     DADOS *LeRegistroPorByteOffset(FILE *arqBin, long int byteOffset);
-    void BuscaSequencialBinario(char *nomeArqBin, PARES_BUSCA *paresBusca, int qtdPares);
+    
 
     //Funções Get do registro de Dados
     char GetRegistroRemovido(DADOS *registro);

@@ -19,6 +19,6 @@
     bool DecideOrdemBusca(PARES_BUSCA *vetor, int tamanho, char *campoIndexado);
     void DesalocaParesBusca(PARES_BUSCA *vetor);
 
-
+    void BuscaSequencialBinario(char *nomeArqBin, PARES_BUSCA *paresBusca, int qtdPares);
     
 #endif
