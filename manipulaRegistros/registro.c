@@ -42,21 +42,6 @@ DADOS *RegistroCriar(void){
     return registro;
 }
 
-DADOS **VetorRegistroCriar(int tamanho){
-    DADOS **registro = (DADOS**) calloc(tamanho, sizeof(DADOS *));
-
-    //inicializa registro
-    if(registro != NULL){
-        for (int i = 0; i < tamanho; i++)
-        {
-            registro[i] == NULL;
-        }
-    }
-    else{
-        ErroAlocacao();
-    }
-    return registro;
-}
 
 void DesalocaCamposVariaveis(DADOS *registro){
     if(registro != NULL){
@@ -263,9 +248,9 @@ DADOS *LeRegistroPorByteOffset(FILE *arqBin, long int byteOffset){
 }
 
 
-DADOS **BuscaSequencialBinarioInt(char *nomeArqBin, int valorBuscado, int tipoCampo, int *tamanhoVetor){
+void BuscaSequencialBinario(char *nomeArqBin, PARES_BUSCA *paresBusca, int qtdPares){
     FILE *arqBin;
-    if(!AbreArquivo(&arqBin, nomeArqBin, "r", NULL)) return NULL;
+    if(!AbreArquivo(&arqBin, nomeArqBin, "r", NULL)) return ;
 
     CABECALHO *cabecalho_aux = CabecalhoCriar();
 
@@ -273,131 +258,69 @@ DADOS **BuscaSequencialBinarioInt(char *nomeArqBin, int valorBuscado, int tipoCa
     LeCabecalhoDoArqBinario(cabecalho_aux, arqBin);
 
     DADOS *registro_aux = RegistroCriar();
+
+    //não usa
     int aux;
     int flag = LerRegBinario(arqBin, registro_aux, &aux);
-
-    DADOS **vetorRegistros = VetorRegistroCriar(1);
     int i;
-    int passou = 0;
+    int qtdRegistrosImpressos = 0;
     for(i=0; flag!=0; i++){
+        int passou = 1;//Verifica se passou em todos os criterios de busca
         
-        switch (tipoCampo)
+        for (int j = 0; j < qtdPares; j++)
         {
-            case 0:
-                if(valorBuscado == registro_aux->idCrime){
-                    passou = 1;
-                    vetorRegistros[i] = registro_aux;
-                }
-                break;
-            
-            case 1:
-                if(valorBuscado == registro_aux->numeroArtigo){
-                    passou = 1;
-                    vetorRegistros[i] = registro_aux;
-                }
-                break;
+            int tipoCampo = GetTipoCampo(paresBusca, j);
 
-            default:
-                break;
+            switch (tipoCampo)
+            {
+                case 0:
+                    if(registro_aux->idCrime != GetValorCampoInt(paresBusca, j))
+                        passou = 0;
+                    break;
+                case 1:
+                    if(registro_aux->numeroArtigo != GetValorCampoInt(paresBusca, j))
+                        passou = 0;
+                    break;
+                case 2:
+                    if(strncmp(registro_aux->dataCrime, GetValorCampoString(paresBusca, j), 10) != 0 )
+                        passou = 0;
+                    break;
+                case 3:
+                    if(strncmp(registro_aux->marcaCelular, GetValorCampoString(paresBusca, j), 12) != 0 )
+                        passou = 0;
+                    break;
+                case 4:
+                    if(strcmpAtePipe(registro_aux->lugarCrime, GetValorCampoString(paresBusca, j)) != 0 )
+                        passou = 0;
+                    break;
+                case 5:
+                    if(strcmpAtePipe(registro_aux->descricaoCrime, GetValorCampoString(paresBusca, j)) != 0 )
+                        passou = 0;
+                    break;
+                default:
+                    break;
+            }
         }
-        registro_aux = RegistroCriar();
-        vetorRegistros = (DADOS **) realloc(vetorRegistros, sizeof(DADOS*) * i+1);
+
+        if(passou){
+            ImprimeRegistroBinario(registro_aux);
+            qtdRegistrosImpressos++;
+        }
+        
+        DesalocaCamposVariaveis(registro_aux);
 
         flag = LerRegBinario(arqBin, registro_aux, &aux); 
     }
 
-    *tamanhoVetor = i;
 
     //desaloca os auxiliares criados
     DesalocaCabecalho(cabecalho_aux);
     DesalocaRegistro(registro_aux);
 
     //se nao existem registros no arquivo
-    if(i==0 || passou == 0) ErroRegistro();
+    if(i==0 || qtdRegistrosImpressos == 0) ErroRegistro();
     fclose(arqBin);
-    return vetorRegistros;
 }
-
-
-
-DADOS **BuscaSequencialBinarioString(char *nomeArqBin, char *valorBuscado, int tipoCampo, int *tamanhoVetor){
-    FILE *arqBin;
-    if(!AbreArquivo(&arqBin, nomeArqBin, "r", NULL)) return NULL;
-
-    CABECALHO *cabecalho_aux = CabecalhoCriar();
-    DADOS *registro_aux = RegistroCriar();
-
-    //le o cabecalho do arquivo binario
-    LeCabecalhoDoArqBinario(cabecalho_aux, arqBin);
-
-    int aux;
-    int flag = LerRegBinario(arqBin, registro_aux, &aux);
-
-
-    DADOS **vetorRegistros = VetorRegistroCriar(1);
-
-    int i;
-    int passou = 0;
-    for(i=0; flag!=0; i++){
-        
-        switch (tipoCampo)
-        {
-            case 2:
-                if(strncmp(valorBuscado, registro_aux->dataCrime, 10)){
-                    passou = 1;
-                    vetorRegistros[i] = registro_aux;
-                }else{
-                    vetorRegistros[i] = NULL;
-                }
-                break;
-            
-            case 3:
-                if(strncmp(valorBuscado, registro_aux->marcaCelular, 12)){
-                    passou = 1;
-                    vetorRegistros[i] = registro_aux;
-                }else{
-                    vetorRegistros[i] = NULL;
-                }
-                break;
-            
-            case 4:
-                if(strcmpAtePipe(registro_aux->lugarCrime, valorBuscado)){
-                    passou = 1;
-                    vetorRegistros[i] = registro_aux;
-                }else{
-                    vetorRegistros[i] = NULL;
-                }
-                break;
-            case 5:
-                if(strcmpAtePipe(registro_aux->descricaoCrime, valorBuscado)){
-                    passou = 1;
-                    vetorRegistros[i] = registro_aux;
-                }else{
-                    vetorRegistros[i] = NULL;
-                }
-                break;
-            default:
-                break;
-        }
-        registro_aux = RegistroCriar();
-        vetorRegistros = (DADOS **) realloc(vetorRegistros, sizeof(DADOS*) * i+1);
-
-        flag = LerRegBinario(arqBin, registro_aux, &aux); 
-    }
-
-    *tamanhoVetor = i;
-
-    //desaloca os auxiliares criados
-    DesalocaCabecalho(cabecalho_aux);
-    DesalocaRegistro(registro_aux);
-
-    //se nao existem registros no arquivo
-    if(i==0 || passou == 0) ErroRegistro();
-    fclose(arqBin);
-    return vetorRegistros;
-}
-
-
 
 
 

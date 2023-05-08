@@ -268,28 +268,8 @@ bool funcionalidade4(){
             //todos os casos são busca sequencial
             //ErroRegistro();
 
-            //Serve para saber o tamanho final do vetor
-            int tamanhoVetor = 0;
-            DADOS **vetorRegistros;
-            for (int i = 0; i < qtdPares; i++)
-            {
-                int tipoCampo = GetTipoCampo(paresBusca, i);
-                if (tipoCampo == 0 || tipoCampo == 1){ //O campo é do tipo int
-                    vetorRegistros = BuscaSequencialBinarioInt(arqEntrada, GetValorCampoInt(paresBusca, i), tipoCampo, &tamanhoVetor);
-                }else if(tipoCampo >= 2){ //O campo é do tipo string
-                    vetorRegistros = BuscaSequencialBinarioString(arqEntrada, GetValorCampoString(paresBusca, i), tipoCampo, &tamanhoVetor);
-                }
-                
-            }
-
-            for (int i = 0; i < tamanhoVetor; i++)
-            {
-                if(vetorRegistros[i] != NULL){
-                    ImprimeRegistroBinario(vetorRegistros[i]);
-                }
-            }
+            BuscaSequencialBinario(arqEntrada, paresBusca, qtdPares);
             
-            DesalocaVetorRegistro(vetorRegistros, tamanhoVetor);
             
         }
         
