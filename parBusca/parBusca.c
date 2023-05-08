@@ -98,7 +98,7 @@ void RecebeParesBuscaFunc4(int qtdPares, PARES_BUSCA *paresBusca){
     }
 }
 
-//Retorna true se existe for para realizar a busca binaria na primeira posição
+//Retorna true se existe um par para realizar a busca binaria na primeira posição
 bool DecideOrdemBusca(PARES_BUSCA *vetor, int tamanho, char *campoIndexado){
 
     int tipoChaveBusca = TipoChaveBusca(campoIndexado);
