@@ -64,6 +64,20 @@ void DesalocaRegistro(DADOS *registro){
     }
 }
 
+void DesalocaVetorRegistro(DADOS **registro, int tamanho){
+    if(registro != NULL){
+        for (int i = 0; i < tamanho; i++)
+        {
+            DesalocaCamposVariaveis(registro[i]);
+            free(registro[i]);
+        }
+        free(registro);
+    }
+    else{
+        ErroDesalocar();
+    }
+}
+
 
 //Essa função faz a leitura de um registro do arquivo CSV
 DADOS *LerRegistroCsv(FILE *arquivoCSV, int *flagFuncionou){
@@ -147,7 +161,7 @@ int LerRegBinario(FILE *arqBin, DADOS *registro, int *offsetlido){
 }
 
 
-void ImprimeRegistroBinario(FILE *arqBin, DADOS *registro){
+void ImprimeRegistroBinario(DADOS *registro){
     if(registro->removido == '0'){
 
         //imprime o id do crime
@@ -196,7 +210,7 @@ bool ImprimirBinario(FILE *arqBin){
     int i;
     for(i=0; flag!=0; i++){
         
-        ImprimeRegistroBinario(arqBin, registro_aux);
+        ImprimeRegistroBinario(registro_aux);
         DesalocaCamposVariaveis(registro_aux);
 
         flag = LerRegBinario(arqBin, registro_aux, &aux); 
@@ -214,6 +228,30 @@ bool ImprimirBinario(FILE *arqBin){
     return true;
 
 }
+
+
+DADOS *LeRegistroPorByteOffset(FILE *arqBin, long int byteOffset){
+    //vai ate o byteoffset do registro buscado
+    fseek(arqBin, byteOffset, SEEK_SET);
+
+    DADOS *registro = RegistroCriar();
+
+    int tamanho_registro;
+    int flag = LerRegBinario(arqBin, registro, &tamanho_registro);
+
+    if(flag == 0){
+        ErroArquivo();
+        return NULL;
+    }
+
+    return registro;
+}
+
+
+
+
+
+
 
 char GetRegistroRemovido(DADOS *registro){
     if(registro != NULL){

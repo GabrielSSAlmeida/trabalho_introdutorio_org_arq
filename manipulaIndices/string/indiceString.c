@@ -9,7 +9,7 @@ struct dadosIndiceString{
 };
 
 //aloca um registro de indice do tipo String
-DADOS_STR *RegistroDadosStringCriar(void){
+DADOS_STR *IndiceDadosStringCriar(void){
     DADOS_STR *registro = (DADOS_STR*) calloc(1, sizeof(DADOS_STR));
 
     //inicializa registro
@@ -46,6 +46,13 @@ void EscreveArqIndiceString(FILE* arqIndice, DADOS_STR indice, int* nroRegistro)
     }else{
         (*nroRegistro)--;
     }
+}
+
+DADOS_STR LerRegIndiceString(FILE *arqIndice, DADOS_STR *registroIndice){
+    fread(&(registroIndice->chaveBusca), sizeof(char), 12, arqIndice);
+    fread(&(registroIndice->byteOffset), sizeof(long int), 1, arqIndice);
+
+    return (*registroIndice);
 }
 
 
@@ -144,7 +151,7 @@ bool CriaIndiceString(char arqEntrada[], char arqSaida[], char campo[]){
 }
 
 bool InsereCampoStringEmIndices(DADOS_STR *vetor, DADOS *registro_auxiliar, int posicao, int campo, int byteoffset){
-    DADOS_STR *registroDados = RegistroDadosStringCriar();
+    DADOS_STR *registroDados = IndiceDadosStringCriar();
     
     switch(campo){
         //caso dataCrime
@@ -254,3 +261,90 @@ void mergeSortIndiceString(DADOS_STR* vetor, int inicio, int fim){
 	//processo de conquista
 	intercalaString(vetor, inicio, centro, fim);
 }
+
+
+
+
+long int* buscaBinaria_iterativa_string(DADOS_STR* vetor, int posicaoInicial, int posicaoFinal, char *chave, long int *vetorByteOffset){
+    int posInicialGlobal = posicaoInicial;
+    int posFinalGlobal = posicaoFinal;
+    int len = strlen(chave); //para nn ler os '$'
+    int tam_vetor = 1;
+	while(posicaoInicial <= posicaoFinal){
+		int centro = (int)((posicaoInicial+posicaoFinal)/2);
+
+        
+		if (strncmp(chave, vetor[centro].chaveBusca, len)==0) {
+            int centroAux = centro;
+            
+            //volta ate o primeiro que satisfaz
+            while (centroAux >= posInicialGlobal && strncmp(chave, vetor[centroAux].chaveBusca, len)==0 )
+            {
+                centroAux--;
+            }
+
+            centroAux++;
+            //ao encontrar um que satisfaz, verifica todos acima dele que sejam iguais 
+            while (centroAux <= posFinalGlobal && strncmp(chave, vetor[centroAux].chaveBusca, len)==0 )
+            {
+                vetorByteOffset[tam_vetor-1] = vetor[centroAux].byteOffset;
+                tam_vetor++;
+                vetorByteOffset = (long int *) realloc(vetorByteOffset, sizeof(long int) * tam_vetor);
+                centroAux++;
+            } 
+              
+            break;
+        }
+			
+		else if (strncmp(chave, vetor[centro].chaveBusca, 12) < 0) 
+			posicaoFinal = centro - 1;
+		else if (strncmp(chave, vetor[centro].chaveBusca, 12) > 0) 
+			posicaoInicial = centro + 1;
+	}
+
+    //Coloca o -1 para saber qual é o ultimo elemento
+    vetorByteOffset[tam_vetor-1] = -1;
+    return vetorByteOffset;
+}
+
+
+
+long int* BuscaBinariaIndiceString(char *nomeArqIndice, char *valorBuscado, long int *vetorByteOffset){
+    FILE *arqIndice;
+    CABECALHO_INDICE *cabecalho_aux = CabecalhoIndiceCriar();
+    DADOS_STR *registroIndice_aux= IndiceDadosStringCriar();
+
+
+    //abre o arquivo de indice
+    if(!AbreArquivo(&arqIndice, nomeArqIndice, "r", NULL)) return NULL;
+
+    LeCabecalhoDoArqIndice(cabecalho_aux, arqIndice);
+
+    int nroReg = GetNroRegArqIndice(cabecalho_aux);
+
+    DADOS_STR *vetorIndices = VetorIndicesStringCriar(nroReg);
+
+
+    //Preenche o vetor de indices
+    for (int i = 0; i < nroReg; i++)
+    {
+        vetorIndices[i] = LerRegIndiceString(arqIndice, registroIndice_aux);
+        
+        //printf("%d %s %ld \n", i, vetorIndices[i].chaveBusca, vetorIndices[i].byteOffset);
+    }
+
+
+    vetorByteOffset = buscaBinaria_iterativa_string(vetorIndices, 0, nroReg, valorBuscado, vetorByteOffset);
+
+    DesalocaCabecalhoIndice(cabecalho_aux);
+    free(registroIndice_aux);
+    fclose(arqIndice);
+
+    
+    free(vetorIndices);
+    return vetorByteOffset;
+}
+
+
+
+

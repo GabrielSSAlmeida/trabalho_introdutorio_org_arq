@@ -264,3 +264,26 @@ void strncpySem0(char *string1, char *string2, int n){
     for(int i = 0; i<n && string2[i] != '|'; i++)
         string1[i] = string2[i];
 }
+
+int strcmpAtePipe(char *string1, char *string2){
+    int pos1= 0;
+    int pos2 = 0;
+    while (string1[pos1] != '|' || string2[pos2] != '\0')
+    {
+        if(string1[pos1] != string2[pos2]){
+            break;
+        }
+        pos1++;
+        pos2++;
+    }
+
+    if(string1[pos1] == '|' && string2[pos2] == '\0'){
+        pos1--;
+        pos2--;
+    }
+    char s1 = string1[pos1];
+    char s2 = string2[pos2];
+    int diferenca =  (int)s1 - (int)s2;
+    return diferenca;
+    
+}

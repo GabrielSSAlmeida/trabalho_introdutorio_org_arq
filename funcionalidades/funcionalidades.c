@@ -109,17 +109,30 @@ bool funcionalidade3(){
 
 bool funcionalidade4(){
     char arqEntrada[32];
-    char arqSaida[32];
-    char campo[32];
+    char nomeArqIndice[32];
+    char campoIndexado[32];
     char dado[32];
     int qtdBuscas;
 
-    RecebeEntradaFunc4(arqEntrada, campo, dado, arqSaida, &qtdBuscas);
+    RecebeEntradaFunc4(arqEntrada, campoIndexado, dado, nomeArqIndice, &qtdBuscas);
 
-    //verifica se o tipo de dado é string(1) ou int(0)
-    int dadoVerificado = VerificaDado(dado);
 
+    for (int i = 0; i < qtdBuscas; i++)
+    {
+        int qtdPares;
+        scanf("%d ", &qtdPares);
+
+        PARES_BUSCA *paresBusca = VetorParesBuscaCriar(qtdPares);
+
+        RecebeParesBuscaFunc4(qtdPares, paresBusca); 
+        
+        printf("Resposta para a busca %d\n", i+1);
+
+        if(!MetodoDeBusca(arqEntrada, nomeArqIndice, paresBusca, qtdPares, campoIndexado)) return false;
+
+        DesalocaParesBusca(paresBusca);
+        
+    }
     
-
     return true;
 }

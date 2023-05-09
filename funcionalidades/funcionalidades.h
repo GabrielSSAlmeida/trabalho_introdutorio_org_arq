@@ -5,6 +5,7 @@
     #include <string.h>
     #include <stdbool.h>
     #include "../utils/utils.h"
+    #include "../parBusca/parBusca.h"
     #include "../manipulaRegistros/registro.h"
     #include "../prints_e_erros/prints_e_erros.h"
     #include "../arquivos/arquivos.h"

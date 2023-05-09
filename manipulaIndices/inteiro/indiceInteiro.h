@@ -5,12 +5,13 @@
     #include <string.h>
     #include "../../cabecalho/cabecalhoIndice.h"
     #include "../../manipulaRegistros/registro.h"
+    #include "../../parBusca/parBusca.h"
 
     typedef struct dadosIndiceInt DADOS_INT;
 
 
     //aloca um registro de indice do tipo inteiro
-    DADOS_INT *RegistroDadosIntCriar(void);
+    DADOS_INT *IndiceDadosIntCriar(void);
     //aloca um vetor de DADOS_INT
     DADOS_INT *VetorIndicesIntCriar(int tamanho);
 
@@ -24,5 +25,6 @@
     void mergeSortIndiceInt(DADOS_INT* vetor, int inicio, int fim);
 
 
+    long int* BuscaBinariaIndiceInt(char *nomeArqIndice, int valorBuscado, long int *vetorByteOffset);
 
 #endif

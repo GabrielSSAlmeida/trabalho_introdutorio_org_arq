@@ -11,7 +11,7 @@
 
     bool CriaIndiceString(char arqEntrada[], char arqSaida[], char campo[]);
 
-    DADOS_STR *RegistroDadosStringCriar(void);
+    DADOS_STR *IndiceDadosStringCriar(void);
     DADOS_STR *VetorIndicesStringCriar(int tamanho);
 
 
@@ -19,5 +19,7 @@
 
 
     void mergeSortIndiceString(DADOS_STR* vetor, int inicio, int fim);
+
+    long int* BuscaBinariaIndiceString(char *nomeArqIndice, char *valorBuscado, long int *vetorByteOffset);
 
 #endif
