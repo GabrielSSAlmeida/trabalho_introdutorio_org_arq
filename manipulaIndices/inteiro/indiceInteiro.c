@@ -100,7 +100,7 @@ bool CriaIndiceInteiro(char arqEntrada[], char arqSaida[], char campo[]){
     //fecha para atualizar em disco
     fclose(arqIndice);
     //abre novamente para uso
-    if(!AbreArquivo(&arqIndice, arqSaida, "wb+", NULL)) return false;
+    if(!AbreArquivo(&arqIndice, arqSaida, "rb+", NULL)) return false;
     //ajusta o ponteiro para depois do cabecalho
     fseek(arqIndice, 5, SEEK_SET);
 
@@ -122,10 +122,12 @@ bool CriaIndiceInteiro(char arqEntrada[], char arqSaida[], char campo[]){
     int offsetanterior = 17;
     //A flag verifica se o id foi lido e serve para saber se chegou no final do arquivo
     int flag = LerRegBinario(arqBin, registro_auxiliar, &offsetlido);
+    int pos=0;
     int i;
     for(i=0; flag!=0; i++){
         if(GetRegistroRemovido(registro_auxiliar) == '0'){
-            InsereCampoIntEmIndices(indices, registro_auxiliar, i, tipoCampo, offsetanterior);
+            InsereCampoIntEmIndices(indices, registro_auxiliar, pos, tipoCampo, offsetanterior);
+            pos++;
         }
 
         DesalocaCamposVariaveis(registro_auxiliar);

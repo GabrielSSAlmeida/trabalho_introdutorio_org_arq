@@ -261,7 +261,7 @@ int TipoChaveBusca(char campo[]){
 
 //strncpy sem copiar o /0
 void strncpySem0(char *string1, char *string2, int n){
-    for(int i=0; i<n && string2[i] != '|'; i++)
+    int i = 0;
+    for( ; i<n && string2[i] != '|'; i++)
         string1[i] = string2[i];
-
 }

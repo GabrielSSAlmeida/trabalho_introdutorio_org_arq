@@ -65,7 +65,7 @@ bool CriaIndiceString(char arqEntrada[], char arqSaida[], char campo[]){
     fclose(arqIndice);
 
     //abre novamente para uso
-    if(!AbreArquivo(&arqIndice, arqSaida, "wb+", NULL)) return false;
+    if(!AbreArquivo(&arqIndice, arqSaida, "rb+", NULL)) return false;
 
     //ajusta o ponteiro para depois do cabecalho
     fseek(arqIndice, 5, SEEK_SET);
@@ -90,10 +90,12 @@ bool CriaIndiceString(char arqEntrada[], char arqSaida[], char campo[]){
     int offsetanterior = 17;
 
     int flag = LerRegBinario(arqBin, registro_auxiliar, &offsetlido);
+    int pos=0;
     int i;
     for(i=0; flag!=0; i++){
         if(GetRegistroRemovido(registro_auxiliar) == '0'){
-            InsereCampoStringEmIndices(indices, registro_auxiliar, i, tipoCampo, offsetanterior);
+            InsereCampoStringEmIndices(indices, registro_auxiliar, pos, tipoCampo, offsetanterior);
+            pos++;
         }
 
         DesalocaCamposVariaveis(registro_auxiliar);
@@ -104,7 +106,6 @@ bool CriaIndiceString(char arqEntrada[], char arqSaida[], char campo[]){
     }
     //se nao existem registros no arquivo
     if(i==0) ErroArquivo();
-
 
     //ordenar
     mergeSortIndiceString(indices, 0, nroRegistros-1);
