@@ -19,6 +19,7 @@
     bool funcionalidade2();
     bool funcionalidade3();
     bool funcionalidade4();
+    bool funcionalidade5();
 
 
 #endif

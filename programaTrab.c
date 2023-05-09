@@ -33,6 +33,10 @@ int main(){
             funcionalidade4();
             break;
         }
+        case 5:{
+            funcionalidade5();
+            break;
+        }
     }
 
     return 0;
