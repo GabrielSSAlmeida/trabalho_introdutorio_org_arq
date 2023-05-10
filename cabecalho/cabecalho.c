@@ -81,7 +81,7 @@ void AtualizaNroRegArq(CABECALHO *cabecalho, int nroRegArq){
 //Atualiza o campo NroRegRem
 void AtualizaNroRegRem(CABECALHO *cabecalho, int nroRegRem){
     if(cabecalho != NULL)
-        (cabecalho->nroRegArq) = nroRegRem;
+        (cabecalho->nroRegRem) = nroRegRem;
 }
 //Atualiza o campo proxByteOffset
 void AtualizaByteOffset(CABECALHO *cabecalho, int byteOffset){

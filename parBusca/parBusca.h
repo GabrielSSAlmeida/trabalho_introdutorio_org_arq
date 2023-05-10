@@ -45,6 +45,6 @@
 
     bool RemocaoBinariaIndicesBinario(char *arqEntrada, char *nomeArqIndice, PARES_BUSCA *paresBusca, int qtdPares);
 
-    bool RemocaoSequencialBinario(char *nomeArqBin, PARES_BUSCA *paresBusca, int qtdPares);
+    bool RemocaoSequencialBinario(char *nomeArqBin, char *nomeArqIndice, PARES_BUSCA *paresBusca, int qtdPares, int tipoCampoIndice);
     //=============================================================================================
 #endif

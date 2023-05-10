@@ -359,7 +359,7 @@ void RemoveArquivoIndiceInt(char *nomeArqIndice, long int byteOffset){
 
     DADOS_INT *vetorIndices = VetorIndicesIntCriar(nroReg);
 
-    int posByteOffset;
+    int posByteOffset = -1;
     //Preenche o vetor de indices
     for (int i = 0; i < nroReg; i++)
     {
@@ -370,6 +370,10 @@ void RemoveArquivoIndiceInt(char *nomeArqIndice, long int byteOffset){
         }
     }
 
+    if(posByteOffset == -1){
+        ErroArquivo();  
+    } 
+
     fclose(arqIndice); //Fecha o arquivo para leitura
 
 
@@ -377,6 +381,8 @@ void RemoveArquivoIndiceInt(char *nomeArqIndice, long int byteOffset){
     if(!AbreArquivo(&arqIndice, nomeArqIndice, "wb", NULL)) return ;
 
     LeCabecalhoDoArqIndice(cabecalho_aux, arqIndice);
+
+    printf("%d ", nroReg);
 
     ShiftadaDoRemovidoInt(vetorIndices, nroReg, posByteOffset);
 
