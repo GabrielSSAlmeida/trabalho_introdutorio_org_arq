@@ -254,7 +254,7 @@ void mergeSortIndiceInt(DADOS_INT* vetor, int inicio, int fim){
 
 
 
-long int* buscaBinaria_iterativa_int(DADOS_INT* vetor, int posicaoInicial, int posicaoFinal, int chave, long int *vetorByteOffset){
+long int* buscaBinariaInt(DADOS_INT* vetor, int posicaoInicial, int posicaoFinal, int chave, long int *vetorByteOffset){
     int posInicialGlobal = posicaoInicial;
     int posFinalGlobal = posicaoFinal;
     int tam_vetor = 1;
@@ -307,7 +307,7 @@ long int* BuscaBinariaIndiceInt(char *nomeArqIndice, int valorBuscado, long int 
 
 
     //abre o arquivo de indice
-    if(!AbreArquivo(&arqIndice, nomeArqIndice, "r", NULL)) return NULL;
+    if(!AbreArquivo(&arqIndice, nomeArqIndice, "rb", NULL)) return NULL;
 
     LeCabecalhoDoArqIndice(cabecalho_aux, arqIndice);
 
@@ -322,7 +322,7 @@ long int* BuscaBinariaIndiceInt(char *nomeArqIndice, int valorBuscado, long int 
     }
 
 
-    vetorByteOffset = buscaBinaria_iterativa_int(vetorIndices, 0, nroReg, valorBuscado, vetorByteOffset);
+    vetorByteOffset = buscaBinariaInt(vetorIndices, 0, nroReg, valorBuscado, vetorByteOffset);
 
     DesalocaCabecalhoIndice(cabecalho_aux);
     free(registroIndice_aux);
@@ -334,8 +334,67 @@ long int* BuscaBinariaIndiceInt(char *nomeArqIndice, int valorBuscado, long int 
 }
 
 
+void ShiftadaDoRemovidoInt(DADOS_INT *vetorIndices, int tamanhoVetor, int posRemovido){
+    for (int i = posRemovido; i < tamanhoVetor-1; i++)
+    {
+        DADOS_INT aux = vetorIndices[i];
+        vetorIndices[i] = vetorIndices[i+1];
+        vetorIndices[i+1] = aux;
+    }
+}
 
 
+void RemoveArquivoIndiceInt(char *nomeArqIndice, long int byteOffset){
+    FILE *arqIndice;
+    CABECALHO_INDICE *cabecalho_aux = CabecalhoIndiceCriar();
+    DADOS_INT *registroIndice_aux= IndiceDadosIntCriar();
+
+
+    //abre o arquivo de indice
+    if(!AbreArquivo(&arqIndice, nomeArqIndice, "rb", NULL)) return ;
+
+    LeCabecalhoDoArqIndice(cabecalho_aux, arqIndice);
+
+    int nroReg = GetNroRegArqIndice(cabecalho_aux);
+
+    DADOS_INT *vetorIndices = VetorIndicesIntCriar(nroReg);
+
+    int posByteOffset;
+    //Preenche o vetor de indices
+    for (int i = 0; i < nroReg; i++)
+    {
+        vetorIndices[i] = LerRegIndiceInt(arqIndice, registroIndice_aux);
+        if(vetorIndices[i].byteOffset == byteOffset){
+            posByteOffset = i;
+            vetorIndices[i].chaveBusca = -1; //Indica que esta removido
+        }
+    }
+
+    fclose(arqIndice); //Fecha o arquivo para leitura
+
+
+    //abre o arquivo de indice para reescrita
+    if(!AbreArquivo(&arqIndice, nomeArqIndice, "wb", NULL)) return ;
+
+    LeCabecalhoDoArqIndice(cabecalho_aux, arqIndice);
+
+    ShiftadaDoRemovidoInt(vetorIndices, nroReg, posByteOffset);
+
+    AtualizaNroRegArqIndice(cabecalho_aux, nroReg-1);
+
+    EscreveCabecalhoIndice(arqIndice, cabecalho_aux);
+
+    for (int i = 0; i < nroReg; i++)
+    {
+        EscreveArqIndiceInt(arqIndice, vetorIndices[i], &nroReg);
+    }
+
+    free(vetorIndices);
+    DesalocaCabecalhoIndice(cabecalho_aux);
+    free(registroIndice_aux);
+    fclose(arqIndice);
+    
+}
 
 
 

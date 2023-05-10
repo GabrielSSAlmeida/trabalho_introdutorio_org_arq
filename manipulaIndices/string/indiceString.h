@@ -22,4 +22,7 @@
 
     long int* BuscaBinariaIndiceString(char *nomeArqIndice, char *valorBuscado, long int *vetorByteOffset);
 
+
+    void RemoveArquivoIndiceString(char *nomeArqIndice, long int byteOffset);
+
 #endif

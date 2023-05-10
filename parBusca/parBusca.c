@@ -76,7 +76,8 @@ void DesalocaParesBusca(PARES_BUSCA *vetor){
 }
 
 
-void RecebeParesBuscaFunc4(int qtdPares, PARES_BUSCA *paresBusca){
+//Le da entrada padrão cada par de busca em uma busca e armazena na struct
+void RecebeParesBusca(int qtdPares, PARES_BUSCA *paresBusca){
     for (int j = 0; j < qtdPares; j++)
     {
         char *nomeCampo = GetNomeCampo(paresBusca, j);
@@ -121,24 +122,26 @@ bool DecideOrdemBusca(PARES_BUSCA *vetor, int tamanho, char *campoIndexado){
     
 }
 
-
+//Escolhe se vai fazer uma busca binaria no arquivo de indices ou uma busca sequencial no binario
 bool MetodoDeBusca(char *arqEntrada, char *nomeArqIndice, PARES_BUSCA *paresBusca, int qtdPares, char *campoIndexado){
     if(DecideOrdemBusca(paresBusca, qtdPares, campoIndexado)){ //O metodo é a busca binaria
-        if(!BuscaBinariaBinario(arqEntrada, nomeArqIndice, paresBusca, qtdPares)) return false;
+        if(!BuscaBinariaIndices(arqEntrada, nomeArqIndice, paresBusca, qtdPares)) return false;
     }else{ //o metodo é a busca sequencial
-        BuscaSequencialBinario(arqEntrada, paresBusca, qtdPares);
+        if(!BuscaSequencialBinario(arqEntrada, paresBusca, qtdPares)) return false;
     }
 
     return true;
 }
 
-bool BuscaBinariaBinario(char *arqEntrada, char *nomeArqIndice, PARES_BUSCA *paresBusca, int qtdPares){
+//Realiza uma busca binaria no arquivo de indices e depois verifica as outras buscas no arquivo binario
+//imprime as buscas que passarem nos testes
+bool BuscaBinariaIndices(char *arqEntrada, char *nomeArqIndice, PARES_BUSCA *paresBusca, int qtdPares){
     //Vai indicar os byteOffset dos registros encontrados
     //-1 indica o fim do vetor
     long int *vetorByteOffset  = calloc(1, sizeof(long int));
 
     FILE *arqBin;
-    if(!AbreArquivo(&arqBin, arqEntrada, "r", NULL)) return false;
+    if(!AbreArquivo(&arqBin, arqEntrada, "rb", NULL)) return false;
 
     int tipoCampo = GetTipoCampo(paresBusca, 0);
 
@@ -149,10 +152,8 @@ bool BuscaBinariaBinario(char *arqEntrada, char *nomeArqIndice, PARES_BUSCA *par
         vetorByteOffset =  BuscaBinariaIndiceString(nomeArqIndice, GetValorCampoString(paresBusca, 0), vetorByteOffset);
     }
 
-
-    
    int qtdRegistrosImpressos=0;
-   //Se tiver apenas 1 criterio de busca(no caso o pelo indice) ja imprime
+   //Se tiver apenas 1 criterio de busca(no caso, a busca pelo indice) ja imprime
    if(qtdPares == 1){
         for (int j = 0; vetorByteOffset[j] != -1; j++)
         {
@@ -241,100 +242,17 @@ bool BuscaBinariaBinario(char *arqEntrada, char *nomeArqIndice, PARES_BUSCA *par
    }
    if(qtdRegistrosImpressos == 0) ErroRegistro();
    
-   
-
-   
-    /* while (contador < qtdPares){
-        int tipoCampo = GetTipoCampo(paresBusca, contador);
-
-        for (int j = 0; vetorByteOffset[j] != -1 ; j++)
-        {
-            DADOS *registro_aux = LeRegistroPorByteOffset(arqBin, vetorByteOffset[j]);
-
-            switch (tipoCampo)
-            {
-                case 0:
-                    if(GetRegistroIdCrime(registro_aux) != GetValorCampoInt(paresBusca, contador)){
-                        vetorByteOffset[j] = 0;
-                    }
-                    break;
-                
-                case 1:
-                    if(GetRegistroNroArtigo(registro_aux) != GetValorCampoInt(paresBusca, contador)){
-                        vetorByteOffset[j] = 0;
-                    }
-                    break;
-                
-                case 2:
-                    if(strncmp(GetRegistroDataCrime(registro_aux), 
-                    GetValorCampoString(paresBusca, contador), 10) != 0){
-                        vetorByteOffset[j] = 0;
-                    }
-                    break;
-
-                case 3:
-                    if(strncmp(GetRegistroMarcaCelular(registro_aux), 
-                    GetValorCampoString(paresBusca, contador), 12) !=0){
-                        vetorByteOffset[j] = 0;
-                    }
-                    break;
-
-                case 4:
-                    if(strcmpAtePipe(GetRegistroLugarCrime(registro_aux), 
-                    GetValorCampoString(paresBusca, contador))!= 0){
-                        vetorByteOffset[j] = 0;
-                    }
-                    break;
-                
-                case 5:
-                    if(strcmpAtePipe(GetRegistroDescricaoCrime(registro_aux), 
-                    GetValorCampoString(paresBusca, contador)) != 0){
-                        vetorByteOffset[j] = 0;
-                    }
-                    break;
-                default:
-                    break;
-            }
-
-            DesalocaRegistro(registro_aux);
-        }
-        
-        contador++;
-    } */
-
-    /* //Não encontrou o registro
-    if(vetorByteOffset[0] == -1){
-        ErroRegistro();
-    }else{
-        int passou = 0;
-        int tamanho = 0;
-        //Percorre vetor de byteoffset e le os registros
-        for (int j = 0; vetorByteOffset[j] != -1; j++)
-        {
-            if(vetorByteOffset[j] != 0){
-                passou = 1;
-                DADOS *registro_aux = LeRegistroPorByteOffset(arqBin, vetorByteOffset[j]);
-                ImprimeRegistroBinario(registro_aux);
-
-                DesalocaRegistro(registro_aux);
-            }
-        }
-        
-        if(!passou){
-            ErroRegistro();
-        }
-    } */
-
     
     fclose(arqBin);
     free(vetorByteOffset);
     return true;
 }
 
-
-void BuscaSequencialBinario(char *nomeArqBin, PARES_BUSCA *paresBusca, int qtdPares){
+//Realiza uma busca sequencial direto no arquivo binario
+//imprime as buscas que passarem nos testes
+bool BuscaSequencialBinario(char *nomeArqBin, PARES_BUSCA *paresBusca, int qtdPares){
     FILE *arqBin;
-    if(!AbreArquivo(&arqBin, nomeArqBin, "r", NULL)) return ;
+    if(!AbreArquivo(&arqBin, nomeArqBin, "rb", NULL)) return false;
 
     CABECALHO *cabecalho_aux = CabecalhoCriar();
 
@@ -405,4 +323,171 @@ void BuscaSequencialBinario(char *nomeArqBin, PARES_BUSCA *paresBusca, int qtdPa
     //se nao existem registros no arquivo
     if(i==0 || qtdRegistrosImpressos == 0) ErroRegistro();
     fclose(arqBin);
+    return true;
 }
+
+
+
+
+//Escolhe se vai remover a partir de uma busca binaria no arquivo de indices ou uma busca sequencial no binario
+bool MetodoDeRemocao(char *arqEntrada, char *nomeArqIndice, PARES_BUSCA *paresBusca, int qtdPares, char *campoIndexado){
+
+    if(DecideOrdemBusca(paresBusca, qtdPares, campoIndexado)){ //O metodo é a busca binaria
+        if(!RemocaoBinariaIndicesBinario(arqEntrada, nomeArqIndice, paresBusca, qtdPares)) return false;
+    }else{ //o metodo é a busca sequencial
+        if(!RemocaoSequencialBinario(arqEntrada, paresBusca, qtdPares)) return false;
+    }
+
+    return true;
+}
+
+
+bool RemocaoBinariaIndicesBinario(char *arqEntrada, char *nomeArqIndice, PARES_BUSCA *paresBusca, int qtdPares){
+    //Vai indicar os byteOffset dos registros encontrados
+    //0 indica um registro que não passou em todos os casos
+    //-1 indica o fim do vetor
+    long int *vetorByteOffset  = calloc(1, sizeof(long int));
+
+    FILE *arqBin;
+    if(!AbreArquivo(&arqBin, arqEntrada, "rb+", NULL)) return false;
+
+    int tipoCampoIndice = GetTipoCampo(paresBusca, 0);
+
+    if (tipoCampoIndice == 0 || tipoCampoIndice == 1){ //O campo é do tipo int
+        vetorByteOffset =  BuscaBinariaIndiceInt(nomeArqIndice, GetValorCampoInt(paresBusca, 0), vetorByteOffset);
+
+    }else if(tipoCampoIndice >= 2){ //O campo é do tipo string
+        vetorByteOffset =  BuscaBinariaIndiceString(nomeArqIndice, GetValorCampoString(paresBusca, 0), vetorByteOffset);
+    }
+
+   int qtdRegistrosRemovidos=0;
+   //Se tiver apenas 1 criterio de busca(no caso, a busca pelo indice) ja imprime
+   if(qtdPares == 1){
+        char remove = '1';
+
+        for (int j = 0; vetorByteOffset[j] != -1; j++)
+        {
+            fseek(arqBin, vetorByteOffset[j], SEEK_SET);
+            fwrite(&(remove), sizeof(char), 1, arqBin);
+            
+            if (tipoCampoIndice == 0 || tipoCampoIndice == 1){ //O campo é do tipo int
+                RemoveArquivoIndiceInt(nomeArqIndice, vetorByteOffset[j]);
+                qtdRegistrosRemovidos++;
+
+            }else if(tipoCampoIndice >= 2){ //O campo é do tipo string
+                RemoveArquivoIndiceString(nomeArqIndice, vetorByteOffset[j]);
+                qtdRegistrosRemovidos++;
+            } 
+        }
+        
+   }
+    /*  A partir das buscas retornadas da busca binaria, verifica se esses campos
+        satisfazem os outros criterios de busca
+    */
+   else{
+        for (int j = 0; vetorByteOffset[j] != -1; j++){
+            int passou = 1;
+            
+            DADOS *registro_aux = LeRegistroPorByteOffset(arqBin, vetorByteOffset[j]);
+
+            for (int i = 1; i < qtdPares; i++)
+            {
+                int tipoCampo = GetTipoCampo(paresBusca, i);
+
+                switch (tipoCampo)
+                {
+                    case 0:
+                        if(GetRegistroIdCrime(registro_aux) != GetValorCampoInt(paresBusca, i)){
+                            passou = 0;
+                            vetorByteOffset[j] = 0;
+                        }
+                        break;
+                    
+                    case 1:
+                        if(GetRegistroNroArtigo(registro_aux) != GetValorCampoInt(paresBusca, i)){
+                            passou = 0;
+                             vetorByteOffset[j] = 0;
+                        }
+                        break;
+                    
+                    case 2:{
+
+                        int len = strlen(GetValorCampoString(paresBusca, i));
+                        if(strncmp(GetRegistroDataCrime(registro_aux), 
+                        GetValorCampoString(paresBusca, i), len) != 0){
+                            passou = 0;
+                             vetorByteOffset[j] = 0;
+                        }
+                        break;
+                    }
+                        
+
+                    case 3:{
+                        int len = strlen(GetValorCampoString(paresBusca, i));
+                        if(strncmp(GetRegistroMarcaCelular(registro_aux), 
+                        GetValorCampoString(paresBusca, i), len) !=0){
+                            passou = 0;
+                             vetorByteOffset[j] = 0;
+                        }
+                        break;
+                    }
+                    case 4:
+                        if(strcmpAtePipe(GetRegistroLugarCrime(registro_aux), 
+                        GetValorCampoString(paresBusca, i))!= 0){
+                            passou = 0;
+                             vetorByteOffset[j] = 0;
+                        }
+                        break;
+                    
+                    case 5:
+                        if(strcmpAtePipe(GetRegistroDescricaoCrime(registro_aux), 
+                        GetValorCampoString(paresBusca, i)) != 0){
+                            passou = 0;
+                            vetorByteOffset[j] = 0;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+
+            }
+
+            if(passou && GetRegistroRemovido(registro_aux) != '1'){
+                //remover
+                fseek(arqBin, vetorByteOffset[j], SEEK_SET);
+                fwrite(&(remove), sizeof(char), 1, arqBin);
+                
+                if (tipoCampoIndice == 0 || tipoCampoIndice == 1){ //O campo é do tipo int
+                    RemoveArquivoIndiceInt(nomeArqIndice, vetorByteOffset[j]);
+                    qtdRegistrosRemovidos++;
+
+                }else if(tipoCampoIndice >= 2){ //O campo é do tipo string
+                    RemoveArquivoIndiceString(nomeArqIndice, vetorByteOffset[j]);
+                    qtdRegistrosRemovidos++;
+                } 
+                qtdRegistrosRemovidos++;
+            }
+               
+            DesalocaRegistro(registro_aux);
+        
+        }
+   }
+   if(qtdRegistrosRemovidos == 0) ErroRegistro();
+   
+    
+    fclose(arqBin);
+    free(vetorByteOffset);
+    binarioNaTela(arqEntrada);
+    binarioNaTela(nomeArqIndice);
+    return true;
+}
+
+
+
+bool RemocaoSequencialBinario(char *nomeArqBin, PARES_BUSCA *paresBusca, int qtdPares){
+    
+}
+
+
+
+

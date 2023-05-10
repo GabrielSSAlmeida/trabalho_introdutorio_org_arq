@@ -17,7 +17,7 @@ void RecebeEntradaFunc3(char arqEntrada[], char campo[], char dado[], char arqIn
     scanf("%s %s %s %s", arqEntrada, campo, dado, arqIndice);
 }
 
-void RecebeEntradaFunc4(char arqEntrada[], char campo[], char dado[], char arqIndice[], int *qtdBuscas){
+void RecebeEntradaFunc4e5(char arqEntrada[], char campo[], char dado[], char arqIndice[], int *qtdBuscas){
     scanf("%s %s %s %s %d", arqEntrada, campo, dado, arqIndice, qtdBuscas);
 }
 

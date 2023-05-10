@@ -27,4 +27,6 @@
 
     long int* BuscaBinariaIndiceInt(char *nomeArqIndice, int valorBuscado, long int *vetorByteOffset);
 
+    void RemoveArquivoIndiceInt(char *nomeArqIndice, long int byteOffset);
+
 #endif

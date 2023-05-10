@@ -30,7 +30,7 @@ bool funcionalidade1(){
     fclose(arqBin);
 
     //abre o arquivo novamente
-    if(!AbreArquivo(&arqBin, arqSaida, "wb+", NULL)) return false;
+    if(!AbreArquivo(&arqBin, arqSaida, "rb+", NULL)) return false;
 
     //ajusta o ponteiro para dps do cabecalho
     fseek(arqBin, GetByteOffset(cabecalho_saida), SEEK_SET);
@@ -114,7 +114,7 @@ bool funcionalidade4(){
     char dado[32];
     int qtdBuscas;
 
-    RecebeEntradaFunc4(arqEntrada, campoIndexado, dado, nomeArqIndice, &qtdBuscas);
+    RecebeEntradaFunc4e5(arqEntrada, campoIndexado, dado, nomeArqIndice, &qtdBuscas);
 
 
     for (int i = 0; i < qtdBuscas; i++)
@@ -124,7 +124,7 @@ bool funcionalidade4(){
 
         PARES_BUSCA *paresBusca = VetorParesBuscaCriar(qtdPares);
 
-        RecebeParesBuscaFunc4(qtdPares, paresBusca); 
+        RecebeParesBusca(qtdPares, paresBusca); 
         
         printf("Resposta para a busca %d\n", i+1);
 
@@ -138,5 +138,28 @@ bool funcionalidade4(){
 }
 
 bool funcionalidade5(){
+    char arqEntrada[32];
+    char nomeArqIndice[32];
+    char campoIndexado[32];
+    char dado[32];
+    int qtdBuscas;
+
+    RecebeEntradaFunc4e5(arqEntrada, campoIndexado, dado, nomeArqIndice, &qtdBuscas);
+
+    for (int i = 0; i < qtdBuscas; i++)
+    {
+        int qtdPares;
+        scanf("%d ", &qtdPares);
+
+        PARES_BUSCA *paresBusca = VetorParesBuscaCriar(qtdPares);
+
+        RecebeParesBusca(qtdPares, paresBusca); 
+
+        if(!MetodoDeRemocao(arqEntrada, nomeArqIndice, paresBusca, qtdPares, campoIndexado)) return false;
+
+        DesalocaParesBusca(paresBusca);
+        
+    }
     
+    return true;
 }
