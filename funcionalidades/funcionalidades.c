@@ -136,3 +136,20 @@ bool funcionalidade4(){
     
     return true;
 }
+
+bool funcionalidade6(){
+    char arqEntrada[32];
+    char nomeArqIndice[32];
+    char campoIndexado[32];
+    char dado[32];
+    int n;
+    DADOS *registro_auxiliar = RegistroCriar();
+
+    RecebeEntradaFunc6(arqEntrada, campoIndexado, dado, nomeArqIndice, &n);
+
+    for(int i=0; i<n; i++){
+        RecebeRegistro(registro_auxiliar);
+        // ImprimeRegistroBinario(registro_auxiliar);
+    }
+
+}
