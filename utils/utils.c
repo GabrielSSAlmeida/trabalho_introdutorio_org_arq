@@ -68,8 +68,18 @@ void ImprimeCampoVariavel(char *string){
     printf(", ");
 }
 
+void avancaCursosEmCampoVariavel(FILE *arqBin){
+    char caracter;
+
+    fread(&caracter, 1, 1, arqBin);
+    while(caracter != '|'){
+        fread(&caracter, 1, 1, arqBin);
+    }
+}
+
+
 //Serve para avançar o cursor nos campos de tamanho variavel sem imprimir
-char *LerCampoVariavel(FILE *arqBin, int *offsetlido){
+char *LerCampoVariavel(FILE *arqBin, long int *offsetlido){
     char caracter;
     char *vetor = NULL;
     int numeroCaracteres = 0;
@@ -79,7 +89,6 @@ char *LerCampoVariavel(FILE *arqBin, int *offsetlido){
     if(vetor == NULL){
         ErroAlocacao();
     }
-
 
     fread(&caracter, 1, 1, arqBin);
     vetor[0] = caracter;

@@ -93,8 +93,8 @@ bool CriaIndiceString(char arqEntrada[], char arqSaida[], char campo[]){
     
 
     //Percorre arquivo binario lendo os registros
-    int offsetlido = 17; //será o offset do próximo registro durante o loop
-    int offsetanterior = 17;
+    long int offsetlido = 17; //será o offset do próximo registro durante o loop
+    long int offsetanterior = 17;
 
     int flag = LerRegBinario(arqBin, registro_auxiliar, &offsetlido);
     int pos=0;
@@ -330,7 +330,6 @@ long int* BuscaBinariaIndiceString(char *nomeArqIndice, char *valorBuscado, long
     {
         vetorIndices[i] = LerRegIndiceString(arqIndice, registroIndice_aux);
         
-        //printf("%d %s %ld \n", i, vetorIndices[i].chaveBusca, vetorIndices[i].byteOffset);
     }
 
 
@@ -372,7 +371,7 @@ void RemoveArquivoIndiceString(char *nomeArqIndice, long int byteOffset){
 
     DADOS_STR *vetorIndices = VetorIndicesStringCriar(nroReg);
 
-    int posByteOffset;
+    int posByteOffset = -1;
     //Preenche o vetor de indices
     for (int i = 0; i < nroReg; i++)
     {
@@ -383,6 +382,10 @@ void RemoveArquivoIndiceString(char *nomeArqIndice, long int byteOffset){
         }
     }
 
+    if(posByteOffset == -1){
+        ErroArquivo();  
+    } 
+
     fclose(arqIndice); //Fecha o arquivo para leitura
 
 
@@ -391,7 +394,9 @@ void RemoveArquivoIndiceString(char *nomeArqIndice, long int byteOffset){
 
     LeCabecalhoDoArqIndice(cabecalho_aux, arqIndice);
 
-    ShiftadaDoRemovidoString(vetorIndices, nroReg, posByteOffset);
+    if(posByteOffset != -1){
+        ShiftadaDoRemovidoString(vetorIndices, nroReg, posByteOffset);
+    }
 
     AtualizaNroRegArqIndice(cabecalho_aux, nroReg-1);
 

@@ -135,8 +135,24 @@ void EscreverRegistroBin(FILE *arquivoBIN, DADOS *registro, CABECALHO *cabecalho
     AtualizaNroRegArq(cabecalho, GetNroRegArq(cabecalho)+1);
 }
 
+void avancaCursosSemRemovido(FILE *arqBin, DADOS *registro){
+    
+    fread(&(registro->idCrime), 4, 1, arqBin);
+    fread((registro->dataCrime), 10, 1, arqBin);
+    fread(&(registro->numeroArtigo), 4, 1, arqBin);
+    fread((registro->marcaCelular), 12, 1, arqBin);
+    
 
-int LerRegBinario(FILE *arqBin, DADOS *registro, int *offsetlido){
+    avancaCursosEmCampoVariavel(arqBin);
+    avancaCursosEmCampoVariavel(arqBin);
+
+    //lê o delimitador do registro
+    fread(&(registro->delimitador), 1, 1, arqBin);
+
+}
+
+
+int LerRegBinario(FILE *arqBin, DADOS *registro, long int *offsetlido){
     int aux = fread(&(registro->removido), 1, 1, arqBin);
 
     if(aux == 0){
@@ -203,7 +219,7 @@ bool ImprimirBinario(FILE *arqBin){
     }
 
     //é passado no parametro da funcao, mas nao sera utilizado nesse momento
-    int aux;
+    long int aux;
 
     int flag = LerRegBinario(arqBin, registro_aux, &aux);
 
@@ -236,7 +252,7 @@ DADOS *LeRegistroPorByteOffset(FILE *arqBin, long int byteOffset){
 
     DADOS *registro = RegistroCriar();
 
-    int tamanho_registro;
+    long int tamanho_registro;
     int flag = LerRegBinario(arqBin, registro, &tamanho_registro);
 
     if(flag == 0){

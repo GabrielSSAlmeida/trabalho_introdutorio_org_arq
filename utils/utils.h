@@ -20,7 +20,7 @@
     void ImprimeCampoVariavel(char *string);
     void ImprimeMarcaCelular(char marcaCelular[]);
     void ImprimeDataCrime(char dataCrime[]);
-    char *LerCampoVariavel(FILE *arqBin, int *offsetlido);
+    char *LerCampoVariavel(FILE *arqBin, long int *offsetlido);
 
 
     char *LerStringVariavel(FILE *arq);
@@ -32,6 +32,9 @@
 
     void strncpySem0(char *string1, char *string2, int n);
     int strcmpAtePipe(char *string1, char *string2);
+
+
+    void avancaCursosEmCampoVariavel(FILE *arqBin);
 
     //Ler e ignorar a primeira linha do arquivo
     void IgnoraLinha(FILE *arq);

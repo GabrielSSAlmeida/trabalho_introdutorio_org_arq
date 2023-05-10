@@ -9,7 +9,7 @@
     typedef struct dados DADOS;
 
     DADOS *RegistroCriar(void);
-    int LerRegBinario(FILE *arqBin, DADOS *registro, int *offsetlido);
+    int LerRegBinario(FILE *arqBin, DADOS *registro, long int *offsetlido);
     void DesalocaRegistro(DADOS *registro);
     void DesalocaVetorRegistro(DADOS **registro, int tamanho);
     void DesalocaCamposVariaveis(DADOS *registro);
@@ -26,6 +26,9 @@
     //Funcionalidade 4
     DADOS *LeRegistroPorByteOffset(FILE *arqBin, long int byteOffset);
     
+
+    //Func5
+    void avancaCursosSemRemovido(FILE *arqBin, DADOS *registro);
 
     //Funções Get do registro de Dados
     char GetRegistroRemovido(DADOS *registro);

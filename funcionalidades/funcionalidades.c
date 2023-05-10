@@ -133,9 +133,6 @@ bool funcionalidade4(){
         DesalocaParesBusca(paresBusca);
         
     }
-
-    binarioNaTela(arqEntrada);
-    binarioNaTela(nomeArqIndice);
     
     return true;
 }

@@ -125,8 +125,8 @@ bool CriaIndiceInteiro(char arqEntrada[], char arqSaida[], char campo[]){
     int tipoCampo = TipoChaveBusca(campo);
 
     //Percorre arquivo binario lendo os registros
-    int offsetlido = 17; //será o offset do proximo registro durante o loop
-    int offsetanterior = 17;
+    long int offsetlido = 17; //será o offset do proximo registro durante o loop
+    long int offsetanterior = 17;
     //A flag verifica se o id foi lido e serve para saber se chegou no final do arquivo
     int flag = LerRegBinario(arqBin, registro_auxiliar, &offsetlido);
     int pos=0;
@@ -182,7 +182,6 @@ bool CriaIndiceInteiro(char arqEntrada[], char arqSaida[], char campo[]){
     fclose(arqIndice);
 
     
-    binarioNaTela(arqSaida);
     
     return true;
 }
@@ -382,9 +381,10 @@ void RemoveArquivoIndiceInt(char *nomeArqIndice, long int byteOffset){
 
     LeCabecalhoDoArqIndice(cabecalho_aux, arqIndice);
 
-    printf("%d ", nroReg);
 
-    ShiftadaDoRemovidoInt(vetorIndices, nroReg, posByteOffset);
+    if(posByteOffset != -1){
+        ShiftadaDoRemovidoInt(vetorIndices, nroReg, posByteOffset);
+    }
 
     AtualizaNroRegArqIndice(cabecalho_aux, nroReg-1);
 
