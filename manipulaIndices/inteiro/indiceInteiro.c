@@ -181,7 +181,7 @@ bool CriaIndiceInteiro(char arqEntrada[], char arqSaida[], char campo[]){
     fclose(arqBin);
     fclose(arqIndice);
 
-    
+    binarioNaTela(arqSaida);
     
     return true;
 }
