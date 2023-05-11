@@ -35,6 +35,15 @@
     //escreve no arquivo de indice para inteiros
     void EscreveArqIndiceInt(FILE* arqIndice, DADOS_INT indice, int*nroRegistros);
 
+    //preenche o vetor com os indices do arquivo
+    void PreencheVetorIndicesINT(FILE *arqIndice, DADOS_INT *vetor, int tamanho);
+
+    //insere ordenado no vetor
+    void InsereVetorIndicesOrdenadoINT(DADOS_INT *vetorIndices, DADOS_INT *registroIndice, int tamanho);
+
+    //Copia os dados de acordo com o tipoCampo pedido
+    void CopiaChaveEByteOffsetINT(DADOS *registro, DADOS_INT *registroIndice, int byteoffset, int tipoCampo);   
+
 
     long int* BuscaBinariaIndiceInt(char *nomeArqIndice, int valorBuscado, long int *vetorByteOffset);
 

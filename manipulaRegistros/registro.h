@@ -7,6 +7,17 @@
     #include "../arquivos/arquivos.h"
     //#include "../manipulaIndices/string/indiceString.h"
 
+    struct dados{
+        char removido;                  //indica se a struct foi removida (1 = removido, 0 = nao)
+        int idCrime;                    
+        char dataCrime[10];
+        int numeroArtigo;
+        char marcaCelular[12];
+        char *lugarCrime;
+        char *descricaoCrime;
+        char delimitador;               //delimitador do fim da struct
+    };
+
     typedef struct dados DADOS;
 
     DADOS *RegistroCriar(void);

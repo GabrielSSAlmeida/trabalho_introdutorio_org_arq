@@ -302,6 +302,10 @@ int strcmpAtePipe(char *string1, char *string2){
         pos1--;
         pos2--;
     }
+
+    //trata caso de strings nulas
+    if(pos1 == -1 && pos2 == -1) return 0;
+
     char s1 = string1[pos1];
     char s2 = string2[pos2];
     int diferenca =  (int)s1 - (int)s2;

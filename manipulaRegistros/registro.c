@@ -2,16 +2,16 @@
 #include "../utils/utils.h"
 #include "../prints_e_erros/prints_e_erros.h"
 
-struct dados{
-        char removido;                  //indica se a struct foi removida (1 = removido, 0 = nao)
-        int idCrime;                    
-        char dataCrime[10];
-        int numeroArtigo;
-        char marcaCelular[12];
-        char *lugarCrime;
-        char *descricaoCrime;
-        char delimitador;               //delimitador do fim da struct
-};
+// struct dados{
+//         char removido;                  //indica se a struct foi removida (1 = removido, 0 = nao)
+//         int idCrime;                    
+//         char dataCrime[10];
+//         int numeroArtigo;
+//         char marcaCelular[12];
+//         char *lugarCrime;
+//         char *descricaoCrime;
+//         char delimitador;               //delimitador do fim da struct
+// };
 
 
 DADOS *RegistroCriar(void){
@@ -264,11 +264,6 @@ void RecebeRegistro(DADOS *registro){
     scan_quote_string(string_aux);
     strcpySem0Fixa(registro->dataCrime, string_aux);
 
-    // if(strcmp(string_aux, "")==0){
-    //     for(int i=0; i<10; i++)
-    //         registro->dataCrime[i] = '$';
-    // }
-
     //recebe numeroArtigo
     scan_quote_string(string_aux);
 
@@ -293,17 +288,9 @@ void RecebeRegistro(DADOS *registro){
 
     //recebe marcaCelular
     scan_quote_string(string_aux);
-    
-    // for(int i=11; i>=strlen(string_aux); i--)
-    //     registro->marcaCelular[i] = '$';
-    
 
     strcpySem0Fixa(registro->marcaCelular, string_aux);
 
-    // if(strcmp(string_aux, "")==0){
-    //     for(int i=0; i<12; i++)
-    //         registro->marcaCelular[i] = '$';
-    // }
 }
 
 bool InsereRegistroNoArqBin(DADOS *registro, char *arqEntrada, long int *byteoffset){
@@ -334,21 +321,12 @@ bool InsereRegistroNoArqBin(DADOS *registro, char *arqEntrada, long int *byteoff
     EscreveCabecalho(arqBin, cabecalho);
     DesalocaCabecalho(cabecalho);
     fclose(arqBin);
+
+    return true;
 }
 
-bool InsereRegistro(DADOS *registro, char *arqEntrada, char *nomeArqIndice, char *campo, char *dado){
-    //salva o byteoffset do registro após inserido no arq bin (sera usado no arquivo de indices)
-    long int byteoffsetanterior = 0;
-
-    InsereRegistroNoArqBin(registro, arqEntrada, &byteoffsetanterior);
-
-
-    //INSERCAO NO ARQUIVO DE INDICE
+bool InsereRegistroNoArqInd(DADOS *registro, char *nomeArqIndice, char *dado, int tipoCampo, int byteoffsetanterior){
     FILE *arqIndice;
-
-    //interpreta qual o tipo de campo exigido (string ou int)
-    int tipoCampo = TipoChaveBusca(campo);
-
     //atualiza status do arquivo
     if(!AbreArquivo(&arqIndice, nomeArqIndice, "rb+", NULL)) return false;
     CABECALHO_INDICE *cabecalho_indice = CabecalhoIndiceCriar();
@@ -369,48 +347,14 @@ bool InsereRegistro(DADOS *registro, char *arqEntrada, char *nomeArqIndice, char
             int nroReg = GetNroRegArqIndice(cabecalho_indice);
             DADOS_INT *vetorIndices = VetorIndicesIntCriar(nroReg+1);
             DADOS_INT *registroIndice_aux = IndiceDadosIntCriar();
-            DADOS_INT *registroIndice_aux2 = IndiceDadosIntCriar();
 
-            switch(tipoCampo){
-                //caso idCrime
-                case 0:{
-                    registroIndice_aux->chaveBusca = registro->idCrime;
-                    registroIndice_aux->byteOffset = byteoffsetanterior;
-                    break;
-                }
-
-                //caso numeroArtigo
-                case 1:{
-                    registroIndice_aux->chaveBusca = registro->numeroArtigo;
-                    registroIndice_aux->byteOffset = byteoffsetanterior;
-                    break;
-                }
-
-            }
+            CopiaChaveEByteOffsetINT(registro, registroIndice_aux, byteoffsetanterior, tipoCampo);
             
             LeCabecalhoDoArqIndice(cabecalho_indice, arqIndice);
 
-            //Preenche o vetor de indices
-            for (int i = 0; i < nroReg; i++)
-            {
-                vetorIndices[i] = LerRegIndiceInt(arqIndice, registroIndice_aux2);
-            }
+            PreencheVetorIndicesINT(arqIndice, vetorIndices, nroReg);
 
-            //insere ordenado
-            if(vetorIndices[nroReg-1].chaveBusca < registroIndice_aux->chaveBusca){
-                vetorIndices[nroReg].chaveBusca = registroIndice_aux->chaveBusca;
-                vetorIndices[nroReg].byteOffset = registroIndice_aux->byteOffset;
-            }
-            for(int i=0; i < nroReg; i++){
-                if(vetorIndices[i].chaveBusca > registroIndice_aux->chaveBusca){
-                    for(int j=nroReg; j>i; j--){
-                        vetorIndices[j] = vetorIndices[j-1];
-                    }
-                    vetorIndices[i].chaveBusca = registroIndice_aux->chaveBusca;
-                    vetorIndices[i].byteOffset = registroIndice_aux->byteOffset;
-                    break;
-                }
-            }
+            InsereVetorIndicesOrdenadoINT(vetorIndices, registroIndice_aux, nroReg);
 
             //escrever no arquivo de indice
             fclose(arqIndice);
@@ -425,24 +369,14 @@ bool InsereRegistro(DADOS *registro, char *arqEntrada, char *nomeArqIndice, char
             //Coloca o cursor no começo do arq para sobrescrever o cabecalho
             EscreveCabecalhoIndice(arqIndice, cabecalho_indice);
 
-            //essa variavel conta no sentido negativo (0, -1, -2, -3) por conta de outra parte do código
-            int contaNulos = 0;
-
+            //escreve os registros
+            int aux=0;
             for (int j = 0; j < nroReg+1; j++)
-                EscreveArqIndiceInt(arqIndice, vetorIndices[j], &contaNulos);
+                EscreveArqIndiceInt(arqIndice, vetorIndices[j], &aux);
             
-            nroReg = (nroReg+1) + contaNulos;
-
-            //ATUALIZA CABECALHO INDICE
-            AtualizaNroRegArqIndice(cabecalho_indice, nroReg);
-            fseek(arqIndice, 0, SEEK_SET);
-            EscreveCabecalhoIndice(arqIndice, cabecalho_indice);
-
-
 
             free(vetorIndices);
             free(registroIndice_aux);
-            free(registroIndice_aux2);
             break;
         }
 
@@ -550,6 +484,56 @@ bool InsereRegistro(DADOS *registro, char *arqEntrada, char *nomeArqIndice, char
     DesalocaCabecalhoIndice(cabecalho_indice);
     fclose(arqIndice);
 
+    return true;
+}
+
+bool TestaNulo(DADOS *registro, int tipoCampo){
+    switch(tipoCampo){
+        case 0:{
+            if(registro->idCrime == -1) return true;
+            break;
+        }
+        case 1:{
+            if(registro->numeroArtigo == -1) return true;
+            break;
+        }
+        case 2:{
+            if(registro->dataCrime[0] == '$') return true;
+            break;
+        }
+        case 3:{
+            if(registro->marcaCelular[0] == '$') return true;
+            break;
+        }
+        case 4:{
+            if(strcmpAtePipe(registro->lugarCrime, "") == 0) return true;
+            break;
+        }
+        case 5:{
+            if(strcmpAtePipe(registro->descricaoCrime, "") == 0) return true;
+            break;
+        }
+        default:
+            break;
+    }
+    return false;
+}
+
+bool InsereRegistro(DADOS *registro, char *arqEntrada, char *nomeArqIndice, char *campo, char *dado){
+    //salva o byteoffset do registro após inserido no arq bin (sera usado no arquivo de indices)
+    long int byteoffsetanterior = 0;
+
+    bool testeArqBin = InsereRegistroNoArqBin(registro, arqEntrada, &byteoffsetanterior);
+
+    //interpreta qual o tipo de campo exigido (string ou int)
+    int tipoCampo = TipoChaveBusca(campo);
+    //se o campo for nulo, o registro nao será inserido no arquivo de indice
+    if(TestaNulo(registro, tipoCampo)) return true;
+
+    bool testeArqInd = InsereRegistroNoArqInd(registro, nomeArqIndice, dado, tipoCampo, byteoffsetanterior);
+
+    if(testeArqBin && testeArqInd) return true;
+    else return false;
 }
 
 
