@@ -20,6 +20,7 @@
     bool funcionalidade3();
     bool funcionalidade4();
     bool funcionalidade5();
+    bool funcionalidade6();
 
 
 #endif

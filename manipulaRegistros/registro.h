@@ -5,6 +5,18 @@
     #include <string.h>
     #include "../cabecalho/cabecalho.h"
     #include "../arquivos/arquivos.h"
+    //#include "../manipulaIndices/string/indiceString.h"
+
+    struct dados{
+        char removido;                  //indica se a struct foi removida (1 = removido, 0 = nao)
+        int idCrime;                    
+        char dataCrime[10];
+        int numeroArtigo;
+        char marcaCelular[12];
+        char *lugarCrime;
+        char *descricaoCrime;
+        char delimitador;               //delimitador do fim da struct
+    };
 
     typedef struct dados DADOS;
 
@@ -25,7 +37,10 @@
 
     //Funcionalidade 4
     DADOS *LeRegistroPorByteOffset(FILE *arqBin, long int byteOffset);
-    
+
+    //Funcionalidade 6
+    void RecebeRegistro(DADOS *registro);
+    bool InsereRegistro(DADOS *registro, char *arqEntrada, char *arqIndice, char *campo, char *dado);
 
     //Func5
     void avancaCursosSemRemovido(FILE *arqBin, DADOS *registro);

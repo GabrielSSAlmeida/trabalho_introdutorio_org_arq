@@ -3,11 +3,6 @@
 #include "../../arquivos/arquivos.h"
 #include "../../prints_e_erros/prints_e_erros.h"
 
-struct dadosIndiceString{
-    char chaveBusca[12];                    
-    long int byteOffset;            //número relativo do registro do arquivo de dados referente à chave de busca
-};
-
 //aloca um registro de indice do tipo String
 DADOS_STR *IndiceDadosStringCriar(void){
     DADOS_STR *registro = (DADOS_STR*) calloc(1, sizeof(DADOS_STR));
@@ -342,6 +337,68 @@ long int* BuscaBinariaIndiceString(char *nomeArqIndice, char *valorBuscado, long
     
     free(vetorIndices);
     return vetorByteOffset;
+}
+
+//Copia os dados de acordo com o tipoCampo pedido
+void CopiaChaveEByteOffsetSTR(DADOS *registro, DADOS_STR *registroIndice, int byteoffset, int tipoCampo){
+    switch(tipoCampo){
+        //caso dataCrime
+        case 2:{
+            strncpySem0(registroIndice->chaveBusca, registro->dataCrime, 12);
+            registroIndice->byteOffset = byteoffset;
+            break;
+        }
+
+        //caso marcaCelular
+        case 3:{
+            strncpySem0(registroIndice->chaveBusca, registro->marcaCelular, 12);
+            registroIndice->byteOffset = byteoffset;
+            break;
+        }
+
+        //caso lugarCrime
+        case 4:{
+            strncpySem0(registroIndice->chaveBusca, registro->lugarCrime, 12);
+            registroIndice->byteOffset = byteoffset;
+            break;
+        }
+
+        //caso descricaoCrime
+        case 5:{
+            strncpySem0(registroIndice->chaveBusca, registro->descricaoCrime, 12);
+            registroIndice->byteOffset = byteoffset;
+            break;
+        }
+
+    }
+}
+
+void PreencheVetorIndicesSTR(FILE *arqIndice, DADOS_STR *vetor, int tamanho){
+    DADOS_STR *registroIndice = IndiceDadosStringCriar();
+    //Preenche o vetor de indices
+    for (int i = 0; i < tamanho; i++)
+    {
+        vetor[i] = LerRegIndiceString(arqIndice, registroIndice);
+    }
+    free(registroIndice);
+}
+
+void InsereVetorIndicesOrdenadoSTR(DADOS_STR *vetorIndices, DADOS_STR *registroIndice, int tamanho){
+    //insere ordenado
+    if(strncmp(vetorIndices[tamanho-1].chaveBusca, registroIndice->chaveBusca, 12) < 0 ){
+        strncpySem0(vetorIndices[tamanho].chaveBusca, registroIndice->chaveBusca, 12);
+        vetorIndices[tamanho].byteOffset = registroIndice->byteOffset;
+    }
+    for(int i=0; i < tamanho; i++){
+        if(vetorIndices[i].chaveBusca > registroIndice->chaveBusca){
+            for(int j=tamanho; j>i; j--){
+                vetorIndices[j] = vetorIndices[j-1];
+            }
+            strncpySem0(vetorIndices[i].chaveBusca, registroIndice->chaveBusca, 12);
+            vetorIndices[i].byteOffset = registroIndice->byteOffset;
+            break;
+        }
+    }
 }
 
 

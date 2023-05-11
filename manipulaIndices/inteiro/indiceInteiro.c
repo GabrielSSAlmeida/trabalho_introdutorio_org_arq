@@ -3,13 +3,6 @@
 #include "../../arquivos/arquivos.h"
 #include "../../prints_e_erros/prints_e_erros.h"
 
-
-struct dadosIndiceInt{
-    int chaveBusca;                    
-    long int byteOffset;            //número relativo do registro do arquivo de dados referente à chave de busca
-};
-
-
 //Criação das Structs
 //aloca um registro de indice do tipo inteiro
 DADOS_INT *IndiceDadosIntCriar(void){
@@ -315,10 +308,14 @@ long int* BuscaBinariaIndiceInt(char *nomeArqIndice, int valorBuscado, long int 
     DADOS_INT *vetorIndices = VetorIndicesIntCriar(nroReg);
 
     //Preenche o vetor de indices
-    for (int i = 0; i < nroReg; i++)
-    {
-        vetorIndices[i] = LerRegIndiceInt(arqIndice, registroIndice_aux);
-    }
+    // for (int i = 0; i < nroReg; i++)
+    // {
+    //     vetorIndices[i] = LerRegIndiceInt(arqIndice, registroIndice_aux);
+    // }
+
+    PreencheVetorIndicesINT(arqIndice, vetorIndices, nroReg);
+
+
 
 
     vetorByteOffset = buscaBinariaInt(vetorIndices, 0, nroReg, valorBuscado, vetorByteOffset);
@@ -332,6 +329,51 @@ long int* BuscaBinariaIndiceInt(char *nomeArqIndice, int valorBuscado, long int 
     return vetorByteOffset;
 }
 
+void PreencheVetorIndicesINT(FILE *arqIndice, DADOS_INT *vetor, int tamanho){
+    DADOS_INT *registroIndice = IndiceDadosIntCriar();
+    //Preenche o vetor de indices
+    for (int i = 0; i < tamanho; i++)
+    {
+        vetor[i] = LerRegIndiceInt(arqIndice, registroIndice);
+    }
+    free(registroIndice);
+}
+
+void InsereVetorIndicesOrdenadoINT(DADOS_INT *vetorIndices, DADOS_INT *registroIndice, int tamanho){
+    //insere ordenado
+    if(vetorIndices[tamanho-1].chaveBusca < registroIndice->chaveBusca){
+        vetorIndices[tamanho].chaveBusca = registroIndice->chaveBusca;
+        vetorIndices[tamanho].byteOffset = registroIndice->byteOffset;
+    }
+    for(int i=0; i < tamanho; i++){
+        if(vetorIndices[i].chaveBusca > registroIndice->chaveBusca){
+            for(int j=tamanho; j>i; j--){
+                vetorIndices[j] = vetorIndices[j-1];
+            }
+            vetorIndices[i].chaveBusca = registroIndice->chaveBusca;
+            vetorIndices[i].byteOffset = registroIndice->byteOffset;
+            break;
+        }
+    }
+}
+
+//Copia os dados de acordo com o tipoCampo pedido
+void CopiaChaveEByteOffsetINT(DADOS *registro, DADOS_INT *registroIndice, int byteoffset, int tipoCampo){
+    switch(tipoCampo){
+        //caso idCrime
+        case 0:{
+            registroIndice->chaveBusca = registro->idCrime;
+            registroIndice->byteOffset = byteoffset;
+            break;
+        }
+        //caso numeroArtigo
+        case 1:{
+            registroIndice->chaveBusca = registro->numeroArtigo;
+            registroIndice->byteOffset = byteoffset;
+            break;
+        }
+    }
+}
 
 void ShiftadaDoRemovidoInt(DADOS_INT *vetorIndices, int tamanhoVetor, int posRemovido){
     for (int i = posRemovido; i < tamanhoVetor-1; i++)

@@ -143,7 +143,7 @@ bool funcionalidade5(){
     char campoIndexado[32];
     char dado[32];
     int qtdBuscas;
-
+    
     RecebeEntradaFunc4e5(arqEntrada, campoIndexado, dado, nomeArqIndice, &qtdBuscas);
 
     for (int i = 0; i < qtdBuscas; i++)
@@ -165,4 +165,26 @@ bool funcionalidade5(){
     binarioNaTela(nomeArqIndice);
     
     return true;
+    
+}
+
+bool funcionalidade6(){
+    char arqEntrada[32];
+    char nomeArqIndice[32];
+    char campoIndexado[32];
+    char dado[32];
+    int n;
+
+    RecebeEntradaFunc6(arqEntrada, campoIndexado, dado, nomeArqIndice, &n);
+
+    for(int i=0; i<n; i++){
+        DADOS *registro_auxiliar = RegistroCriar();
+        RecebeRegistro(registro_auxiliar);
+        InsereRegistro(registro_auxiliar, arqEntrada, nomeArqIndice, campoIndexado, dado);
+
+        DesalocaCamposVariaveis(registro_auxiliar);
+        DesalocaRegistro(registro_auxiliar);
+    }
+
+
 }
