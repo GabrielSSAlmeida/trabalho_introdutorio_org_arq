@@ -31,4 +31,10 @@
 
     long int* BuscaBinariaIndiceString(char *nomeArqIndice, char *valorBuscado, long int *vetorByteOffset);
 
+    void CopiaChaveEByteOffsetSTR(DADOS *registro, DADOS_STR *registroIndice, int byteoffset, int tipoCampo);
+
+    void PreencheVetorIndicesSTR(FILE *arqIndice, DADOS_STR *vetor, int tamanho);
+
+    void InsereVetorIndicesOrdenadoSTR(DADOS_STR *vetorIndices, DADOS_STR *registroIndice, int tamanho);
+
 #endif

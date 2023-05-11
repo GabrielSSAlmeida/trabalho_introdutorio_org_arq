@@ -385,62 +385,68 @@ bool InsereRegistroNoArqInd(DADOS *registro, char *nomeArqIndice, char *dado, in
             int nroReg = GetNroRegArqIndice(cabecalho_indice);
             DADOS_STR *vetorIndices = VetorIndicesStringCriar(nroReg+1);
             DADOS_STR *registroIndice_aux = IndiceDadosStringCriar();
-            DADOS_STR *registroIndice_aux2 = IndiceDadosStringCriar();
+            // DADOS_STR *registroIndice_aux2 = IndiceDadosStringCriar();
 
-            switch(tipoCampo){
-                //caso dataCrime
-                case 2:{
-                    strncpySem0(registroIndice_aux->chaveBusca, registro->dataCrime, 12);
-                    registroIndice_aux->byteOffset = byteoffsetanterior;
-                    break;
-                }
+            // switch(tipoCampo){
+            //     //caso dataCrime
+            //     case 2:{
+            //         strncpySem0(registroIndice_aux->chaveBusca, registro->dataCrime, 12);
+            //         registroIndice_aux->byteOffset = byteoffsetanterior;
+            //         break;
+            //     }
 
-                //caso marcaCelular
-                case 3:{
-                    strncpySem0(registroIndice_aux->chaveBusca, registro->marcaCelular, 12);
-                    registroIndice_aux->byteOffset = byteoffsetanterior;
-                    break;
-                }
+            //     //caso marcaCelular
+            //     case 3:{
+            //         strncpySem0(registroIndice_aux->chaveBusca, registro->marcaCelular, 12);
+            //         registroIndice_aux->byteOffset = byteoffsetanterior;
+            //         break;
+            //     }
 
-                //caso lugarCrime
-                case 4:{
-                    strncpySem0(registroIndice_aux->chaveBusca, registro->lugarCrime, 12);
-                    registroIndice_aux->byteOffset = byteoffsetanterior;
-                    break;
-                }
+            //     //caso lugarCrime
+            //     case 4:{
+            //         strncpySem0(registroIndice_aux->chaveBusca, registro->lugarCrime, 12);
+            //         registroIndice_aux->byteOffset = byteoffsetanterior;
+            //         break;
+            //     }
 
-                //caso descricaoCrime
-                case 5:{
-                    strncpySem0(registroIndice_aux->chaveBusca, registro->descricaoCrime, 12);
-                    registroIndice_aux->byteOffset = byteoffsetanterior;
-                    break;
-                }
+            //     //caso descricaoCrime
+            //     case 5:{
+            //         strncpySem0(registroIndice_aux->chaveBusca, registro->descricaoCrime, 12);
+            //         registroIndice_aux->byteOffset = byteoffsetanterior;
+            //         break;
+            //     }
 
-            }
+            // }
+
+            CopiaChaveEByteOffsetSTR(registro, registroIndice_aux, byteoffsetanterior, tipoCampo);
 
             LeCabecalhoDoArqIndice(cabecalho_indice, arqIndice);
 
-            //Preenche o vetor de indices
-            for (int i = 0; i < nroReg; i++)
-            {
-                vetorIndices[i] = LerRegIndiceString(arqIndice, registroIndice_aux2);
-            }
+            // //Preenche o vetor de indices
+            // for (int i = 0; i < nroReg; i++)
+            // {
+            //     vetorIndices[i] = LerRegIndiceString(arqIndice, registroIndice_aux2);
+            // }
 
-            //insere ordenado
-            if(strncmp(vetorIndices[nroReg-1].chaveBusca, registroIndice_aux->chaveBusca, 12) < 0 ){
-                strncpySem0(vetorIndices[nroReg].chaveBusca, registroIndice_aux->chaveBusca, 12);
-                vetorIndices[nroReg].byteOffset = registroIndice_aux->byteOffset;
-            }
-            for(int i=0; i < nroReg; i++){
-                if(vetorIndices[i].chaveBusca > registroIndice_aux->chaveBusca){
-                    for(int j=nroReg; j>i; j--){
-                        vetorIndices[j] = vetorIndices[j-1];
-                    }
-                    strncpySem0(vetorIndices[i].chaveBusca, registroIndice_aux->chaveBusca, 12);
-                    vetorIndices[i].byteOffset = registroIndice_aux->byteOffset;
-                    break;
-                }
-            }
+            PreencheVetorIndicesSTR(arqIndice, vetorIndices, nroReg);
+
+            // //insere ordenado
+            // if(strncmp(vetorIndices[nroReg-1].chaveBusca, registroIndice_aux->chaveBusca, 12) < 0 ){
+            //     strncpySem0(vetorIndices[nroReg].chaveBusca, registroIndice_aux->chaveBusca, 12);
+            //     vetorIndices[nroReg].byteOffset = registroIndice_aux->byteOffset;
+            // }
+            // for(int i=0; i < nroReg; i++){
+            //     if(vetorIndices[i].chaveBusca > registroIndice_aux->chaveBusca){
+            //         for(int j=nroReg; j>i; j--){
+            //             vetorIndices[j] = vetorIndices[j-1];
+            //         }
+            //         strncpySem0(vetorIndices[i].chaveBusca, registroIndice_aux->chaveBusca, 12);
+            //         vetorIndices[i].byteOffset = registroIndice_aux->byteOffset;
+            //         break;
+            //     }
+            // }
+
+            InsereVetorIndicesOrdenadoSTR(vetorIndices, registroIndice_aux, nroReg);
 
             //escrever no arquivo de indice
             fclose(arqIndice);
@@ -455,24 +461,12 @@ bool InsereRegistroNoArqInd(DADOS *registro, char *nomeArqIndice, char *dado, in
             //Coloca o cursor no começo do arq para sobrescrever o cabecalho
             EscreveCabecalhoIndice(arqIndice, cabecalho_indice);
 
-            //essa variavel conta no sentido negativo (0, -1, -2, -3) por conta de outra parte do código
-            int contaNulos = 0;
-
+            int aux=0;
             for (int j = 0; j < nroReg+1; j++)
-                EscreveArqIndiceString(arqIndice, vetorIndices[j], &contaNulos);
-            
-            nroReg = (nroReg+1) + contaNulos;
-
-            //ATUALIZA CABECALHO INDICE
-            AtualizaNroRegArqIndice(cabecalho_indice, nroReg);
-            fseek(arqIndice, 0, SEEK_SET);
-            EscreveCabecalhoIndice(arqIndice, cabecalho_indice);
-
-
+                EscreveArqIndiceString(arqIndice, vetorIndices[j], &aux);
 
             free(vetorIndices);
             free(registroIndice_aux);
-            free(registroIndice_aux2);
 
             break;
         }

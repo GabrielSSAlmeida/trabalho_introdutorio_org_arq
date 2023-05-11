@@ -25,6 +25,10 @@ void RecebeEntradaFunc6(char arqEntrada[], char campo[], char dado[], char arqIn
     scanf("%s %s %s %s %d", arqEntrada, campo, dado, arqIndice, n);
 }
 
+void RecebeEntradaFunc7(char arqEntrada[], char campo[], char dado[], char arqIndice[], int *n){
+    scanf("%s %s %s %s %d", arqEntrada, campo, dado, arqIndice, n);
+}
+
 
 void ImprimeMarcaCelular(char marcaCelular[]){
     //imprime marca do celular
