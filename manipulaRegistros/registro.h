@@ -5,6 +5,7 @@
     #include <string.h>
     #include "../cabecalho/cabecalho.h"
     #include "../arquivos/arquivos.h"
+    //#include "../manipulaIndices/string/indiceString.h"
 
     typedef struct dados DADOS;
 
@@ -25,7 +26,10 @@
 
     //Funcionalidade 4
     DADOS *LeRegistroPorByteOffset(FILE *arqBin, long int byteOffset);
-    
+
+    //Funcionalidade 6
+    void RecebeRegistro(DADOS *registro);
+    bool InsereRegistro(DADOS *registro, char *arqEntrada, char *arqIndice, char *campo, char *dado);
 
     //Funções Get do registro de Dados
     char GetRegistroRemovido(DADOS *registro);

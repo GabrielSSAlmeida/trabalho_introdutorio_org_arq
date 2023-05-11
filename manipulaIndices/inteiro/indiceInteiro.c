@@ -3,13 +3,6 @@
 #include "../../arquivos/arquivos.h"
 #include "../../prints_e_erros/prints_e_erros.h"
 
-
-struct dadosIndiceInt{
-    int chaveBusca;                    
-    long int byteOffset;            //número relativo do registro do arquivo de dados referente à chave de busca
-};
-
-
 //Criação das Structs
 //aloca um registro de indice do tipo inteiro
 DADOS_INT *IndiceDadosIntCriar(void){

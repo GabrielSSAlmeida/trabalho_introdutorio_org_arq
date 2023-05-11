@@ -143,13 +143,17 @@ bool funcionalidade6(){
     char campoIndexado[32];
     char dado[32];
     int n;
-    DADOS *registro_auxiliar = RegistroCriar();
 
     RecebeEntradaFunc6(arqEntrada, campoIndexado, dado, nomeArqIndice, &n);
 
     for(int i=0; i<n; i++){
+        DADOS *registro_auxiliar = RegistroCriar();
         RecebeRegistro(registro_auxiliar);
-        // ImprimeRegistroBinario(registro_auxiliar);
+        InsereRegistro(registro_auxiliar, arqEntrada, nomeArqIndice, campoIndexado, dado);
+
+        DesalocaCamposVariaveis(registro_auxiliar);
+        DesalocaRegistro(registro_auxiliar);
     }
+
 
 }

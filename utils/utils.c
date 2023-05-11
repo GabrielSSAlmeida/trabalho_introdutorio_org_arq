@@ -21,6 +21,10 @@ void RecebeEntradaFunc4(char arqEntrada[], char campo[], char dado[], char arqIn
     scanf("%s %s %s %s %d", arqEntrada, campo, dado, arqIndice, qtdBuscas);
 }
 
+void RecebeEntradaFunc6(char arqEntrada[], char campo[], char dado[], char arqIndice[], int *n){
+    scanf("%s %s %s %s %d", arqEntrada, campo, dado, arqIndice, n);
+}
+
 
 void ImprimeMarcaCelular(char marcaCelular[]){
     //imprime marca do celular
@@ -264,6 +268,23 @@ void strncpySem0(char *string1, char *string2, int n){
     for(int i = 0; i<n && string2[i] != '|'; i++)
         string1[i] = string2[i];
 }
+
+void strcpySem0(char *string1, char *string2, char final){
+    int i=0;    
+    for(; string2[i] != '\0'; i++)
+        string1[i] = string2[i];
+    string1[i]=final;
+    
+}
+
+void strcpySem0Variavel(char *string1, char *string2){
+    strcpySem0(string1, string2, '|');
+}
+
+void strcpySem0Fixa(char *string1, char *string2){
+    strcpySem0(string1, string2, '$');
+}
+
 
 int strcmpAtePipe(char *string1, char *string2){
     int pos1= 0;

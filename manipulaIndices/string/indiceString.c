@@ -3,11 +3,6 @@
 #include "../../arquivos/arquivos.h"
 #include "../../prints_e_erros/prints_e_erros.h"
 
-struct dadosIndiceString{
-    char chaveBusca[12];                    
-    long int byteOffset;            //número relativo do registro do arquivo de dados referente à chave de busca
-};
-
 //aloca um registro de indice do tipo String
 DADOS_STR *IndiceDadosStringCriar(void){
     DADOS_STR *registro = (DADOS_STR*) calloc(1, sizeof(DADOS_STR));

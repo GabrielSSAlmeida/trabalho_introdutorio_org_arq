@@ -7,6 +7,11 @@
     #include "../../manipulaRegistros/registro.h"
     #include "../../parBusca/parBusca.h"
 
+    struct dadosIndiceInt{
+        int chaveBusca;                    
+        long int byteOffset;            //número relativo do registro do arquivo de dados referente à chave de busca
+    };
+
     typedef struct dadosIndiceInt DADOS_INT;
 
 
@@ -23,6 +28,12 @@
 
     //ordena o vetor de indices do tipo inteiro
     void mergeSortIndiceInt(DADOS_INT* vetor, int inicio, int fim);
+
+    //le um registro do arquivo de indice para inteiros
+    DADOS_INT LerRegIndiceInt(FILE *arqIndice, DADOS_INT *registroIndice);
+
+    //escreve no arquivo de indice para inteiros
+    void EscreveArqIndiceInt(FILE* arqIndice, DADOS_INT indice, int*nroRegistros);
 
 
     long int* BuscaBinariaIndiceInt(char *nomeArqIndice, int valorBuscado, long int *vetorByteOffset);

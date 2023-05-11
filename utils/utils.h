@@ -16,6 +16,7 @@
     void RecebeEntradaFunc2(char str1[]);
     void RecebeEntradaFunc3(char arqEntrada[], char campo[], char dado[], char arqIndice[]);
     void RecebeEntradaFunc4(char arqEntrada[], char campo[], char dado[], char arqIndice[], int *qtdBuscas);
+    void RecebeEntradaFunc6(char arqEntrada[], char campo[], char dado[], char arqIndice[], int *n);
 
     void ImprimeCampoVariavel(char *string);
     void ImprimeMarcaCelular(char marcaCelular[]);
@@ -31,6 +32,8 @@
     int TipoChaveBusca(char campo[]);
 
     void strncpySem0(char *string1, char *string2, int n);
+    void strcpySem0Variavel(char *string1, char *string2);
+    void strcpySem0Fixa(char *string1, char *string2);
     int strcmpAtePipe(char *string1, char *string2);
 
     //Ler e ignorar a primeira linha do arquivo
