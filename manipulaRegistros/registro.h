@@ -47,6 +47,11 @@
     void avancaCursorSemRemovido(FILE *arqBin, DADOS *registro);
 
 
+    bool TestaNulo(DADOS *registro, int tipoCampo);
+
+    //Func7
+    bool InsereRegistroNoArqInd(DADOS *registro, char *nomeArqIndice, char *dado, int tipoCampo, int byteoffsetanterior);
+
     //Funções Get do registro de Dados
     char GetRegistroRemovido(DADOS *registro);
     int GetRegistroIdCrime(DADOS *registro);

@@ -588,8 +588,9 @@ bool InsereRegistro(DADOS *registro, char *arqEntrada, char *nomeArqIndice, char
     //interpreta qual o tipo de campo exigido (string ou int)
     int tipoCampo = TipoChaveBusca(campo);
     //se o campo for nulo, o registro nao será inserido no arquivo de indice
-    if(TestaNulo(registro, tipoCampo)) return true;
-
+    if(TestaNulo(registro, tipoCampo))
+        return true;
+    
     bool testeArqInd = InsereRegistroNoArqInd(registro, nomeArqIndice, dado, tipoCampo, byteoffsetanterior);
 
     if(testeArqBin && testeArqInd) return true;

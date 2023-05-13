@@ -36,6 +36,7 @@
     void strcpySem0Fixa(char *string1, char *string2);
     int strcmpAtePipe(char *string1, char *string2);
     void strcpySem0(char *string1, char *string2);
+    void strncpySemBarra0(char *string1, char *string2, int n);
 
 
     void avancaCursosEmCampoVariavel(FILE *arqBin);

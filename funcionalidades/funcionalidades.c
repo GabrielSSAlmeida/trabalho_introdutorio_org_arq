@@ -175,19 +175,19 @@ bool funcionalidade7(char *arqEntrada, char *nomeArqIndice, char *campoIndexado,
 
         PARES_BUSCA *paresAtualizacoes = VetorParesBuscaCriar(qtdAtualizacoes);
 
+
+
+
+        //LEMBRAR DE TRATAR CASOS NULO!!!!!
+
+
+
+
         if(!RecebeParesBusca(qtdAtualizacoes, paresAtualizacoes)){
             free(paresBusca);
             free(paresAtualizacoes);
             return false;
         }         
-
-        // for(int i=0; i<qtdAtualizacoes; i++){
-        //     //caso seja marcaCelular, ajusta o lixo
-        //     if(GetTipoCampo(paresAtualizacoes, i) == 3){
-        //         strcpySem0Fixa(paresAtualizacoes[i].valorCampoString, paresAtualizacoes[i].valorCampoString);
-        //         paresAtualizacoes[i].valorCampoString[12] = '\0';
-        //     }
-        // }
         
         if(!MetodoDeAtualizacao(arqEntrada, nomeArqIndice, paresBusca, paresAtualizacoes, qtdPares, qtdAtualizacoes, campoIndexado, dado)) return false;
         

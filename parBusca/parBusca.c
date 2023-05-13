@@ -362,6 +362,7 @@ bool RemocaoBinariaIndicesBinario(char *arqEntrada, char *nomeArqIndice, PARES_B
     //0 indica um registro que não passou em todos os casos
     //-1 indica o fim do vetor
     long int *vetorByteOffset  = calloc(1, sizeof(long int));
+    bool isNulo = false;
 
     FILE *arqBin;
     if(!AbreArquivo(&arqBin, arqEntrada, "rb+", NULL)) return false;
@@ -387,18 +388,18 @@ bool RemocaoBinariaIndicesBinario(char *arqEntrada, char *nomeArqIndice, PARES_B
         char remove = '1';
 
         for (int j = 0; vetorByteOffset[j] != -1; j++)
-        {
+        {   
+            DADOS *registro_aux = LeRegistroPorByteOffset(arqBin, vetorByteOffset[j]);
+            isNulo = TestaNulo(registro_aux, tipoCampoIndice);
             fseek(arqBin, vetorByteOffset[j], SEEK_SET);
             fwrite(&(remove), sizeof(char), 1, arqBin);
             
-            if (tipoCampoIndice == 0 || tipoCampoIndice == 1){ //O campo é do tipo int
+            if (!isNulo && (tipoCampoIndice == 0 || tipoCampoIndice == 1)){ //O campo é do tipo int
                 RemoveArquivoIndiceInt(nomeArqIndice, vetorByteOffset[j]);
-                qtdRegistrosRemovidos++;
-
-            }else if(tipoCampoIndice >= 2){ //O campo é do tipo string
+            }else if(!isNulo && (tipoCampoIndice >= 2)){ //O campo é do tipo string
                 RemoveArquivoIndiceString(nomeArqIndice, vetorByteOffset[j]);
-                qtdRegistrosRemovidos++;
-            } 
+            }
+            qtdRegistrosRemovidos++;
         }
         
    }
@@ -472,29 +473,29 @@ bool RemocaoBinariaIndicesBinario(char *arqEntrada, char *nomeArqIndice, PARES_B
                 }
 
             }
-
             if(passou && GetRegistroRemovido(registro_aux) != '1'){
                 char remove = '1';
+
+                isNulo = TestaNulo(registro_aux, tipoCampoIndice);
+                
                 //remover
                 fseek(arqBin, vetorByteOffset[j], SEEK_SET);
                 fwrite(&(remove), sizeof(char), 1, arqBin);
                 
-                if (tipoCampoIndice == 0 || tipoCampoIndice == 1){ //O campo é do tipo int
+                if (!isNulo && (tipoCampoIndice == 0 || tipoCampoIndice == 1)){ //O campo é do tipo int
                     RemoveArquivoIndiceInt(nomeArqIndice, vetorByteOffset[j]);
-                    qtdRegistrosRemovidos++;
-
-                }else if(tipoCampoIndice >= 2){ //O campo é do tipo string
+                }else if(!isNulo && (tipoCampoIndice >= 2)){ //O campo é do tipo string
                     RemoveArquivoIndiceString(nomeArqIndice, vetorByteOffset[j]);
-                    qtdRegistrosRemovidos++;
-                } 
+                }
+                qtdRegistrosRemovidos++;
             }
                
             DesalocaRegistro(registro_aux);
         
         }
     }
-    if(qtdRegistrosRemovidos == 0) ErroRegistro();
-   //ATUALIZAR CABECALHOOOOOOOO binario!!!!!!!
+    if(!isNulo && qtdRegistrosRemovidos == 0) ErroRegistro();
+   //ATUALIZAR STATUS CABECALHOOOOOOOO binario!!!!!!!
     fclose(arqBin);
 
 
@@ -515,8 +516,8 @@ bool RemocaoBinariaIndicesBinario(char *arqEntrada, char *nomeArqIndice, PARES_B
 bool RemocaoSequencialBinario(char *nomeArqBin, char *nomeArqIndice, PARES_BUSCA *paresBusca, int qtdPares, int tipoCampoIndice){
     FILE *arqBin;
     if(!AbreArquivo(&arqBin, nomeArqBin, "rb+", NULL)) return false;
-
-
+    bool isNulo = false;
+    
     //ATUALIZAR STATUS DO ARQUIVO
 
     CABECALHO *cabecalho_aux = CabecalhoCriar();
@@ -579,17 +580,18 @@ bool RemocaoSequencialBinario(char *nomeArqBin, char *nomeArqIndice, PARES_BUSCA
             fseek(arqBin, byteOffsetAnterior, SEEK_SET);
             fwrite(&(remove), sizeof(char), 1, arqBin);
 
+            isNulo = TestaNulo(registro_aux, tipoCampoIndice);
+
             //avança o cursor lendo os campos
             avancaCursorSemRemovido(arqBin, registro_aux);
             
-            if (tipoCampoIndice == 0 || tipoCampoIndice == 1){ //O campo é do tipo int
+            
+            if (!isNulo && (tipoCampoIndice == 0 || tipoCampoIndice == 1)){ //O campo é do tipo int
                 RemoveArquivoIndiceInt(nomeArqIndice, byteOffsetAnterior);
-                qtdRegistrosRemovidos++;
-
-            }else if(tipoCampoIndice >= 2){ //O campo é do tipo string
+            }else if(!isNulo && (tipoCampoIndice >= 2)){ //O campo é do tipo string
                 RemoveArquivoIndiceString(nomeArqIndice, byteOffsetAnterior);
-                qtdRegistrosRemovidos++;
             } 
+            qtdRegistrosRemovidos++;
         }
 
         byteOffsetAnterior = byteOffsetLido;
@@ -602,7 +604,7 @@ bool RemocaoSequencialBinario(char *nomeArqBin, char *nomeArqIndice, PARES_BUSCA
     fclose(arqBin);
 
     //se nao existem registros no arquivo
-    if(i==0 || qtdRegistrosRemovidos == 0) ErroRegistro();
+    if(!isNulo && (i==0 || qtdRegistrosRemovidos == 0)) ErroRegistro();
 
     //ATUALIZAR CABCALHOOOOOOOO binario!!!!!!!
     int qtdRem = GetNroRegRem(cabecalho_aux) + qtdRegistrosRemovidos;
@@ -726,17 +728,14 @@ bool AtualizacaoBinariaIndices(char *arqEntrada, char *nomeArqIndice, char *camp
                     paresbuscaAUX[0].tipoCampo = 0;
 
                     //remove logicamente o registro
-                    printf("PRÉ-REMOÇÃO: NA: %d data: %s\n", registro_aux->numeroArtigo, registro_aux->dataCrime);
+                    
                     MetodoDeRemocao(arqEntrada, nomeArqIndice, paresbuscaAUX, 1, campoIndexado);
-                    printf("POS-REMOÇÃO: NA: %d data: %s\n", registro_aux->numeroArtigo, registro_aux->dataCrime);
-
-                    fseek(arqBin, 0, SEEK_SET);
-                    LeCabecalhoDoArqBinario(cabecalho, arqBin);
+                    
 
                     //insere registro
                     InsereRegistro(registro_aux, arqEntrada, nomeArqIndice, campoIndexado, dado);
-                    fseek(arqBin, 0, SEEK_SET);
-                    LeCabecalhoDoArqBinario(cabecalho, arqBin);
+
+                    
                     free(paresbuscaAUX);
                 }else{
                     //lembrar de arrumar o cabecalho na escreverregistrobin
@@ -746,7 +745,7 @@ bool AtualizacaoBinariaIndices(char *arqEntrada, char *nomeArqIndice, char *camp
                     EscreverRegistroBinSemDelimitador(arqBin, registro_aux, cabecalho_aux);
 
                     int diferenca = TamanhoRegistro(registro_aux) - tamanhoAntigo;
-                    
+                    //preenche com lixo
                     for(int i=0; i<abs(diferenca); i++){
                         char aux = '$';
                         fwrite(&aux, 1, sizeof(char), arqBin);
@@ -757,11 +756,20 @@ bool AtualizacaoBinariaIndices(char *arqEntrada, char *nomeArqIndice, char *camp
 
                     DesalocaCabecalho(cabecalho_aux);
 
+                    bool isNulo = false;
+                    isNulo = TestaNulo(registro_aux, TipoChaveBusca(campoIndexado));
+
                     if (TipoChaveBusca(campoIndexado) == 0 || TipoChaveBusca(campoIndexado) == 1){ //O campo é do tipo int
-                        AtualizaArquivoIndiceInt(nomeArqIndice, atualizacoes->valorCampoInt, vetorByteOffset[j]);
+                        //AtualizaArquivoIndiceInt(nomeArqIndice, atualizacoes->valorCampoInt, vetorByteOffset[j]);
+                        if(!isNulo)
+                            RemoveArquivoIndiceInt(nomeArqIndice, vetorByteOffset[j]);
                     }else if(TipoChaveBusca(campoIndexado) >= 2){ //O campo é do tipo string
-                        AtualizaArquivoIndiceString(nomeArqIndice, atualizacoes->valorCampoString, vetorByteOffset[j]);
+                        //AtualizaArquivoIndiceString(nomeArqIndice, atualizacoes->valorCampoString, vetorByteOffset[j]);
+                        if(!isNulo)
+                            RemoveArquivoIndiceString(nomeArqIndice, vetorByteOffset[j]);
                     }
+
+                    InsereRegistroNoArqInd(registro_aux, nomeArqIndice, dado, TipoChaveBusca(campoIndexado), vetorByteOffset[j]);
                 }
 
                 qtdRegistrosAtualizados++;
@@ -863,7 +871,7 @@ bool AtualizacaoBinariaIndices(char *arqEntrada, char *nomeArqIndice, char *camp
                     InsereRegistro(registro_aux, arqEntrada, nomeArqIndice, campoIndexado, dado);
                     fseek(arqBin, 0, SEEK_SET);
                     LeCabecalhoDoArqBinario(cabecalho, arqBin);
-
+                    
                     free(paresbuscaAUX);
                 }else{
                     //lembrar de arrumar o cabecalho na escreverregistrobin
@@ -886,12 +894,20 @@ bool AtualizacaoBinariaIndices(char *arqEntrada, char *nomeArqIndice, char *camp
 
                     DecideOrdemBusca(atualizacoes, qtdAtualizacoes, campoIndexado);
 
+                    bool isNulo = false;
+                    isNulo = TestaNulo(registro_aux, TipoChaveBusca(campoIndexado));
+
                     if (TipoChaveBusca(campoIndexado) == 0 || TipoChaveBusca(campoIndexado) == 1){ //O campo é do tipo int
                         //AtualizaArquivoIndiceInt(nomeArqIndice, atualizacoes[0].valorCampoInt, vetorByteOffset[j]);
+                        if(!isNulo)
+                            RemoveArquivoIndiceInt(nomeArqIndice, vetorByteOffset[j]);
                     }else if(TipoChaveBusca(campoIndexado) >= 2){ //O campo é do tipo string
-                        // AtualizaArquivoIndiceString(nomeArqIndice, atualizacoes[0].valorCampoString, vetorByteOffset[j]);
-                        printf("%s\n",atualizacoes[1].valorCampoString);
+                        //AtualizaArquivoIndiceString(nomeArqIndice, atualizacoes[0].valorCampoString, vetorByteOffset[j]);
+                        if(!isNulo)
+                            RemoveArquivoIndiceString(nomeArqIndice, vetorByteOffset[j]);
                     }
+
+                    InsereRegistroNoArqInd(registro_aux, nomeArqIndice, dado, TipoChaveBusca(campoIndexado), vetorByteOffset[j]);
                 }
 
                 qtdRegistrosAtualizados++;
@@ -902,9 +918,6 @@ bool AtualizacaoBinariaIndices(char *arqEntrada, char *nomeArqIndice, char *camp
         }
    }
 //    if(qtdRegistrosAtualizados == 0) ErroRegistro();
-
-    fseek(arqBin, 0, SEEK_SET);
-    EscreveCabecalho(arqBin, cabecalho);
    
     DesalocaCabecalho(cabecalho);
     fclose(arqBin);
@@ -977,6 +990,7 @@ bool AtualizacaoSequencialBinario(char *nomeArqBin, char *nomeArqIndice, char *c
         }
 
         if(passou && GetRegistroRemovido(registro) != '1'){
+
             int tamanhoAntigo = TamanhoRegistro(registro);
 
             int idAuxiliar = GetRegistroIdCrime(registro);
@@ -995,14 +1009,13 @@ bool AtualizacaoSequencialBinario(char *nomeArqBin, char *nomeArqIndice, char *c
                 strcpy(paresbuscaAUX[0].valorCampoString, "");
 
                 //remove logicamente o registro
-                
                 MetodoDeRemocao(nomeArqBin, nomeArqIndice, paresbuscaAUX, 1, campoIndexado);
-                
+
 
                 //insere registro
                 InsereRegistro(registro, nomeArqBin, nomeArqIndice, campoIndexado, dado);
-
-
+                
+                
                 free(paresbuscaAUX);
             }else{
                 //lembrar de arrumar o cabecalho na escreverregistrobin
@@ -1021,11 +1034,20 @@ bool AtualizacaoSequencialBinario(char *nomeArqBin, char *nomeArqIndice, char *c
                 char aux = '#';
                 fwrite(&aux, sizeof(char), 1, arqBin);
 
+                bool isNulo = false;
+                isNulo = TestaNulo(registro, TipoChaveBusca(campoIndexado));
+
                 if (TipoChaveBusca(campoIndexado) == 0 || TipoChaveBusca(campoIndexado) == 1){ //O campo é do tipo int
-                    AtualizaArquivoIndiceInt(nomeArqIndice, atualizacoes->valorCampoInt, byteoffsetanterior);
+                    //AtualizaArquivoIndiceInt(nomeArqIndice, atualizacoes->valorCampoInt, byteoffsetanterior);
+                    if(!isNulo)
+                        RemoveArquivoIndiceInt(nomeArqIndice, byteoffsetanterior);
                 }else if(TipoChaveBusca(campoIndexado) >= 2){ //O campo é do tipo string
-                    AtualizaArquivoIndiceString(nomeArqIndice, atualizacoes->valorCampoString, byteoffsetanterior);
+                    //AtualizaArquivoIndiceString(nomeArqIndice, atualizacoes->valorCampoString, byteoffsetanterior);
+                    if(!isNulo)
+                        RemoveArquivoIndiceString(nomeArqIndice, byteoffsetanterior);
                 }
+
+                InsereRegistroNoArqInd(registro, nomeArqIndice, dado, TipoChaveBusca(campoIndexado), byteoffsetanterior);
 
                 DesalocaCabecalho(cabecalho_aux);
             }
@@ -1038,9 +1060,6 @@ bool AtualizacaoSequencialBinario(char *nomeArqBin, char *nomeArqIndice, char *c
         byteoffsetanterior = byteoffset;
         flag = LerRegBinario(arqBin, registro, &byteoffset); 
     }
-
-    fseek(arqBin, 0, SEEK_SET);
-    EscreveCabecalho(arqBin, cabecalho_aux);
 
     //desaloca os auxiliares criados
     DesalocaCabecalho(cabecalho_aux);

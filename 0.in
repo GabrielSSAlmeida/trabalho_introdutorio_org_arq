@@ -1,4 +1,4 @@
-7 binario12.bin dataCrime string indice12.bin 1
+7 binario13.bin marcaCelular string indice13.bin 1
 
-2 dataCrime "20/11/2021" numeroArtigo 155
-2 marcaCelular "MOTOROLA" dataCrime "20/11/2020"
+1 numeroArtigo 171
+1 lugarCrime "AGUAS DE SANTA BARBARA"
