@@ -276,13 +276,13 @@ int TipoChaveBusca(char campo[]){
     return tipoCampo;
 }
 
-//strncpy sem copiar o /0
+//strncpy sem copiar o '|'
 void strncpySem0(char *string1, char *string2, int n){
     for(int i = 0; i<n && string2[i] != '|'; i++)
         string1[i] = string2[i];
 }
 
-void strcpySem0(char *string1, char *string2, char final){
+void strcpySem0ComFinal(char *string1, char *string2, char final){
     int i=0;    
     for(; string2[i] != '\0'; i++)
         string1[i] = string2[i];
@@ -290,12 +290,18 @@ void strcpySem0(char *string1, char *string2, char final){
     
 }
 
+void strcpySem0(char *string1, char *string2){
+    int i=0;    
+    for(; string2[i] != '\0'; i++)
+        string1[i] = string2[i];
+}
+
 void strcpySem0Variavel(char *string1, char *string2){
-    strcpySem0(string1, string2, '|');
+    strcpySem0ComFinal(string1, string2, '|');
 }
 
 void strcpySem0Fixa(char *string1, char *string2){
-    strcpySem0(string1, string2, '$');
+    strcpySem0ComFinal(string1, string2, '$');
 }
 
 
@@ -325,3 +331,5 @@ int strcmpAtePipe(char *string1, char *string2){
     return diferenca;
     
 }
+
+

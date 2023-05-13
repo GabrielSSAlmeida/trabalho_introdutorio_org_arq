@@ -16,6 +16,12 @@ int main(){
 
     scanf("%d", &variavelMenu);
 
+    char arqEntrada[32];
+    char nomeArqIndice[32];
+    char campoIndexado[32];
+    char dado[32];
+    int n;
+
     switch(variavelMenu){
         case 1:{
             funcionalidade1();
@@ -30,16 +36,30 @@ int main(){
             break;
         }
         case 4:{
-            funcionalidade4();
+            RecebeEntradaFunc4e5(arqEntrada, campoIndexado, dado, nomeArqIndice, &n);
+            funcionalidade4(arqEntrada, nomeArqIndice, campoIndexado, dado, n);
             break;
         }
         case 5:{
-            funcionalidade5();
+            RecebeEntradaFunc4e5(arqEntrada, campoIndexado, dado, nomeArqIndice, &n);
+            funcionalidade5(arqEntrada, nomeArqIndice, campoIndexado, dado, n);
+            binarioNaTela(arqEntrada);
+            binarioNaTela(nomeArqIndice);
             break;
         }
         case 6:{
-            funcionalidade6();
+            RecebeEntradaFunc6(arqEntrada, campoIndexado, dado, nomeArqIndice, &n);
+            funcionalidade6(arqEntrada, nomeArqIndice, campoIndexado, dado, n);
+            binarioNaTela(arqEntrada);
+            binarioNaTela(nomeArqIndice);
             break;
+        }
+        case 7:{
+            RecebeEntradaFunc6(arqEntrada, campoIndexado, dado, nomeArqIndice, &n);
+            if(funcionalidade7(arqEntrada, nomeArqIndice, campoIndexado, dado, n)){
+                binarioNaTela(arqEntrada);
+                binarioNaTela(nomeArqIndice); 
+            }
         }
     }
 

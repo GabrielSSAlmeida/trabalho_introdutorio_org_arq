@@ -107,16 +107,7 @@ bool funcionalidade3(){
     return true;
 }
 
-bool funcionalidade4(){
-    char arqEntrada[32];
-    char nomeArqIndice[32];
-    char campoIndexado[32];
-    char dado[32];
-    int qtdBuscas;
-
-    RecebeEntradaFunc4e5(arqEntrada, campoIndexado, dado, nomeArqIndice, &qtdBuscas);
-
-
+bool funcionalidade4(char *arqEntrada, char *nomeArqIndice, char *campoIndexado, char *dado, int qtdBuscas){
     for (int i = 0; i < qtdBuscas; i++)
     {
         int qtdPares;
@@ -137,15 +128,7 @@ bool funcionalidade4(){
     return true;
 }
 
-bool funcionalidade5(){
-    char arqEntrada[32];
-    char nomeArqIndice[32];
-    char campoIndexado[32];
-    char dado[32];
-    int qtdBuscas;
-    
-    RecebeEntradaFunc4e5(arqEntrada, campoIndexado, dado, nomeArqIndice, &qtdBuscas);
-
+bool funcionalidade5(char *arqEntrada, char *nomeArqIndice, char *campoIndexado, char *dado, int qtdBuscas){    
     for (int i = 0; i < qtdBuscas; i++)
     {
         int qtdPares;
@@ -160,23 +143,12 @@ bool funcionalidade5(){
         DesalocaParesBusca(paresBusca);
         
     }
-
-    binarioNaTela(arqEntrada);
-    binarioNaTela(nomeArqIndice);
     
     return true;
     
 }
 
-bool funcionalidade6(){
-    char arqEntrada[32];
-    char nomeArqIndice[32];
-    char campoIndexado[32];
-    char dado[32];
-    int n;
-
-    RecebeEntradaFunc6(arqEntrada, campoIndexado, dado, nomeArqIndice, &n);
-
+bool funcionalidade6(char *arqEntrada, char *nomeArqIndice, char *campoIndexado, char *dado, int n){
     for(int i=0; i<n; i++){
         DADOS *registro_auxiliar = RegistroCriar();
         RecebeRegistro(registro_auxiliar);
@@ -185,6 +157,34 @@ bool funcionalidade6(){
         DesalocaCamposVariaveis(registro_auxiliar);
         DesalocaRegistro(registro_auxiliar);
     }
+}
 
+bool funcionalidade7(char *arqEntrada, char *nomeArqIndice, char *campoIndexado, char *dado, int n){
+    for (int i = 0; i < n; i++)
+    {
+        
+        int qtdPares;
+        scanf("%d ", &qtdPares);
 
+        PARES_BUSCA *paresBusca = VetorParesBuscaCriar(qtdPares);
+
+        if(!RecebeParesBusca(qtdPares, paresBusca)) return false; 
+        
+        int qtdAtualizacoes;
+        scanf("%d ", &qtdAtualizacoes);
+
+        PARES_BUSCA *paresAtualizacoes = VetorParesBuscaCriar(qtdAtualizacoes);
+
+        if(!RecebeParesBusca(qtdAtualizacoes, paresAtualizacoes)){
+            free(paresBusca);
+            free(paresAtualizacoes);
+            return false;
+        } 
+        
+        if(!MetodoDeAtualizacao(arqEntrada, nomeArqIndice, paresBusca, paresAtualizacoes, qtdPares, qtdAtualizacoes, campoIndexado, dado)) return false;
+        
+        DesalocaParesBusca(paresBusca);
+        DesalocaParesBusca(paresAtualizacoes);
+        
+    }
 }

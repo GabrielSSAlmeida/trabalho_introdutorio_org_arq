@@ -134,7 +134,7 @@ void EscreverRegistroBin(FILE *arquivoBIN, DADOS *registro, CABECALHO *cabecalho
     AtualizaNroRegArq(cabecalho, GetNroRegArq(cabecalho)+1);
 }
 
-void avancaCursosSemRemovido(FILE *arqBin, DADOS *registro){
+void avancaCursorSemRemovido(FILE *arqBin, DADOS *registro){
     
     fread(&(registro->idCrime), 4, 1, arqBin);
     fread((registro->dataCrime), 10, 1, arqBin);
@@ -201,6 +201,8 @@ void ImprimeRegistroBinario(DADOS *registro){
     
 }
 
+
+
 bool ImprimirBinario(FILE *arqBin){
     //alocacao de auxiliares
     CABECALHO *cabecalho_aux = CabecalhoCriar();
@@ -260,6 +262,19 @@ DADOS *LeRegistroPorByteOffset(FILE *arqBin, long int byteOffset){
     }
 
     return registro;
+}
+
+int TamanhoRegistro(DADOS *registro){
+    int fixos = 32;
+    int i = 1;
+    int j = 1;
+
+    for(; registro->lugarCrime[i-1] != '|'; i++){}
+
+    for(; registro->descricaoCrime[j-1] != '|'; j++){}
+
+    return (fixos + i + j);
+
 }
 
 //recebe registro na entrada da func6
@@ -549,6 +564,9 @@ bool InsereRegistro(DADOS *registro, char *arqEntrada, char *nomeArqIndice, char
 
 
 
+
+
+
 char GetRegistroRemovido(DADOS *registro){
     if(registro != NULL){
         return (registro->removido);
@@ -597,3 +615,4 @@ char *GetRegistroDescricaoCrime(DADOS *registro){
     }
     return NULL;
 }
+

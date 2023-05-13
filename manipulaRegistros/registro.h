@@ -5,7 +5,6 @@
     #include <string.h>
     #include "../cabecalho/cabecalho.h"
     #include "../arquivos/arquivos.h"
-    //#include "../manipulaIndices/string/indiceString.h"
 
     struct dados{
         char removido;                  //indica se a struct foi removida (1 = removido, 0 = nao)
@@ -25,6 +24,7 @@
     void DesalocaRegistro(DADOS *registro);
     void DesalocaVetorRegistro(DADOS **registro, int tamanho);
     void DesalocaCamposVariaveis(DADOS *registro);
+    int TamanhoRegistro(DADOS *registro);
     
     //Funções para a funcionalidade 1
     DADOS *LerRegistroCsv(FILE *arquivoCSV, int *flagFuncionou);
@@ -43,7 +43,8 @@
     bool InsereRegistro(DADOS *registro, char *arqEntrada, char *arqIndice, char *campo, char *dado);
 
     //Func5
-    void avancaCursosSemRemovido(FILE *arqBin, DADOS *registro);
+    void avancaCursorSemRemovido(FILE *arqBin, DADOS *registro);
+
 
     //Funções Get do registro de Dados
     char GetRegistroRemovido(DADOS *registro);
