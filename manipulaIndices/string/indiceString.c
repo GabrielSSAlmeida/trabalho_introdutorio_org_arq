@@ -470,3 +470,59 @@ void RemoveArquivoIndiceString(char *nomeArqIndice, long int byteOffset){
     free(registroIndice_aux);
     fclose(arqIndice);
 }
+
+void AtualizaArquivoIndiceString(char *nomeArqIndice, char *novaString, long int byteOffset){
+    FILE *arqIndice;
+    CABECALHO_INDICE *cabecalho_aux = CabecalhoIndiceCriar();
+    DADOS_STR *registroIndice_aux= IndiceDadosStringCriar();
+    char stringaux [12] = "$$$$$$$$$$$$";
+    strcpySem0(stringaux, novaString);
+
+    //abre o arquivo de indice
+    if(!AbreArquivo(&arqIndice, nomeArqIndice, "rb", NULL)) return;
+
+    LeCabecalhoDoArqIndice(cabecalho_aux, arqIndice);
+
+    int nroReg = GetNroRegArqIndice(cabecalho_aux);
+
+    DADOS_STR *vetorIndices = VetorIndicesStringCriar(nroReg);
+
+    int posByteOffset = -1;
+    //Preenche o vetor de indices
+    for (int i = 0; i < nroReg; i++)
+    {
+        vetorIndices[i] = LerRegIndiceString(arqIndice, registroIndice_aux);
+        if(vetorIndices[i].byteOffset == byteOffset){
+            posByteOffset = i;
+            strcpy(vetorIndices[i].chaveBusca, stringaux);
+        }
+    }
+    
+    mergeSortIndiceString(vetorIndices, 0, nroReg-1);
+
+    printf("%d", nroReg);
+
+    if(posByteOffset == -1){
+        ErroArquivo();  
+    } 
+
+    fclose(arqIndice); //Fecha o arquivo para leitura
+
+
+    //abre o arquivo de indice para reescrita
+    if(!AbreArquivo(&arqIndice, nomeArqIndice, "wb", NULL)) return ;
+
+    LeCabecalhoDoArqIndice(cabecalho_aux, arqIndice);
+
+    for (int i = 0; i < nroReg; i++)
+    {
+        EscreveArqIndiceString(arqIndice, vetorIndices[i], &nroReg);
+    }
+
+
+    free(vetorIndices);
+    DesalocaCabecalhoIndice(cabecalho_aux);
+    free(registroIndice_aux);
+    fclose(arqIndice);
+}
+

@@ -40,4 +40,6 @@
 
     void InsereVetorIndicesOrdenadoSTR(DADOS_STR *vetorIndices, DADOS_STR *registroIndice, int tamanho);
 
+    void AtualizaArquivoIndiceString(char *nomeArqIndice, char *novaString, long int byteOffset);
+
 #endif

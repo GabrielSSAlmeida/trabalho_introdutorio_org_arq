@@ -134,6 +134,41 @@ void EscreverRegistroBin(FILE *arquivoBIN, DADOS *registro, CABECALHO *cabecalho
     AtualizaNroRegArq(cabecalho, GetNroRegArq(cabecalho)+1);
 }
 
+void EscreverRegistroBinSemDelimitador(FILE *arquivoBIN, DADOS *registro, CABECALHO *cabecalho){
+    long int somaBytes = 0;
+
+    //escreve campos de tamanho fixo
+    fwrite(&(registro->removido), sizeof(char), 1, arquivoBIN);
+    fwrite(&(registro->idCrime), sizeof(int), 1, arquivoBIN);
+    fwrite(&(registro->dataCrime), sizeof(registro->dataCrime), 1, arquivoBIN);
+    fwrite(&(registro->numeroArtigo), sizeof(int), 1, arquivoBIN);
+    fwrite(&(registro->marcaCelular), sizeof(registro->marcaCelular), 1, arquivoBIN);
+    somaBytes+= 31; //Nro de bytes dos campos de tamanho fixo
+
+    //escreve campos de tamanho variável
+    int i;
+
+        //escreve lugar do crime
+    for(i=0; registro->lugarCrime[i] != '|'; i++){
+        fwrite(&(registro->lugarCrime[i]), sizeof(char), 1, arquivoBIN);
+        somaBytes++;
+    }
+    fwrite(&(registro->lugarCrime[i]), sizeof(char), 1, arquivoBIN);
+    somaBytes++;
+
+        //escreve descricao do crime
+    for(i=0; registro->descricaoCrime[i] != '|'; i++){
+        fwrite(&(registro->descricaoCrime[i]), sizeof(char), 1, arquivoBIN);
+        somaBytes++;
+    }
+    fwrite(&(registro->descricaoCrime[i]), sizeof(char), 1, arquivoBIN);
+    somaBytes++;
+
+        //atualiza dados do cabecalho
+    AtualizaByteOffset(cabecalho, GetByteOffset(cabecalho)+somaBytes); 
+    AtualizaNroRegArq(cabecalho, GetNroRegArq(cabecalho)+1);
+}
+
 void avancaCursorSemRemovido(FILE *arqBin, DADOS *registro){
     
     fread(&(registro->idCrime), 4, 1, arqBin);

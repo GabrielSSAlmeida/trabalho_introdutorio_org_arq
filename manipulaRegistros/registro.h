@@ -29,6 +29,7 @@
     //Funções para a funcionalidade 1
     DADOS *LerRegistroCsv(FILE *arquivoCSV, int *flagFuncionou);
     void EscreverRegistroBin(FILE *arquivoBIN, DADOS *registro, CABECALHO *cabecalho);
+    void EscreverRegistroBinSemDelimitador(FILE *arquivoBIN, DADOS *registro, CABECALHO *cabecalho);
    
 
     //Função para a funcionalidade 2

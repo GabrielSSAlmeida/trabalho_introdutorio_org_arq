@@ -49,4 +49,6 @@
 
     void RemoveArquivoIndiceInt(char *nomeArqIndice, long int byteOffset);
 
+    void AtualizaArquivoIndiceInt(char *nomeArqIndice, int novoInt, long int byteOffset);
+
 #endif

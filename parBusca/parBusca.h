@@ -7,6 +7,22 @@
     #include "../prints_e_erros/prints_e_erros.h"
     #include "../utils/utils.h"
     
+    //Uma struct auxiliar para armazenar todos os pares de busca na funcionalidade 4
+    struct paresBusca{
+        char nomeCampo[15];
+        //So sera usado um valorCampo de cada vez.
+        char valorCampoString[200];
+        int valorCampoInt;
+        int tipoCampo; 
+        /*  0 = idCampo
+            1 = numeroArtigo
+            2 = dataCrime
+            3 = marcaCelular
+            4 = lugarCrime
+            5 = descricaoCrime
+        */
+    };
+
 
     //Uma struct auxiliar para armazenar todos os pares de busca na funcionalidade 4
     typedef struct paresBusca PARES_BUSCA;
