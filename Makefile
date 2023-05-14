@@ -41,4 +41,4 @@ clean:
 	rm *.o programaTrab
 
 run:
-	valgrind --leak-check=full --show-leak-kinds=all -s ./programaTrab < 13.in
+	./programaTrab

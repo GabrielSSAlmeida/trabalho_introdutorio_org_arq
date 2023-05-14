@@ -501,7 +501,7 @@ bool RemocaoBinariaIndicesBinario(char *arqEntrada, char *nomeArqIndice, PARES_B
         
         }
     }
-    if(!isNulo && qtdRegistrosRemovidos == 0) ErroRegistro();
+    
    //ATUALIZAR STATUS CABECALHOOOOOOOO binario!!!!!!!
     fclose(arqBin);
 
