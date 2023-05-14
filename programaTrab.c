@@ -16,75 +16,86 @@ int main(){
 
     scanf("%d", &variavelMenu);
 
-    char arqEntrada[32];
-    char nomeArqIndice[32];
+    char nomeArquivo1[32];
+    char nomeArquivo2[32];
     char campoIndexado[32];
     char dado[32];
     int n;
 
     switch(variavelMenu){
         case 1:{
-            funcionalidade1();
+            RecebeEntradaFunc1(nomeArquivo1, nomeArquivo2);
+
+            funcionalidade1(nomeArquivo1, nomeArquivo2);
+            binarioNaTela(nomeArquivo2);
             break;
         }
-        case 2:{   
-            funcionalidade2();
+        case 2:{
+            RecebeEntradaFunc2(nomeArquivo1);
+            funcionalidade2(nomeArquivo1);
             break;
         }
         case 3:{
-            funcionalidade3();
+            RecebeEntradaFunc3(nomeArquivo1, campoIndexado, dado, nomeArquivo2);
+
+            if(!(VerificaStatusArqBin(nomeArquivo1))){
+                ErroArquivo();
+                break;
+            }
+
+            funcionalidade3(nomeArquivo1, nomeArquivo2, campoIndexado, dado);
+
+            binarioNaTela(nomeArquivo2);
             break;
         }
         case 4:{
-            RecebeEntradaFunc4e5(arqEntrada, campoIndexado, dado, nomeArqIndice, &n);
+            RecebeEntradaFuncs4a7(nomeArquivo1, nomeArquivo2, campoIndexado, dado, &n);
 
-            if(!(VerificaStatusArqBin(arqEntrada) && VerificaStatusArqBin(nomeArqIndice))){
+            if(!(VerificaStatusArqBin(nomeArquivo1) && VerificaStatusArqBin(nomeArquivo2))){
                 ErroArquivo();
                 break;
             }
 
-            funcionalidade4(arqEntrada, nomeArqIndice, campoIndexado, dado, n);
+            funcionalidade4(nomeArquivo1, nomeArquivo2, campoIndexado, dado, n);
             break;
         }
         case 5:{
-            RecebeEntradaFunc4e5(arqEntrada, campoIndexado, dado, nomeArqIndice, &n);
+            RecebeEntradaFuncs4a7(nomeArquivo1, nomeArquivo2, campoIndexado, dado, &n);
 
-            if(!(VerificaStatusArqBin(arqEntrada) && VerificaStatusArqBin(nomeArqIndice))){
+            if(!(VerificaStatusArqBin(nomeArquivo1) && VerificaStatusArqBin(nomeArquivo2))){
                 ErroArquivo();
                 break;
             }
 
-            funcionalidade5(arqEntrada, nomeArqIndice, campoIndexado, dado, n);
-            binarioNaTela(arqEntrada);
-            binarioNaTela(nomeArqIndice);
+            funcionalidade5(nomeArquivo1, nomeArquivo2, campoIndexado, dado, n);
+            binarioNaTela(nomeArquivo1);
+            binarioNaTela(nomeArquivo2);
             break;
         }
         case 6:{
-            RecebeEntradaFunc6(arqEntrada, campoIndexado, dado, nomeArqIndice, &n);
+            RecebeEntradaFuncs4a7(nomeArquivo1, nomeArquivo2, campoIndexado, dado, &n);
 
-            if(!(VerificaStatusArqBin(arqEntrada) && VerificaStatusArqBin(nomeArqIndice))){
+            if(!(VerificaStatusArqBin(nomeArquivo1) && VerificaStatusArqBin(nomeArquivo2))){
                 ErroArquivo();
                 break;
             }
 
-            funcionalidade6(arqEntrada, nomeArqIndice, campoIndexado, dado, n);
-            binarioNaTela(arqEntrada);
-            binarioNaTela(nomeArqIndice);
+            funcionalidade6(nomeArquivo1, nomeArquivo2, campoIndexado, dado, n);
+            binarioNaTela(nomeArquivo1);
+            binarioNaTela(nomeArquivo2);
             break;
         }
         case 7:{
-            RecebeEntradaFunc6(arqEntrada, campoIndexado, dado, nomeArqIndice, &n);
+            RecebeEntradaFuncs4a7(nomeArquivo1, nomeArquivo2, campoIndexado, dado, &n);
 
-            if(!(VerificaStatusArqBin(arqEntrada) && VerificaStatusArqBin(nomeArqIndice))){
+            if(!(VerificaStatusArqBin(nomeArquivo1) && VerificaStatusArqBin(nomeArquivo2))){
                 ErroArquivo();
                 break;
             } 
-            
 
-
-            if(funcionalidade7(arqEntrada, nomeArqIndice, campoIndexado, dado, n)){
-                binarioNaTela(arqEntrada);
-                binarioNaTela(nomeArqIndice); 
+            if(funcionalidade7(nomeArquivo1, nomeArquivo2, campoIndexado, dado, n)){
+                binarioNaTela(nomeArquivo1);
+                binarioNaTela(nomeArquivo2); 
             }
         }
     }

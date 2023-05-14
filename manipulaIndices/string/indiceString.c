@@ -51,35 +51,35 @@ DADOS_STR LerRegIndiceString(FILE *arqIndice, DADOS_STR *registroIndice){
 }
 
 
-bool CriaIndiceString(char arqEntrada[], char arqSaida[], char campo[]){
+bool CriaIndiceString(char nomeArqEntrada[], char nomeArqSaida[], char campo[]){
     FILE *arqBin;
     FILE *arqIndice;
-    CABECALHO_INDICE *cabecalho = CabecalhoIndiceCriar();
+    CABECALHO_INDICE *cabecalhoIndice = CabecalhoIndiceCriar();
 
     //abre os arquivos recebidos na entrada
-    if(!AbreArquivo(&arqBin, arqEntrada, "rb", NULL)) return false;
-    if(!AbreArquivo(&arqIndice, arqSaida, "wb+", arqBin, NULL)) return false;
+    if(!AbreArquivo(&arqBin, nomeArqEntrada, "rb", NULL)) return false;
+    if(!AbreArquivo(&arqIndice, nomeArqSaida, "wb+", arqBin, NULL)) return false;
 
     //Escreve cabecalho
-    EscreveCabecalhoIndice(arqIndice, cabecalho);
+    EscreveCabecalhoIndice(arqIndice, cabecalhoIndice);
 
     //fecha para atualizar em disco
     fclose(arqIndice);
 
     //abre novamente para uso
-    if(!AbreArquivo(&arqIndice, arqSaida, "rb+", NULL)) return false;
+    if(!AbreArquivo(&arqIndice, nomeArqSaida, "rb+", NULL)) return false;
 
     //ajusta o ponteiro para depois do cabecalho
     fseek(arqIndice, 5, SEEK_SET);
 
     //Aloca cabecalho e registro auxiliar para percorrer arquivo binario
-    CABECALHO *cabecalho_registro = CabecalhoCriar();
-    DADOS *registro_auxiliar = RegistroCriar();
+    CABECALHO *cabecalhoRegistro = CabecalhoCriar();
+    DADOS *registroAuxiliar = RegistroCriar();
 
-    LeCabecalhoDoArqBinario(cabecalho_registro, arqBin);
+    LeCabecalhoDoArqBinario(cabecalhoRegistro, arqBin);
 
     //Calcula o numero de registros não removidos e cria um vetor para os indices
-    int nroRegistros = GetNroRegArq(cabecalho_registro) - GetNroRegRem(cabecalho_registro);
+    int nroRegistros = GetNroRegArq(cabecalhoRegistro) - GetNroRegRem(cabecalhoRegistro);
     DADOS_STR *indices = VetorIndicesStringCriar(nroRegistros);
 
 
@@ -88,23 +88,26 @@ bool CriaIndiceString(char arqEntrada[], char arqSaida[], char campo[]){
     
 
     //Percorre arquivo binario lendo os registros
-    long int offsetlido = 17; //será o offset do próximo registro durante o loop
-    long int offsetanterior = 17;
+    long int offsetProximoRegistro = 17; //será o offset do próximo registro durante o loop
+    long int offsetInicioRegistro = 17;
 
-    int flag = LerRegBinario(arqBin, registro_auxiliar, &offsetlido);
+    //usada para identificar momento de parada (EOF)
+    int flag = LerRegBinario(arqBin, registroAuxiliar, &offsetProximoRegistro);
+
+    //armazena a posição da próxima inserção
     int pos=0;
     int i;
-    for(i=0; flag!=0; i++){
-        if(GetRegistroRemovido(registro_auxiliar) == '0'){
-            InsereCampoStringEmIndices(indices, registro_auxiliar, pos, tipoCampo, offsetanterior);
+    for(i = 0; flag != 0; i++){
+        if(GetRegistroRemovido(registroAuxiliar) == '0'){
+            InsereCampoStringEmIndices(indices, registroAuxiliar, pos, tipoCampo, offsetInicioRegistro);
             pos++;
         }
 
-        DesalocaCamposVariaveis(registro_auxiliar);
+        DesalocaCamposVariaveis(registroAuxiliar);
 
-        offsetanterior = offsetlido;
+        offsetInicioRegistro = offsetProximoRegistro;
 
-        flag = LerRegBinario(arqBin, registro_auxiliar, &offsetlido); 
+        flag = LerRegBinario(arqBin, registroAuxiliar, &offsetProximoRegistro); 
     }
     //se nao existem registros no arquivo
     if(i==0) ErroArquivo();
@@ -120,26 +123,20 @@ bool CriaIndiceString(char arqEntrada[], char arqSaida[], char campo[]){
     }
     
 
-    //ATUALIZA CABECALHO INDICE
-    AtualizaStatusIndice(cabecalho, '1');
-    AtualizaNroRegArqIndice(cabecalho, copiaNroRegistro);
-    //Coloca o cursor no começo do arq para sobrescrever o cabcecalho
-    fseek(arqIndice, 0, SEEK_SET); 
-    EscreveCabecalhoIndice(arqIndice, cabecalho);
-    DesalocaCabecalhoIndice(cabecalho);
-
-
+    //Atualiza cabeçalho índice
+    AtualizaStatusIndice(cabecalhoIndice, '1');
+    AtualizaNroRegArqIndice(cabecalhoIndice, copiaNroRegistro);
+    ArqIndReescreveCabecalho(arqIndice, cabecalhoIndice);
+    
     //desaloca os auxiliares criados
-    DesalocaCabecalho(cabecalho_registro);
-    DesalocaRegistro(registro_auxiliar);
+    DesalocaCabecalhoIndice(cabecalhoIndice);
+    DesalocaCabecalho(cabecalhoRegistro);
+    DesalocaRegistro(registroAuxiliar);
 
     free(indices);
 
     fclose(arqBin);
     fclose(arqIndice);
-    
-
-    binarioNaTela(arqSaida);
 
     return true;
 

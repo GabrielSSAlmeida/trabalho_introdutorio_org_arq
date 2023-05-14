@@ -12,6 +12,8 @@
     void EscreveCabecalho(FILE *arqBin, CABECALHO *cabecalho);
     //Função para desalocar a struct cabecalho
     void DesalocaCabecalho(CABECALHO *cabecalho);
+    //Retorna ao início do arquivo e reescreve o cabeçalho
+    bool ArqBinReescreveCabecalho(FILE *arqBin, CABECALHO *cabecalho);
 
     //Le cabecalho do binario e salva no parametro 'cabecalho'
     void LeCabecalhoDoArqBinario(CABECALHO *cabecalho, FILE *arq);

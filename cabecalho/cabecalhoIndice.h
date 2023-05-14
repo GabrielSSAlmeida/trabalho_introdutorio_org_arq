@@ -12,12 +12,12 @@
     void EscreveCabecalhoIndice(FILE *arqBin, CABECALHO_INDICE *cabecalho);
     //Função para desalocar a struct cabecalho
     void DesalocaCabecalhoIndice(CABECALHO_INDICE *cabecalho);
-
     //Le cabecalho do binario e salva no parametro 'cabecalho'
     void LeCabecalhoDoArqIndice(CABECALHO_INDICE *cabecalho, FILE *arq);
-
+    //Verifica se o status está consistente
     bool VerificaStatusIndice(CABECALHO_INDICE *cabecalho);
-
+    //Retorna ao início do arquivo para reescrever cabeçalho
+    bool ArqIndReescreveCabecalho(FILE *arqInd, CABECALHO_INDICE *cabecalho)
 
     //Funções de atualizar campos do cabecalho
     void AtualizaStatusIndice(CABECALHO_INDICE *cabecalho, char status);

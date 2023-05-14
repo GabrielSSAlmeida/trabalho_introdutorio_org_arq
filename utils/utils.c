@@ -13,19 +13,11 @@ void RecebeEntradaFunc2(char str1[]){
     scanf("%s", str1);
 }
 
-void RecebeEntradaFunc3(char arqEntrada[], char campo[], char dado[], char arqIndice[]){
+void RecebeEntradaFunc3(char arqEntrada[], char arqIndice[], char campo[], char dado[]){
     scanf("%s %s %s %s", arqEntrada, campo, dado, arqIndice);
 }
 
-void RecebeEntradaFunc4e5(char arqEntrada[], char campo[], char dado[], char arqIndice[], int *qtdBuscas){
-    scanf("%s %s %s %s %d", arqEntrada, campo, dado, arqIndice, qtdBuscas);
-}
-
-void RecebeEntradaFunc6(char arqEntrada[], char campo[], char dado[], char arqIndice[], int *n){
-    scanf("%s %s %s %s %d", arqEntrada, campo, dado, arqIndice, n);
-}
-
-void RecebeEntradaFunc7(char arqEntrada[], char campo[], char dado[], char arqIndice[], int *n){
+void RecebeEntradaFuncs4a7(char arqEntrada[], char arqIndice[], char campo[], char dado[], int *n){
     scanf("%s %s %s %s %d", arqEntrada, campo, dado, arqIndice, n);
 }
 

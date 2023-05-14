@@ -15,9 +15,9 @@
 
     
 
-    bool funcionalidade1();
-    bool funcionalidade2();
-    bool funcionalidade3();
+    bool funcionalidade1(char *nomeArqEntrada, char *nomeArqSaida);
+    bool funcionalidade2(char *nomeArqEntrada);
+    bool funcionalidade3(char *nomeArqEntrada, char *nomeArqSaida, char *campoIndexado, char *dado);
     bool funcionalidade4(char *arqEntrada, char *nomeArqIndice, char *campoIndexado, char *dado, int qtdBuscas);
     bool funcionalidade5(char *arqEntrada, char *nomeArqIndice, char *campoIndexado, char *dado, int qtdBuscas);
     bool funcionalidade6(char *arqEntrada, char *nomeArqIndice, char *campoIndexado, char *dado, int n);

@@ -52,6 +52,10 @@ bool VerificaStatusIndice(CABECALHO_INDICE *cabecalho){
     return true;
 }
 
+bool ArqIndReescreveCabecalho(FILE *arqInd, CABECALHO_INDICE *cabecalho){
+    fseek(arqInd, 0, SEEK_SET); 
+    EscreveCabecalhoIndice(arqInd, cabecalho);
+}
 
 
 //Funçoes de atualizar

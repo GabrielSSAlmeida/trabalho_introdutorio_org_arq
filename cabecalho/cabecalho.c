@@ -65,6 +65,11 @@ bool VerificaStatus(CABECALHO *cabecalho){
     return true;
 }
 
+//Após todas as alterações, volta ao início do arquivo para reescrever o cabeçalho
+bool ArqBinReescreveCabecalho(FILE *arqBin, CABECALHO *cabecalho){
+    fseek(arqBin, 0, SEEK_SET); 
+    EscreveCabecalho(arqBin, cabecalho);
+}
 
 
 //Funçoes de atualizar

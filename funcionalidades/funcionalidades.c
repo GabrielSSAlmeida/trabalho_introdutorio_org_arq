@@ -1,18 +1,14 @@
 #include "funcionalidades.h"
 
 
-bool funcionalidade1(){
-    char arqEntrada[32], arqSaida[32];
+bool funcionalidade1(char *nomeArqEntrada, char *nomeArqSaida){
     FILE *arqCsv;
     FILE *arqBin;
 
-    //abertura dos arquivos para funcionalidade 1
-    RecebeEntradaFunc1(arqEntrada, arqSaida);
-    
     //Abre arquivos csv e binario
     //Se a abertura falhar para o código 
-    if(!AbreArquivo(&arqCsv, arqEntrada, "r", NULL)) return false;
-    if(!AbreArquivo(&arqBin, arqSaida, "wb+", arqCsv, NULL)) return false;
+    if(!AbreArquivo(&arqCsv, nomeArqEntrada, "r", NULL)) return false;
+    if(!AbreArquivo(&arqBin, nomeArqSaida, "wb+", arqCsv, NULL)) return false;
 
     //Cria o cabecalho que será usado no arquivo binario
     CABECALHO *cabecalho_saida = CabecalhoCriar();
@@ -30,7 +26,7 @@ bool funcionalidade1(){
     fclose(arqBin);
 
     //abre o arquivo novamente
-    if(!AbreArquivo(&arqBin, arqSaida, "rb+", NULL)) return false;
+    if(!AbreArquivo(&arqBin, nomeArqSaida, "rb+", NULL)) return false;
 
     //ajusta o ponteiro para dps do cabecalho
     fseek(arqBin, GetByteOffset(cabecalho_saida), SEEK_SET);
@@ -48,8 +44,6 @@ bool funcionalidade1(){
     //fecha arquivos
     fclose(arqCsv);
     fclose(arqBin);
-    
-    binarioNaTela(arqSaida);
 
     DesalocaCabecalho(cabecalho_saida);
 
@@ -57,14 +51,11 @@ bool funcionalidade1(){
 }
 
 
-bool funcionalidade2(){
-    char arqEntrada[32];
+bool funcionalidade2(char *nomeArqEntrada){
     FILE *arqBin;
 
-    RecebeEntradaFunc2(arqEntrada);
-
     //abre arquivo binario para funcionalidade 2
-    if(!AbreArquivo(&arqBin, arqEntrada, "rb", NULL)) return false;
+    if(!AbreArquivo(&arqBin, nomeArqEntrada, "rb", NULL)) return false;
 
     //imprime os registro do arquivo binario na tela
     if(!ImprimirBinario(arqBin)){
@@ -77,13 +68,7 @@ bool funcionalidade2(){
     return true;
 }
 
-bool funcionalidade3(){
-    char arqEntrada[32];
-    char arqSaida[32];
-    char campo[32];
-    char dado[32];
-
-    RecebeEntradaFunc3(arqEntrada, campo, dado, arqSaida);
+bool funcionalidade3(char *nomeArqEntrada, char *nomeArqSaida, char *campoIndexado, char *dado){
 
     //verifica se o tipo de dado é string ou int
     int dadoVerificado = VerificaDado(dado);
@@ -91,12 +76,12 @@ bool funcionalidade3(){
     switch(dadoVerificado){
         //caso int
         case 0:{
-            CriaIndiceInteiro(arqEntrada, arqSaida, campo);
+            CriaIndiceInteiro(nomeArqEntrada, nomeArqSaida, campoIndexado);
             break;
         }
         //caso string
         case 1:{
-            CriaIndiceString(arqEntrada, arqSaida, campo);
+            CriaIndiceString(nomeArqEntrada, nomeArqSaida, campoIndexado);
             break;
         }
         default:
@@ -113,8 +98,8 @@ bool funcionalidade4(char *arqEntrada, char *nomeArqIndice, char *campoIndexado,
         int qtdPares;
         scanf("%d ", &qtdPares);
 
+        //cria um vetor com os pares utilizados para busca
         PARES_BUSCA *paresBusca = VetorParesBuscaCriar(qtdPares);
-
         RecebeParesBusca(qtdPares, paresBusca); 
         
         printf("Resposta para a busca %d\n", i+1);
@@ -122,7 +107,6 @@ bool funcionalidade4(char *arqEntrada, char *nomeArqIndice, char *campoIndexado,
         if(!MetodoDeBusca(arqEntrada, nomeArqIndice, paresBusca, qtdPares, campoIndexado)) return false;
 
         DesalocaParesBusca(paresBusca);
-        
     }
     
     return true;
@@ -174,14 +158,6 @@ bool funcionalidade7(char *arqEntrada, char *nomeArqIndice, char *campoIndexado,
         scanf("%d ", &qtdAtualizacoes);
 
         PARES_BUSCA *paresAtualizacoes = VetorParesBuscaCriar(qtdAtualizacoes);
-
-
-
-
-        //LEMBRAR DE TRATAR CASOS DE ATUALIZACAO POR NULO!!!!!
-
-
-
 
         if(!RecebeParesBusca(qtdAtualizacoes, paresAtualizacoes)){
             free(paresBusca);

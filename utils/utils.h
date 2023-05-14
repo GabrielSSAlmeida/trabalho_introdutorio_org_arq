@@ -14,9 +14,8 @@
     //Funções criadas
     void RecebeEntradaFunc1(char str1[], char str2[]);
     void RecebeEntradaFunc2(char str1[]);
-    void RecebeEntradaFunc3(char arqEntrada[], char campo[], char dado[], char arqIndice[]);
-    void RecebeEntradaFunc4e5(char arqEntrada[], char campo[], char dado[], char arqIndice[], int *qtdBuscas);
-    void RecebeEntradaFunc6(char arqEntrada[], char campo[], char dado[], char arqIndice[], int *n);
+    void RecebeEntradaFunc3(char arqEntrada[], char arqIndice[], char campo[], char dado[]);
+    void RecebeEntradaFuncs4a7(char arqEntrada[], char arqIndice[], char campo[], char dado[], int *n);
 
     void ImprimeCampoVariavel(char *string);
     void ImprimeMarcaCelular(char marcaCelular[]);
