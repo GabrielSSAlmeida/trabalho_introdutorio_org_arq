@@ -56,7 +56,7 @@ int main(){
                 break;
             }
 
-            funcionalidade4(nomeArquivo1, nomeArquivo2, campoIndexado, dado, n);
+            funcionalidaæde4(nomeArquivo1, nomeArquivo2, campoIndexado, dado, n);
             break;
         }
         case 5:{
