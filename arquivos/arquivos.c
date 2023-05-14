@@ -39,3 +39,23 @@ void CsvParaBin(FILE *arqCsv, FILE *arqBin, CABECALHO *cabecalho_saida){
         DesalocaRegistro(registro);
     }
 }
+
+bool VerificaStatusArqBin(char *nomeArq){
+    FILE *arq;
+    char aux;
+
+    if(!AbreArquivo(&arq, nomeArq, "rb")) return false;
+
+    fread(&aux, 1, 1, arq);
+
+    switch(aux){
+        case '0':
+            fclose(arq);
+            return false;
+            break;
+        case '1':
+            fclose(arq);
+            return true;
+            break;
+    }
+}

@@ -344,14 +344,14 @@ void CopiaChaveEByteOffsetSTR(DADOS *registro, DADOS_STR *registroIndice, int by
     switch(tipoCampo){
         //caso dataCrime
         case 2:{
-            strncpySem0(registroIndice->chaveBusca, registro->dataCrime, 12);
+            strncpySemBarra0(registroIndice->chaveBusca, registro->dataCrime, 12);
             registroIndice->byteOffset = byteoffset;
             break;
         }
 
         //caso marcaCelular
         case 3:{
-            strncpySem0(registroIndice->chaveBusca, registro->marcaCelular, 12);
+            strncpySemBarra0(registroIndice->chaveBusca, registro->marcaCelular, 12);
             registroIndice->byteOffset = byteoffset;
             break;
         }
@@ -384,21 +384,41 @@ void PreencheVetorIndicesSTR(FILE *arqIndice, DADOS_STR *vetor, int tamanho){
 }
 
 void InsereVetorIndicesOrdenadoSTR(DADOS_STR *vetorIndices, DADOS_STR *registroIndice, int tamanho){
-    //insere ordenado
-    if(strncmp(vetorIndices[tamanho-1].chaveBusca, registroIndice->chaveBusca, 12) < 0 ){
-        strncpySem0(vetorIndices[tamanho].chaveBusca, registroIndice->chaveBusca, 12);
-        vetorIndices[tamanho].byteOffset = registroIndice->byteOffset;
-    }
-    for(int i=0; i < tamanho; i++){
-        if(vetorIndices[i].chaveBusca > registroIndice->chaveBusca){
-            for(int j=tamanho; j>i; j--){
-                vetorIndices[j] = vetorIndices[j-1];
-            }
-            strncpySem0(vetorIndices[i].chaveBusca, registroIndice->chaveBusca, 12);
-            vetorIndices[i].byteOffset = registroIndice->byteOffset;
+    // //insere ordenado
+    // if(strncmp(vetorIndices[tamanho-1].chaveBusca, registroIndice->chaveBusca, 12) < 0 ){
+    //     strncpySem0(vetorIndices[tamanho].chaveBusca, registroIndice->chaveBusca, 12);
+    //     vetorIndices[tamanho].byteOffset = registroIndice->byteOffset;
+    // }
+    // for(int i=0; i < tamanho; i++){
+    //     if(vetorIndices[i].chaveBusca > registroIndice->chaveBusca){
+    //         for(int j=tamanho; j>i; j--){
+    //             vetorIndices[j] = vetorIndices[j-1];
+    //         }
+    //         strncpySem0(vetorIndices[i].chaveBusca, registroIndice->chaveBusca, 12);
+    //         vetorIndices[i].byteOffset = registroIndice->byteOffset;
+    //         break;
+    //     }
+    // }
+
+    int pos;
+    for(int i=0; i<tamanho; i++){
+        if(strncmp(registroIndice->chaveBusca, vetorIndices[i].chaveBusca, strlen(vetorIndices[i].chaveBusca)) < 0){
+            pos = i;
+            break;
+        }
+        if(strncmp(registroIndice->chaveBusca, vetorIndices[i].chaveBusca, strlen(vetorIndices[i].chaveBusca)) > 0){
+            pos = tamanho;
             break;
         }
     }
+    if(pos != tamanho){
+        int m = tamanho - pos + 1;
+        for(int i=0; i<m; i++){
+            strcpy(vetorIndices[tamanho - i + 2].chaveBusca, vetorIndices[tamanho - i + 1].chaveBusca);
+        }
+    }
+    strncpySem0(vetorIndices[pos].chaveBusca, registroIndice->chaveBusca, 12);
+    vetorIndices[pos].byteOffset = registroIndice->byteOffset; 
 }
 
 

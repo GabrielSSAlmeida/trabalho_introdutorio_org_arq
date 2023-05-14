@@ -1,7 +1,7 @@
 /*
-- Gabriel Sousa Santos de Almeida - 13837432
-- Luís Henrique Giorgetti Dantas - 13782369
-- João Gabriel Manfre Nazar - 13733652
+- Gabriel Sousa Santos de Almeida - 13837432 (100%)
+- Luís Henrique Giorgetti Dantas - 13782369 (100%)
+- João Gabriel Manfre Nazar - 13733652  (100%)
 */
 
 
@@ -37,11 +37,23 @@ int main(){
         }
         case 4:{
             RecebeEntradaFunc4e5(arqEntrada, campoIndexado, dado, nomeArqIndice, &n);
+
+            if(!(VerificaStatusArqBin(arqEntrada) && VerificaStatusArqBin(nomeArqIndice))){
+                ErroArquivo();
+                break;
+            }
+
             funcionalidade4(arqEntrada, nomeArqIndice, campoIndexado, dado, n);
             break;
         }
         case 5:{
             RecebeEntradaFunc4e5(arqEntrada, campoIndexado, dado, nomeArqIndice, &n);
+
+            if(!(VerificaStatusArqBin(arqEntrada) && VerificaStatusArqBin(nomeArqIndice))){
+                ErroArquivo();
+                break;
+            }
+
             funcionalidade5(arqEntrada, nomeArqIndice, campoIndexado, dado, n);
             binarioNaTela(arqEntrada);
             binarioNaTela(nomeArqIndice);
@@ -49,6 +61,12 @@ int main(){
         }
         case 6:{
             RecebeEntradaFunc6(arqEntrada, campoIndexado, dado, nomeArqIndice, &n);
+
+            if(!(VerificaStatusArqBin(arqEntrada) && VerificaStatusArqBin(nomeArqIndice))){
+                ErroArquivo();
+                break;
+            }
+
             funcionalidade6(arqEntrada, nomeArqIndice, campoIndexado, dado, n);
             binarioNaTela(arqEntrada);
             binarioNaTela(nomeArqIndice);
@@ -56,6 +74,14 @@ int main(){
         }
         case 7:{
             RecebeEntradaFunc6(arqEntrada, campoIndexado, dado, nomeArqIndice, &n);
+
+            if(!(VerificaStatusArqBin(arqEntrada) && VerificaStatusArqBin(nomeArqIndice))){
+                ErroArquivo();
+                break;
+            } 
+            
+
+
             if(funcionalidade7(arqEntrada, nomeArqIndice, campoIndexado, dado, n)){
                 binarioNaTela(arqEntrada);
                 binarioNaTela(nomeArqIndice); 

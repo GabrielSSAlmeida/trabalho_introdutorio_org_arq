@@ -178,7 +178,7 @@ bool funcionalidade7(char *arqEntrada, char *nomeArqIndice, char *campoIndexado,
 
 
 
-        //LEMBRAR DE TRATAR CASOS NULO!!!!!
+        //LEMBRAR DE TRATAR CASOS DE ATUALIZACAO POR NULO!!!!!
 
 
 

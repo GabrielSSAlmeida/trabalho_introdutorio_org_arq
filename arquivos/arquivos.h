@@ -12,6 +12,7 @@
         Função usa parâmetros variados para fechar arquivos já abertos.
     */ 
     bool AbreArquivo(FILE **arq, char nomeArquivo[], char modo[], ...);
+    bool VerificaStatusArqBin(char *nomeArq);
 
     //Le registros do csv e escreve no binario
     void CsvParaBin(FILE *arqCsv, FILE *arqBin, CABECALHO *cabecalho_saida);

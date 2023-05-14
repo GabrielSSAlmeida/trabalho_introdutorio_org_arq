@@ -409,15 +409,15 @@ bool InsereRegistroNoArqInd(DADOS *registro, char *nomeArqIndice, char *dado, in
     switch(tipoDado){
         //caso int
         case 0:{
-
             int nroReg = GetNroRegArqIndice(cabecalho_indice);
+            
             DADOS_INT *vetorIndices = VetorIndicesIntCriar(nroReg+1);
             DADOS_INT *registroIndice_aux = IndiceDadosIntCriar();
 
             CopiaChaveEByteOffsetINT(registro, registroIndice_aux, byteoffsetanterior, tipoCampo);
             
             LeCabecalhoDoArqIndice(cabecalho_indice, arqIndice);
-
+            
             PreencheVetorIndicesINT(arqIndice, vetorIndices, nroReg);
 
             InsereVetorIndicesOrdenadoINT(vetorIndices, registroIndice_aux, nroReg);
@@ -451,66 +451,12 @@ bool InsereRegistroNoArqInd(DADOS *registro, char *nomeArqIndice, char *dado, in
             int nroReg = GetNroRegArqIndice(cabecalho_indice);
             DADOS_STR *vetorIndices = VetorIndicesStringCriar(nroReg+1);
             DADOS_STR *registroIndice_aux = IndiceDadosStringCriar();
-            // DADOS_STR *registroIndice_aux2 = IndiceDadosStringCriar();
-
-            // switch(tipoCampo){
-            //     //caso dataCrime
-            //     case 2:{
-            //         strncpySem0(registroIndice_aux->chaveBusca, registro->dataCrime, 12);
-            //         registroIndice_aux->byteOffset = byteoffsetanterior;
-            //         break;
-            //     }
-
-            //     //caso marcaCelular
-            //     case 3:{
-            //         strncpySem0(registroIndice_aux->chaveBusca, registro->marcaCelular, 12);
-            //         registroIndice_aux->byteOffset = byteoffsetanterior;
-            //         break;
-            //     }
-
-            //     //caso lugarCrime
-            //     case 4:{
-            //         strncpySem0(registroIndice_aux->chaveBusca, registro->lugarCrime, 12);
-            //         registroIndice_aux->byteOffset = byteoffsetanterior;
-            //         break;
-            //     }
-
-            //     //caso descricaoCrime
-            //     case 5:{
-            //         strncpySem0(registroIndice_aux->chaveBusca, registro->descricaoCrime, 12);
-            //         registroIndice_aux->byteOffset = byteoffsetanterior;
-            //         break;
-            //     }
-
-            // }
 
             CopiaChaveEByteOffsetSTR(registro, registroIndice_aux, byteoffsetanterior, tipoCampo);
 
             LeCabecalhoDoArqIndice(cabecalho_indice, arqIndice);
 
-            // //Preenche o vetor de indices
-            // for (int i = 0; i < nroReg; i++)
-            // {
-            //     vetorIndices[i] = LerRegIndiceString(arqIndice, registroIndice_aux2);
-            // }
-
             PreencheVetorIndicesSTR(arqIndice, vetorIndices, nroReg);
-
-            // //insere ordenado
-            // if(strncmp(vetorIndices[nroReg-1].chaveBusca, registroIndice_aux->chaveBusca, 12) < 0 ){
-            //     strncpySem0(vetorIndices[nroReg].chaveBusca, registroIndice_aux->chaveBusca, 12);
-            //     vetorIndices[nroReg].byteOffset = registroIndice_aux->byteOffset;
-            // }
-            // for(int i=0; i < nroReg; i++){
-            //     if(vetorIndices[i].chaveBusca > registroIndice_aux->chaveBusca){
-            //         for(int j=nroReg; j>i; j--){
-            //             vetorIndices[j] = vetorIndices[j-1];
-            //         }
-            //         strncpySem0(vetorIndices[i].chaveBusca, registroIndice_aux->chaveBusca, 12);
-            //         vetorIndices[i].byteOffset = registroIndice_aux->byteOffset;
-            //         break;
-            //     }
-            // }
 
             InsereVetorIndicesOrdenadoSTR(vetorIndices, registroIndice_aux, nroReg);
 
@@ -588,6 +534,8 @@ bool InsereRegistro(DADOS *registro, char *arqEntrada, char *nomeArqIndice, char
     //interpreta qual o tipo de campo exigido (string ou int)
     int tipoCampo = TipoChaveBusca(campo);
     //se o campo for nulo, o registro nao será inserido no arquivo de indice
+    
+    
     if(TestaNulo(registro, tipoCampo))
         return true;
     

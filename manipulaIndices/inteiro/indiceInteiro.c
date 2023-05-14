@@ -355,6 +355,26 @@ void InsereVetorIndicesOrdenadoINT(DADOS_INT *vetorIndices, DADOS_INT *registroI
             break;
         }
     }
+
+    // int pos;
+    // for(int i=0; i<tamanho; i++){
+    //     if(registroIndice->chaveBusca < vetorIndices[i].chaveBusca){
+    //         pos = i;
+    //         break;
+    //     }
+    //     if(registroIndice->chaveBusca > vetorIndices[i].chaveBusca){
+    //         pos = tamanho;
+    //         break;
+    //     }
+    // }
+    // if(pos != tamanho){
+    //     int m = tamanho - pos + 1;
+    //     for(int i=0; i<m; i++){
+    //         vetorIndices[tamanho - i + 2] = vetorIndices[tamanho - i + 1];
+    //     }
+    // }
+    // vetorIndices[pos].chaveBusca = registroIndice->chaveBusca;
+    // vetorIndices[pos].byteOffset = registroIndice->byteOffset; 
 }
 
 //Copia os dados de acordo com o tipoCampo pedido
