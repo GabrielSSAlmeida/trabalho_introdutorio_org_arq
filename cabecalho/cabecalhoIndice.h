@@ -17,7 +17,7 @@
     //Verifica se o status está consistente
     bool VerificaStatusIndice(CABECALHO_INDICE *cabecalho);
     //Retorna ao início do arquivo para reescrever cabeçalho
-    bool ArqIndReescreveCabecalho(FILE *arqInd, CABECALHO_INDICE *cabecalho)
+    bool ArqIndReescreveCabecalho(FILE *arqInd, CABECALHO_INDICE *cabecalho);
 
     //Funções de atualizar campos do cabecalho
     void AtualizaStatusIndice(CABECALHO_INDICE *cabecalho, char status);

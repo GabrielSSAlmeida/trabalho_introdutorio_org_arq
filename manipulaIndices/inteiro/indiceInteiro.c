@@ -161,7 +161,7 @@ bool CriaIndiceInteiro(char arqEntrada[], char arqSaida[], char campo[]){
     AtualizaStatusIndice(cabecalhoIndice, '1');
     AtualizaNroRegArqIndice(cabecalhoIndice, copiaNroRegistro);
     //Coloca o cursor no começo do arq para sobrescrever o cabecalho
-    ArqIndReescreveCabecalho(arqBin, cabecalhoIndice);
+    ArqIndReescreveCabecalho(arqIndice, cabecalhoIndice);
 
     //desaloca os auxiliares criados
     DesalocaCabecalhoIndice(cabecalhoIndice);
@@ -338,41 +338,25 @@ void PreencheVetorIndicesINT(FILE *arqIndice, DADOS_INT *vetor, int tamanho){
 }
 
 void InsereVetorIndicesOrdenadoINT(DADOS_INT *vetorIndices, DADOS_INT *registroIndice, int tamanho){
-    //insere ordenado
-    if(vetorIndices[tamanho-1].chaveBusca < registroIndice->chaveBusca){
-        vetorIndices[tamanho].chaveBusca = registroIndice->chaveBusca;
-        vetorIndices[tamanho].byteOffset = registroIndice->byteOffset;
-    }
-    for(int i=0; i < tamanho; i++){
-        if(vetorIndices[i].chaveBusca > registroIndice->chaveBusca){
-            for(int j=tamanho; j>i; j--){
-                vetorIndices[j] = vetorIndices[j-1];
-            }
-            vetorIndices[i].chaveBusca = registroIndice->chaveBusca;
-            vetorIndices[i].byteOffset = registroIndice->byteOffset;
+    int pos;
+    for(int i=0; i<tamanho; i++){
+        if(registroIndice->chaveBusca < vetorIndices[i].chaveBusca){
+            pos = i;
+            break;
+        }
+        if(registroIndice->chaveBusca > vetorIndices[i].chaveBusca){
+            pos = tamanho;
             break;
         }
     }
-
-    // int pos;
-    // for(int i=0; i<tamanho; i++){
-    //     if(registroIndice->chaveBusca < vetorIndices[i].chaveBusca){
-    //         pos = i;
-    //         break;
-    //     }
-    //     if(registroIndice->chaveBusca > vetorIndices[i].chaveBusca){
-    //         pos = tamanho;
-    //         break;
-    //     }
-    // }
-    // if(pos != tamanho){
-    //     int m = tamanho - pos + 1;
-    //     for(int i=0; i<m; i++){
-    //         vetorIndices[tamanho - i + 2] = vetorIndices[tamanho - i + 1];
-    //     }
-    // }
-    // vetorIndices[pos].chaveBusca = registroIndice->chaveBusca;
-    // vetorIndices[pos].byteOffset = registroIndice->byteOffset; 
+    if(pos != tamanho){
+        int m = tamanho - pos + 1;
+        for(int i=0; i<m; i++){
+            vetorIndices[tamanho - i + 2] = vetorIndices[tamanho - i + 1];
+        }
+    }
+    vetorIndices[pos].chaveBusca = registroIndice->chaveBusca;
+    vetorIndices[pos].byteOffset = registroIndice->byteOffset; 
 }
 
 //Copia os dados de acordo com o tipoCampo pedido

@@ -381,22 +381,6 @@ void PreencheVetorIndicesSTR(FILE *arqIndice, DADOS_STR *vetor, int tamanho){
 }
 
 void InsereVetorIndicesOrdenadoSTR(DADOS_STR *vetorIndices, DADOS_STR *registroIndice, int tamanho){
-    // //insere ordenado
-    // if(strncmp(vetorIndices[tamanho-1].chaveBusca, registroIndice->chaveBusca, 12) < 0 ){
-    //     strncpySem0(vetorIndices[tamanho].chaveBusca, registroIndice->chaveBusca, 12);
-    //     vetorIndices[tamanho].byteOffset = registroIndice->byteOffset;
-    // }
-    // for(int i=0; i < tamanho; i++){
-    //     if(vetorIndices[i].chaveBusca > registroIndice->chaveBusca){
-    //         for(int j=tamanho; j>i; j--){
-    //             vetorIndices[j] = vetorIndices[j-1];
-    //         }
-    //         strncpySem0(vetorIndices[i].chaveBusca, registroIndice->chaveBusca, 12);
-    //         vetorIndices[i].byteOffset = registroIndice->byteOffset;
-    //         break;
-    //     }
-    // }
-
     int pos;
     for(int i=0; i<tamanho; i++){
         if(strncmp(registroIndice->chaveBusca, vetorIndices[i].chaveBusca, strlen(vetorIndices[i].chaveBusca)) < 0){

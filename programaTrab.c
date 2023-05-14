@@ -36,7 +36,7 @@ int main(){
             break;
         }
         case 3:{
-            RecebeEntradaFunc3(nomeArquivo1, campoIndexado, dado, nomeArquivo2);
+            RecebeEntradaFunc3(nomeArquivo1, nomeArquivo2, campoIndexado, dado);
 
             if(!(VerificaStatusArqBin(nomeArquivo1))){
                 ErroArquivo();
@@ -44,7 +44,7 @@ int main(){
             }
 
             funcionalidade3(nomeArquivo1, nomeArquivo2, campoIndexado, dado);
-
+            
             binarioNaTela(nomeArquivo2);
             break;
         }
@@ -56,7 +56,7 @@ int main(){
                 break;
             }
 
-            funcionalidaæde4(nomeArquivo1, nomeArquivo2, campoIndexado, dado, n);
+            funcionalidade4(nomeArquivo1, nomeArquivo2, campoIndexado, dado, n);
             break;
         }
         case 5:{
