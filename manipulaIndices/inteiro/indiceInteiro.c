@@ -50,7 +50,7 @@ void EscreveArqIndiceInt(FILE* arqIndice, DADOS_INT indice, int*nroRegistros){
     }
 }
 
-//Preenche o vetor de indices, ou seja, insere os campos chaveBusca e byteOffset em cada pos do vetor
+//insere os campos chaveBusca e byteOffset na pos do vetor
 bool InsereCampoIntEmIndices(DADOS_INT *vetor, DADOS *registro_auxiliar, int posicao, int campo, int byteoffset){
     DADOS_INT *registroDados = IndiceDadosIntCriar();
     
@@ -83,11 +83,11 @@ bool InsereCampoIntEmIndices(DADOS_INT *vetor, DADOS *registro_auxiliar, int pos
 bool CriaIndiceInteiro(char arqEntrada[], char arqSaida[], char campo[]){
     FILE *arqBin;
     FILE *arqIndice;
-    CABECALHO_INDICE *cabecalho = CabecalhoIndiceCriar();
+    CABECALHO_INDICE *cabecalhoIndice = CabecalhoIndiceCriar();
 
     //Aloca cabecalho e registro auxiliar para percorrer arquivo binario
-    CABECALHO *cabecalho_registro = CabecalhoCriar();
-    DADOS *registro_auxiliar = RegistroCriar();
+    CABECALHO *cabecalhoRegistro = CabecalhoCriar();
+    DADOS *registroAuxiliar = RegistroCriar();
 
 
     //abre os arquivos recebidos na entrada
@@ -96,7 +96,7 @@ bool CriaIndiceInteiro(char arqEntrada[], char arqSaida[], char campo[]){
 
 
     //Escreve cabecalho de indices
-    EscreveCabecalhoIndice(arqIndice, cabecalho);
+    EscreveCabecalhoIndice(arqIndice, cabecalhoIndice);
     //fecha para atualizar em disco
     fclose(arqIndice);
     //abre novamente para uso
@@ -106,11 +106,11 @@ bool CriaIndiceInteiro(char arqEntrada[], char arqSaida[], char campo[]){
 
    
     //Le cabeçalho do arquivo binario e avança cursor
-    LeCabecalhoDoArqBinario(cabecalho_registro, arqBin);
+    LeCabecalhoDoArqBinario(cabecalhoRegistro, arqBin);
 
 
     //Calcula o numero de registros não removidos e cria um vetor para os indices
-    int nroRegistros = GetNroRegArq(cabecalho_registro) - GetNroRegRem(cabecalho_registro);
+    int nroRegistros = GetNroRegArq(cabecalhoRegistro) - GetNroRegRem(cabecalhoRegistro);
     DADOS_INT *indices = VetorIndicesIntCriar(nroRegistros);
 
 
@@ -118,23 +118,27 @@ bool CriaIndiceInteiro(char arqEntrada[], char arqSaida[], char campo[]){
     int tipoCampo = TipoChaveBusca(campo);
 
     //Percorre arquivo binario lendo os registros
-    long int offsetlido = 17; //será o offset do proximo registro durante o loop
-    long int offsetanterior = 17;
+    long int offsetProximoRegistro = 17; //será o offset do proximo registro durante o loop
+    long int offsetInicioRegistro = 17;
+
     //A flag verifica se o id foi lido e serve para saber se chegou no final do arquivo
-    int flag = LerRegBinario(arqBin, registro_auxiliar, &offsetlido);
-    int pos=0;
+    int flag = LerRegBinario(arqBin, registroAuxiliar, &offsetProximoRegistro);
+
+    //pos é utilizada para armazenar a posicao que o campo deve ser inserido
+    int pos = 0;
     int i;
-    for(i=0; flag!=0; i++){
-        if(GetRegistroRemovido(registro_auxiliar) == '0'){
-            InsereCampoIntEmIndices(indices, registro_auxiliar, pos, tipoCampo, offsetanterior);
+    //le registros até o final do arquivo, inserindo no vetor de indices
+    for(i = 0; flag != 0; i++){
+        if(GetRegistroRemovido(registroAuxiliar) == '0'){
+            InsereCampoIntEmIndices(indices, registroAuxiliar, pos, tipoCampo, offsetInicioRegistro);
             pos++;
         }
 
-        DesalocaCamposVariaveis(registro_auxiliar);
+        DesalocaCamposVariaveis(registroAuxiliar);
 
-        offsetanterior = offsetlido;
+        offsetInicioRegistro = offsetProximoRegistro;
 
-        flag = LerRegBinario(arqBin, registro_auxiliar, &offsetlido); 
+        flag = LerRegBinario(arqBin, registroAuxiliar, &offsetProximoRegistro); 
     }
 
 
@@ -153,28 +157,22 @@ bool CriaIndiceInteiro(char arqEntrada[], char arqSaida[], char campo[]){
     if(i==0) ErroArquivo();
 
     
-    //ATUALIZA CABECALHO INDICE
-    AtualizaStatusIndice(cabecalho, '1');
-    AtualizaNroRegArqIndice(cabecalho, copiaNroRegistro);
-    //Coloca o cursor no começo do arq para sobrescrever o cabcecalho
-    fseek(arqIndice, 0, SEEK_SET); 
-    EscreveCabecalhoIndice(arqIndice, cabecalho);
-
-    //fecha para atualizar em disco
-    DesalocaCabecalhoIndice(cabecalho);
-
+    //Atualiza cabecalho do arquivo de indices
+    AtualizaStatusIndice(cabecalhoIndice, '1');
+    AtualizaNroRegArqIndice(cabecalhoIndice, copiaNroRegistro);
+    //Coloca o cursor no começo do arq para sobrescrever o cabecalho
+    ArqIndReescreveCabecalho(arqBin, cabecalhoIndice);
 
     //desaloca os auxiliares criados
-    DesalocaCabecalho(cabecalho_registro);
-    DesalocaRegistro(registro_auxiliar);
+    DesalocaCabecalhoIndice(cabecalhoIndice);
+    DesalocaCabecalho(cabecalhoRegistro);
+    DesalocaRegistro(registroAuxiliar);
 
     free(indices);
 
-
+    //fecha para atualizar em disco
     fclose(arqBin);
     fclose(arqIndice);
-
-    binarioNaTela(arqSaida);
     
     return true;
 }

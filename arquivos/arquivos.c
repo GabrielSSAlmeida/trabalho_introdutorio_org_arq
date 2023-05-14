@@ -40,6 +40,7 @@ void CsvParaBin(FILE *arqCsv, FILE *arqBin, CABECALHO *cabecalho_saida){
     }
 }
 
+//Verifica se o arquivo está consistente
 bool VerificaStatusArqBin(char *nomeArq){
     FILE *arq;
     char aux;
