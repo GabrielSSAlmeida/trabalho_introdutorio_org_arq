@@ -57,15 +57,21 @@
     /*Realiza uma busca sequencial direto no arquivo binario
     imprime as buscas que passarem nos testes*/
     bool BuscaSequencialBinario(char *nomeArqBin, PARES_BUSCA *paresBusca, int qtdPares);
+
+    void VerificaTodosCriteriosBusca(int inicio, int qtdPares, DADOS *registro, int *passou, PARES_BUSCA *paresBusca);
     //=============================================================================================
 
     //==================================REMOCAO====================================================
     //Escolhe se vai remover a partir de uma busca binaria no arquivo de indices ou uma busca sequencial no binario
     bool MetodoDeRemocao(char *arqEntrada, char *nomeArqIndice, PARES_BUSCA *paresBusca, int qtdPares, char *campoIndexado);
 
+    //Realiza uma busca binaria no arquivo de indices e depois verifica as outras buscas no arquivo binario
+    //imprime as buscas que passarem nos testes
     bool RemocaoBinariaIndicesBinario(char *arqEntrada, char *nomeArqIndice, PARES_BUSCA *paresBusca, int qtdPares);
 
     bool RemocaoSequencialBinario(char *nomeArqBin, char *nomeArqIndice, PARES_BUSCA *paresBusca, int qtdPares, int tipoCampoIndice);
+
+    //=============================================================================================
 
     //Func7
 
@@ -76,7 +82,4 @@
     PARES_BUSCA *atualizacoes, int qtdPares, int qtdAtualizacoes);
 
     bool AtualizaRegistroBinario(DADOS *registro, PARES_BUSCA *atualizacoes, int qtdAtualizacoes);
-
-
-    //=============================================================================================
 #endif

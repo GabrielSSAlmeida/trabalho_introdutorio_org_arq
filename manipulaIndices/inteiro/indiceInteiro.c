@@ -251,10 +251,8 @@ long int* buscaBinariaInt(DADOS_INT* vetor, int posicaoInicial, int posicaoFinal
 	while(posicaoInicial <= posicaoFinal){
 		int centro = (int)((posicaoInicial+posicaoFinal)/2);
 		
-	
 		if (chave == vetor[centro].chaveBusca) {
-            int centroAux = centro;
-            
+            int centroAux = centro;    
 
             //volta ate o primeiro que satisfaz
             while (centroAux >= posInicialGlobal && chave == vetor[centroAux].chaveBusca )
@@ -271,9 +269,7 @@ long int* buscaBinariaInt(DADOS_INT* vetor, int posicaoInicial, int posicaoFinal
                 tam_vetor++;
                 vetorByteOffset = (long int *) realloc(vetorByteOffset, sizeof(long int) * tam_vetor);
                 centroAux++;
-            } 
-            
-              
+            }       
             break;
         }
 			
@@ -289,37 +285,26 @@ long int* buscaBinariaInt(DADOS_INT* vetor, int posicaoInicial, int posicaoFinal
 }
 
 
-
+//FUnção que dado um arquivo de indice e uma chave de busca, retorna todos os bytesOffsets que satisfazem
 long int* BuscaBinariaIndiceInt(char *nomeArqIndice, int valorBuscado, long int *vetorByteOffset){
     FILE *arqIndice;
-    CABECALHO_INDICE *cabecalho_aux = CabecalhoIndiceCriar();
-    DADOS_INT *registroIndice_aux= IndiceDadosIntCriar();
-
+    CABECALHO_INDICE *cabecalhoIndiceAux = CabecalhoIndiceCriar();
 
     //abre o arquivo de indice
     if(!AbreArquivo(&arqIndice, nomeArqIndice, "rb", NULL)) return NULL;
 
-    LeCabecalhoDoArqIndice(cabecalho_aux, arqIndice);
+    LeCabecalhoDoArqIndice(cabecalhoIndiceAux, arqIndice);
 
-    int nroReg = GetNroRegArqIndice(cabecalho_aux);
+    //Numero de registros do cabecalho
+    int nroReg = GetNroRegArqIndice(cabecalhoIndiceAux);
 
+    //Le arqIndice e preenche o vetor
     DADOS_INT *vetorIndices = VetorIndicesIntCriar(nroReg);
-
-    //Preenche o vetor de indices
-    // for (int i = 0; i < nroReg; i++)
-    // {
-    //     vetorIndices[i] = LerRegIndiceInt(arqIndice, registroIndice_aux);
-    // }
-
     PreencheVetorIndicesINT(arqIndice, vetorIndices, nroReg);
-
-
-
 
     vetorByteOffset = buscaBinariaInt(vetorIndices, 0, nroReg, valorBuscado, vetorByteOffset);
 
-    DesalocaCabecalhoIndice(cabecalho_aux);
-    free(registroIndice_aux);
+    DesalocaCabecalhoIndice(cabecalhoIndiceAux);
     fclose(arqIndice);
 
     
@@ -327,6 +312,7 @@ long int* BuscaBinariaIndiceInt(char *nomeArqIndice, int valorBuscado, long int 
     return vetorByteOffset;
 }
 
+//Dado um arquivo de indice, le o arq e preenche um vetor.
 void PreencheVetorIndicesINT(FILE *arqIndice, DADOS_INT *vetor, int tamanho){
     DADOS_INT *registroIndice = IndiceDadosIntCriar();
     //Preenche o vetor de indices
@@ -402,27 +388,28 @@ void ShiftadaDoRemovidoInt(DADOS_INT *vetorIndices, int tamanhoVetor, int posRem
     }
 }
 
-
+//Remove fisicamente um registro do arquivo de indice
 void RemoveArquivoIndiceInt(char *nomeArqIndice, long int byteOffset){
     FILE *arqIndice;
-    CABECALHO_INDICE *cabecalho_aux = CabecalhoIndiceCriar();
-    DADOS_INT *registroIndice_aux= IndiceDadosIntCriar();
+    CABECALHO_INDICE *cabecalhoAux = CabecalhoIndiceCriar();
+    DADOS_INT *registroIndiceAux= IndiceDadosIntCriar();
 
 
     //abre o arquivo de indice
     if(!AbreArquivo(&arqIndice, nomeArqIndice, "rb", NULL)) return ;
 
-    LeCabecalhoDoArqIndice(cabecalho_aux, arqIndice);
+    LeCabecalhoDoArqIndice(cabecalhoAux, arqIndice);
 
-    int nroReg = GetNroRegArqIndice(cabecalho_aux);
+    int nroReg = GetNroRegArqIndice(cabecalhoAux);
 
     DADOS_INT *vetorIndices = VetorIndicesIntCriar(nroReg);
 
+    //armazena a posição do registro que deve ser removido
     int posByteOffset = -1;
     //Preenche o vetor de indices
     for (int i = 0; i < nroReg; i++)
     {
-        vetorIndices[i] = LerRegIndiceInt(arqIndice, registroIndice_aux);
+        vetorIndices[i] = LerRegIndiceInt(arqIndice, registroIndiceAux);
         if(vetorIndices[i].byteOffset == byteOffset){
             posByteOffset = i;
             vetorIndices[i].chaveBusca = -1;
@@ -439,16 +426,16 @@ void RemoveArquivoIndiceInt(char *nomeArqIndice, long int byteOffset){
     //abre o arquivo de indice para reescrita
     if(!AbreArquivo(&arqIndice, nomeArqIndice, "wb", NULL)) return ;
 
-    LeCabecalhoDoArqIndice(cabecalho_aux, arqIndice);
+    LeCabecalhoDoArqIndice(cabecalhoAux, arqIndice);
 
 
     if(posByteOffset != -1){
         ShiftadaDoRemovidoInt(vetorIndices, nroReg, posByteOffset);
     }
 
-    AtualizaNroRegArqIndice(cabecalho_aux, nroReg-1);
+    AtualizaNroRegArqIndice(cabecalhoAux, nroReg-1);
 
-    EscreveCabecalhoIndice(arqIndice, cabecalho_aux);
+    EscreveCabecalhoIndice(arqIndice, cabecalhoAux);
 
     for (int i = 0; i < nroReg; i++)
     {
@@ -456,53 +443,8 @@ void RemoveArquivoIndiceInt(char *nomeArqIndice, long int byteOffset){
     }
 
     free(vetorIndices);
-    DesalocaCabecalhoIndice(cabecalho_aux);
-    free(registroIndice_aux);
+    DesalocaCabecalhoIndice(cabecalhoAux);
+    free(registroIndiceAux);
     fclose(arqIndice);
     
-}
-
-
-
-
-void AtualizaArquivoIndiceInt(char *nomeArqIndice, int novoInt, long int byteOffset){
-    FILE *arqIndice;
-    CABECALHO_INDICE *cabecalho_aux = CabecalhoIndiceCriar();
-
-    if(!AbreArquivo(&arqIndice, nomeArqIndice, "rb", NULL)) return;
-
-    LeCabecalhoDoArqIndice(cabecalho_aux, arqIndice);
-
-    int nroReg = GetNroRegArqIndice(cabecalho_aux);
-
-    DADOS_INT *vetorIndices = VetorIndicesIntCriar(nroReg);
-
-    PreencheVetorIndicesINT(arqIndice, vetorIndices, nroReg);
-
-    for(int i=0; i<nroReg; i++){
-        if(vetorIndices[i].byteOffset == byteOffset){
-            vetorIndices[i].chaveBusca = novoInt;
-        }
-    }
-
-    mergeSortIndiceInt(vetorIndices, 0, nroReg-1);
-
-    fclose(arqIndice);
-
-    //abre para reescrita
-    if(!AbreArquivo(&arqIndice, nomeArqIndice, "wb", NULL)) return ;
-
-    EscreveCabecalhoIndice(arqIndice, cabecalho_aux);
-
-    for (int i = 0; i < nroReg; i++){
-        EscreveArqIndiceInt(arqIndice, vetorIndices[i], &nroReg);
-    }
-
-    AtualizaNroRegArqIndice(cabecalho_aux, nroReg);
-    fseek(arqIndice, 0, SEEK_SET);
-    EscreveCabecalhoIndice(arqIndice, cabecalho_aux);
-    
-    free(vetorIndices);
-    DesalocaCabecalhoIndice(cabecalho_aux);
-    fclose(arqIndice);
 }
