@@ -41,4 +41,4 @@ clean:
 	rm *.o programaTrab
 
 run:
-	valgrind ./programaTrab < 1.in
+	./programaTrab
