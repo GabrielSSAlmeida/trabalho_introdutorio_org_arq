@@ -369,23 +369,30 @@ void CopiaChaveEByteOffsetSTR(DADOS *registro, DADOS_STR *registroIndice, int by
 
 
 void InsereVetorIndicesOrdenadoSTR(DADOS_STR *vetorIndices, DADOS_STR *registroIndice, int tamanho){
+    //algoritmo usado esta disponivel em https://www.sanfoundry.com/c-program-insert-element-specified-position-array/
     int pos;
+
     for(int i=0; i<tamanho; i++){
         if(strncmp(registroIndice->chaveBusca, vetorIndices[i].chaveBusca, strlen(vetorIndices[i].chaveBusca)) < 0){
             pos = i;
             break;
         }
+
         if(strncmp(registroIndice->chaveBusca, vetorIndices[i].chaveBusca, strlen(vetorIndices[i].chaveBusca)) > 0){
             pos = tamanho;
             break;
         }
     }
+
+
     if(pos != tamanho){
-        int m = tamanho - pos + 1;
-        for(int i=0; i<m; i++){
+        int deslocamento = tamanho - pos + 1;
+
+        for(int i=0; i<deslocamento; i++){
             strcpy(vetorIndices[tamanho - i + 2].chaveBusca, vetorIndices[tamanho - i + 1].chaveBusca);
         }
     }
+
     strncpySem0(vetorIndices[pos].chaveBusca, registroIndice->chaveBusca, 12);
     vetorIndices[pos].byteOffset = registroIndice->byteOffset; 
 }

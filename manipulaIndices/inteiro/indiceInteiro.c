@@ -324,20 +324,26 @@ void PreencheVetorIndicesINT(FILE *arqIndice, DADOS_INT *vetor, int tamanho){
 }
 
 void InsereVetorIndicesOrdenadoINT(DADOS_INT *vetorIndices, DADOS_INT *registroIndice, int tamanho){
+    //algoritmo usado esta disponivel em https://www.sanfoundry.com/c-program-insert-element-specified-position-array/
     int pos;
+
     for(int i=0; i<tamanho; i++){
         if(registroIndice->chaveBusca < vetorIndices[i].chaveBusca){
             pos = i;
             break;
         }
+
         if(registroIndice->chaveBusca > vetorIndices[i].chaveBusca){
             pos = tamanho;
             break;
         }
     }
+
+
     if(pos != tamanho){
-        int m = tamanho - pos + 1;
-        for(int i=0; i<m; i++){
+        int deslocamento = tamanho - pos + 1;
+
+        for(int i=0; i<deslocamento; i++){
             vetorIndices[tamanho - i + 2] = vetorIndices[tamanho - i + 1];
         }
     }
