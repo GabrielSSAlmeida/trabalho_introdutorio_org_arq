@@ -29,17 +29,19 @@
 
     void mergeSortIndiceString(DADOS_STR* vetor, int inicio, int fim);
 
+
+    //FUnção que dado um arquivo de indice e uma chave de busca, retorna todos os bytesOffsets que satisfazem
     long int* BuscaBinariaIndiceString(char *nomeArqIndice, char *valorBuscado, long int *vetorByteOffset);
+    
+    //preenche o vetor com os indices do arquivo
+    void PreencheVetorIndicesSTR(FILE *arqIndice, DADOS_STR *vetor, int tamanho);
 
-
+    //Remove fisicamente um registro do arquivo de indice
     void RemoveArquivoIndiceString(char *nomeArqIndice, long int byteOffset);
     
     void CopiaChaveEByteOffsetSTR(DADOS *registro, DADOS_STR *registroIndice, int byteoffset, int tipoCampo);
 
-    void PreencheVetorIndicesSTR(FILE *arqIndice, DADOS_STR *vetor, int tamanho);
-
     void InsereVetorIndicesOrdenadoSTR(DADOS_STR *vetorIndices, DADOS_STR *registroIndice, int tamanho);
 
-    void AtualizaArquivoIndiceString(char *nomeArqIndice, char *novaString, long int byteOffset);
 
 #endif

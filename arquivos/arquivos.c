@@ -45,7 +45,7 @@ bool VerificaStatusArqBin(char *nomeArq){
     FILE *arq;
     char aux;
 
-    if(!AbreArquivo(&arq, nomeArq, "rb")) return false;
+    if(!AbreArquivo(&arq, nomeArq, "rb", NULL)) return false;
 
     fread(&aux, 1, 1, arq);
 
@@ -59,4 +59,6 @@ bool VerificaStatusArqBin(char *nomeArq){
             return true;
             break;
     }
+
+    fclose(arq);
 }

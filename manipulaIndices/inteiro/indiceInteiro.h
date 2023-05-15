@@ -44,11 +44,11 @@
     //Copia os dados de acordo com o tipoCampo pedido
     void CopiaChaveEByteOffsetINT(DADOS *registro, DADOS_INT *registroIndice, int byteoffset, int tipoCampo);   
 
-
+    //FUnção que dado um arquivo de indice e uma chave de busca, retorna todos os bytesOffsets que satisfazem
     long int* BuscaBinariaIndiceInt(char *nomeArqIndice, int valorBuscado, long int *vetorByteOffset);
 
+    //Remove fisicamente um registro do arquivo de indice
     void RemoveArquivoIndiceInt(char *nomeArqIndice, long int byteOffset);
 
-    void AtualizaArquivoIndiceInt(char *nomeArqIndice, int novoInt, long int byteOffset);
 
 #endif
