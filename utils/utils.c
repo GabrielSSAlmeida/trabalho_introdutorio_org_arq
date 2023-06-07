@@ -13,7 +13,7 @@ void RecebeEntradaFunc2(char str1[]){
     scanf("%s", str1);
 }
 
-void RecebeEntradaFunc3(char arqEntrada[], char arqIndice[], char campo[], char dado[]){
+void RecebeEntradaFunc3e8(char arqEntrada[], char arqIndice[], char campo[], char dado[]){
     scanf("%s %s %s %s", arqEntrada, campo, dado, arqIndice);
 }
 
@@ -243,8 +243,8 @@ void IgnoraLinha(FILE *arq){
 
 //verifica se o tipo de dado é string ou int (return 0 == int) (return 1 == string)
 int VerificaDado(char dado[]){
-    if(strcmp(dado, "inteiro") == 0) return 0;
-    if(strcmp(dado, "string") == 0) return 1;
+    if(strcmp(dado, "inteiro") == 0) return inteiro;
+    if(strcmp(dado, "string") == 0) return string;
 }
 
 int TipoChaveBusca(char campo[]){

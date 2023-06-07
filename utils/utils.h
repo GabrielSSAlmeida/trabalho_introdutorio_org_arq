@@ -6,6 +6,9 @@
     #include "../manipulaIndices/inteiro/indiceInteiro.h"
     #include "../manipulaIndices/string/indiceString.h"
 
+
+    typedef enum TipoDados { inteiro, string } TipoDados;
+
     //Funções fornecidas
     void readline(char *string);
     void binarioNaTela(char *nomeArquivoBinario);
@@ -14,7 +17,7 @@
     //Funções criadas
     void RecebeEntradaFunc1(char str1[], char str2[]);
     void RecebeEntradaFunc2(char str1[]);
-    void RecebeEntradaFunc3(char arqEntrada[], char arqIndice[], char campo[], char dado[]);
+    void RecebeEntradaFunc3e8(char arqEntrada[], char arqIndice[], char campo[], char dado[]);
     void RecebeEntradaFuncs4a7(char arqEntrada[], char arqIndice[], char campo[], char dado[], int *n);
 
     void ImprimeCampoVariavel(char *string);

@@ -172,3 +172,23 @@ bool funcionalidade7(char *arqEntrada, char *nomeArqIndice, char *campoIndexado,
         
     }
 }
+
+
+bool funcionalidade8(char *nomeArqEntrada, char *nomeArqSaida, char *campoIndexado, char *dado){
+
+    //verifica se o tipo de dado é string ou int
+    TipoDados dadoVerificado = VerificaDado(dado);
+
+    switch(dadoVerificado){
+        //caso int
+        case inteiro:{
+            (nomeArqEntrada, nomeArqSaida, campoIndexado);
+            break;
+        }
+        default:
+            return false;
+            break;
+    }
+
+    return true;
+}
