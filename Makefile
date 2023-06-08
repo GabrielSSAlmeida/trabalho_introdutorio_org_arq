@@ -1,4 +1,4 @@
-all: prints_e_erros.o parBusca.o indiceString.o indiceInteiro.o cabecalhoIndice.o cabecalho.o arquivos.o funcionalidades.o registro.o fornecidas.o utils.o programaTrab.o
+all: prints_e_erros.o parBusca.o bEstrela.o cabecalhoBEstrela.o indiceString.o indiceInteiro.o cabecalhoIndice.o cabecalho.o arquivos.o funcionalidades.o registro.o fornecidas.o utils.o programaTrab.o
 	gcc *.o -o programaTrab -g -Wall
 
 prints_e_erros.o:
@@ -6,6 +6,12 @@ prints_e_erros.o:
 
 parBusca.o:
 	gcc -c -g parBusca/parBusca.c -o parBusca.o
+
+bEstrela.o:
+	gcc -c -g manipulaBEstrela/bEstrela.c -o bEstrela.o
+
+cabecalhoBEstrela.o:
+	gcc -c -g manipulaBEstrela/cabecalhoBEstrela.c -o cabecalhoBEstrela.o
 
 indiceInteiro.o:
 	gcc -c -g manipulaIndices/inteiro/indiceInteiro.c -o indiceInteiro.o

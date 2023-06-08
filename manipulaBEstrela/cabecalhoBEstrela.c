@@ -1,4 +1,4 @@
-#include "cabecalhoB*.h" 
+#include "cabecalhoBEstrela.h" 
 #include "../prints_e_erros/prints_e_erros.h"
 
 //Aloca e inicializa a struct cabecalhoIndice 
