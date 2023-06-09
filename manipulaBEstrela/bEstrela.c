@@ -53,15 +53,33 @@ bool ArvoreCriar(char nomeArquivo[], char arquivoDados[]){
     if(i==0) ErroArquivo();
 }
 
-bool ArvoreInserir(FILE *arvore, DADOS *registro, CABECALHO_B *cabecalho){
+bool ArvoreInserir(FILE *arvore, DADOS *registro, CABECALHO_B *cabecalho, long int byteoffset){
+    int root = cabecalho->noRaiz;
+
+    DADOS_INT key;
+    key.chaveBusca = registro->idCrime;
+    key.byteOffset = byteoffset;
+
+    DADOS_INT promo_key;
+    int promo_r_child;
+
+    if(Insert(root, key, &promo_key, &promo_r_child) == PROMOTION){
+        //crie nova página raiz com key:=PROMO_KEY, l_child:=ROOT, r_child:=PROMO_R_CHILD
+        //faça ROOT igual ao RRN da nova página raiz
+    }
+
+
+    //atualiza RRN raiz
+    cabecalho->noRaiz = root;
+    CabecalhoBReescreve(arvore, cabecalho);
 
 }
 
-ValoresRetorno Insert(int CURRENT_RRN, DADOS_INT KEY, DADOS_INT PROMO_KEY, int PROMO_R_CHILD){
+ValoresRetorno Insert(int CURRENT_RRN, DADOS_INT KEY, DADOS_INT *PROMO_KEY, int *PROMO_R_CHILD){
     //se nó não existe, promove a chave
     if(CURRENT_RRN == NIL){
-        PROMO_KEY = KEY;
-        PROMO_R_CHILD = NIL;
+        *PROMO_KEY = KEY;
+        *PROMO_R_CHILD = NIL;
 
         return PROMOTION;
     }else{
