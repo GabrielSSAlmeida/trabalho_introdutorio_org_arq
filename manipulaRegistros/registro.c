@@ -41,6 +41,31 @@ DADOS *RegistroCriar(void){
     return registro;
 }
 
+DADOS **VetorRegistrosCriar(int tamanho){
+    DADOS **registro = (DADOS**) calloc(tamanho, sizeof(DADOS*));
+
+    if(registro != NULL){
+        return registro;
+    }
+    else{
+        ErroAlocacao();
+    }
+
+}
+
+void DesalocaVetorRegistro(DADOS** vetor, int tamanho){
+    if(vetor != NULL){
+        for (int i = 0; i < tamanho; i++)
+        {
+            DesalocaRegistro(vetor[i]);
+        }
+    }
+    else{
+        ErroDesalocar();
+    }
+}
+
+
 
 void DesalocaCamposVariaveis(DADOS *registro){
     if(registro != NULL){
@@ -56,20 +81,6 @@ void DesalocaCamposVariaveis(DADOS *registro){
 void DesalocaRegistro(DADOS *registro){
     if(registro != NULL){
         DesalocaCamposVariaveis(registro);
-        free(registro);
-    }
-    else{
-        ErroDesalocar();
-    }
-}
-
-void DesalocaVetorRegistro(DADOS **registro, int tamanho){
-    if(registro != NULL){
-        for (int i = 0; i < tamanho; i++)
-        {
-            DesalocaCamposVariaveis(registro[i]);
-            free(registro[i]);
-        }
         free(registro);
     }
     else{

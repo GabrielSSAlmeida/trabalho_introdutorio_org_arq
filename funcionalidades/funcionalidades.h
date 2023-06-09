@@ -12,7 +12,7 @@
     #include "../cabecalho/cabecalho.h"
     #include "../manipulaIndices/inteiro/indiceInteiro.h"
     #include "../manipulaIndices/string/indiceString.h"
-
+    #include "../manipulaBEstrela/bEstrela.h"
     
 
     bool funcionalidade1(char *nomeArqEntrada, char *nomeArqSaida);

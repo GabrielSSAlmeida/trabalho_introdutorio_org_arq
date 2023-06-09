@@ -10,7 +10,8 @@
     #define NIL -1
 
     typedef enum {PROMOTION, NO_PROMOTION, ERROR} ValoresRetorno;
-
+    typedef enum { ACHOU, NAO_ACHOU } buscaRetorno;
+    
     struct chave {
         int C;
         long int Pr;
@@ -26,5 +27,5 @@
     };
     typedef struct btPage BTPAGE;
     
-
+    DADOS** BuscaIndiceArvore(char *nomeArqEntrada, char *nomeArqIndice, PARES_BUSCA *paresBusca, int qtdPares, int *qtdEncontrados);
 #endif

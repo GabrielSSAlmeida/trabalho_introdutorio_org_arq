@@ -104,7 +104,7 @@ bool funcionalidade4(char *arqEntrada, char *nomeArqIndice, char *campoIndexado,
         
         printf("Resposta para a busca %d\n", i+1);
 
-        if(!MetodoDeBusca(arqEntrada, nomeArqIndice, paresBusca, qtdPares, campoIndexado)) return false;
+        //if(!MetodoDeBusca(arqEntrada, nomeArqIndice, paresBusca, qtdPares, campoIndexado, BuscaBinariaIndices)) return false;
 
         DesalocaParesBusca(paresBusca);
     }
@@ -190,5 +190,52 @@ bool funcionalidade8(char *nomeArqEntrada, char *nomeArqSaida, char *campoIndexa
             break;
     }
 
+    return true;
+}
+
+
+bool funcionalidade9(char *arqEntrada, char *nomeArqIndice, char *campoIndexado, char *dado, int qtdBuscas){
+    for (int i = 0; i < qtdBuscas; i++)
+    {
+        int qtdPares;
+        scanf("%d ", &qtdPares);
+
+        //cria um vetor com os pares utilizados para busca
+        PARES_BUSCA *paresBusca = VetorParesBuscaCriar(qtdPares);
+        RecebeParesBusca(qtdPares, paresBusca); 
+        
+        printf("Resposta para a busca %d\n", i+1);
+
+        int qtdRegistros = 0;
+        DADOS** registros = MetodoDeBusca(arqEntrada, nomeArqIndice, paresBusca, qtdPares, campoIndexado, &qtdRegistros, BuscaIndiceArvore);
+
+        if(registros != NULL){
+            for (int i = 0; i < qtdRegistros; i++)
+            {
+                ImprimeRegistroBinario(registros[i]);
+            }
+            
+        }
+
+        TipoCampo campo = TipoChaveBusca(campoIndexado);
+        int tamanho;
+        if(campo == idCrime){
+            tamanho =1;
+        }else{
+            FILE *arqBin;
+            if(!AbreArquivo(&arqBin, arqEntrada, "rb", NULL)) return false;
+            CABECALHO *cabecalhoBinAux = CabecalhoCriar();
+            //le o cabecalho do arquivo binario
+            LeCabecalhoDoArqBinario(cabecalhoBinAux, arqBin);
+            tamanho = GetNroRegArq(cabecalhoBinAux) - GetNroRegRem(cabecalhoBinAux);
+            DesalocaCabecalho(cabecalhoBinAux);
+        }
+        
+
+
+        DesalocaVetorRegistro(registros, tamanho);
+        DesalocaParesBusca(paresBusca);
+    }
+    
     return true;
 }

@@ -242,25 +242,25 @@ void IgnoraLinha(FILE *arq){
 }
 
 //verifica se o tipo de dado é string ou int (return 0 == int) (return 1 == string)
-int VerificaDado(char dado[]){
+TipoDados VerificaDado(char dado[]){
     if(strcmp(dado, "inteiro") == 0) return inteiro;
     if(strcmp(dado, "string") == 0) return string;
 }
 
-int TipoChaveBusca(char campo[]){
-    int tipoCampo = -1;
+TipoCampo TipoChaveBusca(char campo[]){
+    TipoCampo tipoCampo = erro;
     if(strcmp(campo, "idCrime") == 0){
-        tipoCampo = 0;
+        tipoCampo = idCrime;
     }else if(strcmp(campo, "numeroArtigo") == 0){
-        tipoCampo = 1;
+        tipoCampo = numeroArtigo;
     }else if(strcmp(campo, "dataCrime") == 0){
-        tipoCampo = 2;
+        tipoCampo = dataCrime;
     }else if(strcmp(campo, "marcaCelular") == 0){
-        tipoCampo = 3;
+        tipoCampo = marcaCelular;
     }else if(strcmp(campo, "lugarCrime") == 0){
-        tipoCampo = 4;
+        tipoCampo = lugarCrime;
     }else if(strcmp(campo, "descricaoCrime") == 0){
-        tipoCampo = 5;
+        tipoCampo = descricaoCrime;
     }else{
         ErroArquivo();
     }

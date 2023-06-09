@@ -33,7 +33,7 @@ char *GetValorCampoString(PARES_BUSCA *vetor, int pos){
     return NULL;
 }
 
-int GetTipoCampo(PARES_BUSCA *vetor, int pos){
+TipoCampo GetTipoCampo(PARES_BUSCA *vetor, int pos){
     if(vetor != NULL)
         return vetor[pos].tipoCampo;
     return -1;
@@ -176,18 +176,30 @@ void VerificaTodosCriteriosBusca(int inicio, int qtdPares, DADOS *registro, int 
     }
 }
 
+
 //Escolhe se vai fazer uma busca binaria no arquivo de indices ou uma busca sequencial no binario
-bool MetodoDeBusca(char *arqEntrada, char *nomeArqIndice, PARES_BUSCA *paresBusca, int qtdPares, char *campoIndexado){
+DADOS** MetodoDeBusca(char *arqEntrada, char *nomeArqIndice, PARES_BUSCA *paresBusca, int qtdPares, char *campoIndexado,int *qtdEncontrados,BuscaIndice buscaIndice){
     //Decide qual método de busca utilizar
     if(DecideOrdemBusca(paresBusca, qtdPares, campoIndexado)){ 
         //O metodo é a busca binaria
-        if(!BuscaBinariaIndices(arqEntrada, nomeArqIndice, paresBusca, qtdPares)) return false;
+        DADOS** registros = buscaIndice(arqEntrada, nomeArqIndice, paresBusca, qtdPares, qtdEncontrados);
+
+        if(registros == NULL){
+            ErroRegistro();
+            return false;
+        }
+        return registros;
+
     }else{ 
         //o metodo é a busca sequencial
-        if(!BuscaSequencialBinario(arqEntrada, paresBusca, qtdPares)) return false;
-    }
+        DADOS** registros = BuscaSequencialBinario(arqEntrada, paresBusca, qtdPares, qtdEncontrados);
 
-    return true;
+        if(registros == NULL){
+            ErroRegistro();
+            return false;
+        }
+        return registros;
+    }
 }
 
 //Realiza uma busca binaria no arquivo de indices e depois verifica as outras buscas no arquivo binario
@@ -254,7 +266,7 @@ bool BuscaBinariaIndices(char *nomeArqEntrada, char *nomeArqIndice, PARES_BUSCA 
 
 //Realiza uma busca sequencial direto no arquivo binario
 //imprime as buscas que passarem nos testes
-bool BuscaSequencialBinario(char *nomeArqBin, PARES_BUSCA *paresBusca, int qtdPares){
+DADOS** BuscaSequencialBinario(char *nomeArqBin, PARES_BUSCA *paresBusca, int qtdPares, int *qtdEncontrados){
     FILE *arqBin;
     if(!AbreArquivo(&arqBin, nomeArqBin, "rb", NULL)) return false;
 
@@ -263,36 +275,47 @@ bool BuscaSequencialBinario(char *nomeArqBin, PARES_BUSCA *paresBusca, int qtdPa
     //le o cabecalho do arquivo binario
     LeCabecalhoDoArqBinario(cabecalhoBinAux, arqBin);
 
-    DADOS *registroAux = RegistroCriar();
 
+    int nroRegDisponiveis = GetNroRegArq(cabecalhoBinAux) - GetNroRegRem(cabecalhoBinAux);
+
+    //Cria um vetor de registros
+    DADOS** vetorRegistros =  VetorRegistrosCriar(nroRegDisponiveis);
+
+
+    DADOS *registroAux = RegistroCriar();
     long int boffAux;//Neste caso nn utiliza o numero de byteoffset lidos
     int flag = LerRegBinario(arqBin, registroAux, &boffAux);
     int i;
-    int qtdRegistrosImpressos = 0;
+    int qtdRegistrosEncontrados = 0;
     for(i=0; flag!=0; i++){
         int passou = 1;//Verifica se passou em todos os criterios de busca
         
         VerificaTodosCriteriosBusca(0, qtdPares, registroAux, &passou, paresBusca);
 
         if(passou && GetRegistroRemovido(registroAux) != '1'){
-            ImprimeRegistroBinario(registroAux);
-            qtdRegistrosImpressos++;
+            vetorRegistros[qtdRegistrosEncontrados] = registroAux;
+            qtdRegistrosEncontrados++;
+        }else{
+            DesalocaRegistro(registroAux);
         }
         
-        DesalocaCamposVariaveis(registroAux);
-
+        
+        registroAux = RegistroCriar();
         flag = LerRegBinario(arqBin, registroAux, &boffAux); 
+        if(flag == 0)
+            DesalocaRegistro(registroAux);
     }
 
 
     //desaloca os auxiliares criados
     DesalocaCabecalho(cabecalhoBinAux);
-    DesalocaRegistro(registroAux);
+
+    *qtdEncontrados = qtdRegistrosEncontrados;
 
     //se nao existem registros no arquivo
-    if(i==0 || qtdRegistrosImpressos == 0) ErroRegistro();
+    if(i==0 || qtdRegistrosEncontrados == 0) return NULL;
     fclose(arqBin);
-    return true;
+    return vetorRegistros;
 }
 
 //Escolhe se vai remover a partir de uma busca binaria no arquivo de indices ou uma busca sequencial no binario

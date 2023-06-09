@@ -36,21 +36,20 @@ BTPAGE *PaginaCriarInicializado(CHAVE chave, int pEsquerdo, int pDireito, int ni
     if(pagina != NULL){
         pagina->nivel = nivel;
         pagina->n = n;
-        pagina->chaves[0] = chave;
-        pagina->P[0] = pEsquerdo;
-        pagina->P[1] = pDireito;
-
-
-        //ARRUMAR     TEM UM ERRO
-        for (int i = 1; i < MAXCHAVES+1; i++)
+        
+        for (int i = 0; i < MAXCHAVES+1; i++)
         {
             pagina->P[i] = -1;
-
+            
             if(i < MAXCHAVES){
                 pagina->chaves[i].C = -1;
                 pagina->chaves[i].Pr = -1;
             }
         }
+
+        pagina->chaves[0] = chave;
+        pagina->P[0] = pEsquerdo;
+        pagina->P[1] = pDireito; 
     }
     else{
         ErroAlocacao();
@@ -58,7 +57,7 @@ BTPAGE *PaginaCriarInicializado(CHAVE chave, int pEsquerdo, int pDireito, int ni
     return pagina;
 }
 
-void lerPagina(FILE* arqArvore, int CURRENT_RRN, BTPAGE* pagina){
+void LerPagina(FILE* arqArvore, int CURRENT_RRN, BTPAGE* pagina){
     //Va ate a pagina
     fseek(arqArvore, CURRENT_RRN*TAM_PAGE, SEEK_SET);
 
@@ -179,9 +178,9 @@ ValoresRetorno Insert(FILE*arqArvore, int CURRENT_RRN, CHAVE KEY, CHAVE *PROMO_K
         return PROMOTION;
     }else{
         //leia página CURRENT_RRN e armazene em PAGE
-        lerPagina(arqArvore, CURRENT_RRN, pagina);
+        LerPagina(arqArvore, CURRENT_RRN, pagina);
         //procure por KEY em PAGE
-
+        
         //faça POS igual a posição em que KEY ocorre ou deveria ocorrer
     }
 
@@ -189,3 +188,219 @@ ValoresRetorno Insert(FILE*arqArvore, int CURRENT_RRN, CHAVE KEY, CHAVE *PROMO_K
     free(pagina);
     free(novaPagina);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//===============================================================================
+//FUNCIONALIDADE 9
+
+buscaRetorno Pesquisa(FILE* arqArvore, int RRN, int chave, int encontra_RRN, int encontra_pos){
+    if(RRN == NIL)
+        return NAO_ACHOU;
+    else{
+        BTPAGE *pagina = PaginaCriar(); 
+        LerPagina(arqArvore, RRN, pagina);
+        //procure KEY em PAGE, fazendo POS igual a posição em que KEY ocorre ou deveria ocorrer
+
+        if()
+    }
+}
+
+
+long int BuscaArvore(char *nomeArqIndice, int valorBuscado){
+
+
+}
+
+
+DADOS** BuscaIndiceArvore(char *nomeArqEntrada, char *nomeArqIndice, PARES_BUSCA *paresBusca, int qtdPares, int *qtdEncontrados){
+    //Vai indicar os byteOffset dos registros encontrados
+    //-1 indica o fim do vetor
+    long int byteOffset;
+
+    FILE *arqBin;
+    if(!AbreArquivo(&arqBin, nomeArqEntrada, "rb", NULL)) return false;
+
+    //identifica qual campo será usado na busca por índice
+    TipoCampo tipoCampo = GetTipoCampo(paresBusca, 0);
+
+    if(tipoCampo == idCrime){
+        byteOffset =  BuscaArvore(nomeArqIndice, GetValorCampoInt(paresBusca, 0));
+    }
+
+    //Cria um vetor de registros
+    DADOS** registrosProcurado;
+
+    int qtdRegistrosEncontrados=0;
+    //Se tiver apenas 1 criterio de busca(no caso, a busca pelo indice) ja imprime
+    if(qtdPares == 1){
+        if(byteOffset != -1){
+            DADOS *registroAux = LeRegistroPorByteOffset(arqBin, byteOffset);
+            if(GetRegistroRemovido(registroAux) != '1'){
+                registrosProcurado = &registroAux;
+                qtdRegistrosEncontrados++;
+            }else{
+                DesalocaRegistro(registroAux);
+            }
+        } 
+    }
+        /*  A partir das buscas retornadas da busca binaria, verifica se esses campos
+            satisfazem os outros criterios de busca
+        */
+    else{
+        if (byteOffset != -1){
+            int passou = 1;
+            
+            DADOS *registroAux = LeRegistroPorByteOffset(arqBin, byteOffset);
+
+            VerificaTodosCriteriosBusca(1, qtdPares, registroAux, &passou, paresBusca);
+
+            if(passou && GetRegistroRemovido(registroAux) != '1'){
+                registrosProcurado = &registroAux;
+                qtdRegistrosEncontrados++;
+            }else{
+                DesalocaRegistro(registroAux);
+            }
+        }
+    }
+
+    *qtdEncontrados = qtdRegistrosEncontrados;
+
+    if(qtdRegistrosEncontrados == 0) return NULL;
+    
+        
+    fclose(arqBin);
+    return registrosProcurado;
+}
+
+
+
+
+/*
+//Escolhe se vai fazer uma busca binaria no arquivo de indices ou uma busca sequencial no binario
+bool MetodoDeBusca(char *arqEntrada, char *nomeArqIndice, PARES_BUSCA *paresBusca, int qtdPares, char *campoIndexado){
+    //Decide qual método de busca utilizar
+    if(DecideOrdemBusca(paresBusca, qtdPares, campoIndexado)){ 
+        //O metodo é a busca binaria
+        if(!BuscaBinariaIndices(arqEntrada, nomeArqIndice, paresBusca, qtdPares)) return false;
+    }else{ 
+        //o metodo é a busca sequencial
+        if(!BuscaSequencialBinario(arqEntrada, paresBusca, qtdPares)) return false;
+    }
+
+    return true;
+}
+
+//Realiza uma busca binaria no arquivo de indices e depois verifica as outras buscas no arquivo binario
+//imprime as buscas que passarem nos testes
+bool BuscaBinariaIndices(char *nomeArqEntrada, char *nomeArqIndice, PARES_BUSCA *paresBusca, int qtdPares){
+    //Vai indicar os byteOffset dos registros encontrados
+    //-1 indica o fim do vetor
+    long int *vetorByteOffset  = calloc(1, sizeof(long int));
+
+    FILE *arqBin;
+    if(!AbreArquivo(&arqBin, nomeArqEntrada, "rb", NULL)) return false;
+
+    //identifica qual campo será usado na busca por índice
+    int tipoCampo = GetTipoCampo(paresBusca, 0);
+
+    if (tipoCampo == 0 || tipoCampo == 1){ //O campo é do tipo int
+        vetorByteOffset =  BuscaBinariaIndiceInt(nomeArqIndice, GetValorCampoInt(paresBusca, 0), vetorByteOffset);
+
+    }else if(tipoCampo >= 2){ //O campo é do tipo string
+        vetorByteOffset =  BuscaBinariaIndiceString(nomeArqIndice, GetValorCampoString(paresBusca, 0), vetorByteOffset);
+    }
+
+   int qtdRegistrosImpressos=0;
+   //Se tiver apenas 1 criterio de busca(no caso, a busca pelo indice) ja imprime
+   if(qtdPares == 1){
+        for (int j = 0; vetorByteOffset[j] != -1; j++)
+        {
+            DADOS *registroAux = LeRegistroPorByteOffset(arqBin, vetorByteOffset[j]);
+            if(GetRegistroRemovido(registroAux) != '1'){
+                ImprimeRegistroBinario(registroAux);
+                qtdRegistrosImpressos++;
+            }
+            DesalocaRegistro(registroAux);
+        }
+        
+   }
+
+   else{
+        for (int j = 0; vetorByteOffset[j] != -1; j++){
+            int passou = 1;
+            
+            DADOS *registroAux = LeRegistroPorByteOffset(arqBin, vetorByteOffset[j]);
+
+            VerificaTodosCriteriosBusca(1, qtdPares, registroAux, &passou, paresBusca);
+
+            if(passou && GetRegistroRemovido(registroAux) != '1'){
+                ImprimeRegistroBinario(registroAux);
+                qtdRegistrosImpressos++;
+            }
+               
+            DesalocaRegistro(registroAux);
+        
+        }
+   }
+   if(qtdRegistrosImpressos == 0) ErroRegistro();
+   
+    
+    fclose(arqBin);
+    free(vetorByteOffset);
+    return true;
+}
+
+//Realiza uma busca sequencial direto no arquivo binario
+//imprime as buscas que passarem nos testes
+bool BuscaSequencialBinario(char *nomeArqBin, PARES_BUSCA *paresBusca, int qtdPares){
+    FILE *arqBin;
+    if(!AbreArquivo(&arqBin, nomeArqBin, "rb", NULL)) return false;
+
+    CABECALHO *cabecalhoBinAux = CabecalhoCriar();
+
+    //le o cabecalho do arquivo binario
+    LeCabecalhoDoArqBinario(cabecalhoBinAux, arqBin);
+
+    DADOS *registroAux = RegistroCriar();
+
+    long int boffAux;//Neste caso nn utiliza o numero de byteoffset lidos
+    int flag = LerRegBinario(arqBin, registroAux, &boffAux);
+    int i;
+    int qtdRegistrosImpressos = 0;
+    for(i=0; flag!=0; i++){
+        int passou = 1;//Verifica se passou em todos os criterios de busca
+        
+        VerificaTodosCriteriosBusca(0, qtdPares, registroAux, &passou, paresBusca);
+
+        if(passou && GetRegistroRemovido(registroAux) != '1'){
+            ImprimeRegistroBinario(registroAux);
+            qtdRegistrosImpressos++;
+        }
+        
+        DesalocaCamposVariaveis(registroAux);
+
+        flag = LerRegBinario(arqBin, registroAux, &boffAux); 
+    }
+
+
+    //desaloca os auxiliares criados
+    DesalocaCabecalho(cabecalhoBinAux);
+    DesalocaRegistro(registroAux);
+
+    //se nao existem registros no arquivo
+    if(i==0 || qtdRegistrosImpressos == 0) ErroRegistro();
+    fclose(arqBin);
+    return true;
+} */

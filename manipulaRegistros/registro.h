@@ -20,9 +20,10 @@
     typedef struct dados DADOS;
 
     DADOS *RegistroCriar(void);
+    DADOS **VetorRegistrosCriar(int tamanho);
     int LerRegBinario(FILE *arqBin, DADOS *registro, long int *offsetlido);
     void DesalocaRegistro(DADOS *registro);
-    void DesalocaVetorRegistro(DADOS **registro, int tamanho);
+    void DesalocaVetorRegistro(DADOS** vetor, int tamanho);
     void DesalocaCamposVariaveis(DADOS *registro);
     int TamanhoRegistro(DADOS *registro);
     

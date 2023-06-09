@@ -9,6 +9,16 @@
 
     typedef enum TipoDados { inteiro, string } TipoDados;
 
+    typedef enum TipoCampo{
+        erro = -1,
+        idCrime,
+        numeroArtigo,
+        dataCrime,
+        marcaCelular,
+        lugarCrime,
+        descricaoCrime
+    } TipoCampo;
+
     //Funções fornecidas
     void readline(char *string);
     void binarioNaTela(char *nomeArquivoBinario);
@@ -30,8 +40,8 @@
     void LerStringFixa(FILE *arq, char *vetor, int tamanho);
     int LerInteiroVariavel(FILE *arq);
 
-    int VerificaDado(char dado[]);
-    int TipoChaveBusca(char campo[]);
+    TipoDados VerificaDado(char dado[]);
+    TipoCampo TipoChaveBusca(char campo[]);
 
     void strncpySem0(char *string1, char *string2, int n);
     void strcpySem0Variavel(char *string1, char *string2);

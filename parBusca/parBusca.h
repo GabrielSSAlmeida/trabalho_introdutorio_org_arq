@@ -13,7 +13,7 @@
         //So sera usado um valorCampo de cada vez.
         char valorCampoString[200];
         int valorCampoInt;
-        int tipoCampo; 
+        TipoCampo tipoCampo; 
         /*  0 = idCampo
             1 = numeroArtigo
             2 = dataCrime
@@ -26,6 +26,9 @@
 
     //Uma struct auxiliar para armazenar todos os pares de busca na funcionalidade 4
     typedef struct paresBusca PARES_BUSCA;
+
+
+    typedef DADOS** (*BuscaIndice)(char*, char*, PARES_BUSCA*, int, int*);
 
     //Cria um vetor de PARES_BUSCA
     PARES_BUSCA *VetorParesBuscaCriar(int tamanho);
@@ -46,9 +49,11 @@
     //Retorna true se existe um par para realizar a busca binaria na primeira posição
     bool DecideOrdemBusca(PARES_BUSCA *vetor, int tamanho, char *campoIndexado);
     //Escolhe se vai fazer uma busca binaria no arquivo de indices ou uma busca sequencial no binario
-    bool MetodoDeBusca(char *arqEntrada, char *nomeArqIndice, PARES_BUSCA *paresBusca, int qtdPares, char *campoIndexado);
+    DADOS** MetodoDeBusca(char *arqEntrada, char *nomeArqIndice, PARES_BUSCA *paresBusca, 
+    int qtdPares, char *campoIndexado, int *qtdEncontrados,BuscaIndice buscaIndice);
 
-    bool MetodoDeAtualizacao(char *arqEntrada, char *nomeArqIndice, PARES_BUSCA *paresBusca, PARES_BUSCA *paresAtualizacoes, int qtdPares, int qtdAtualizacoes, char *campoIndexado, char *dado);
+    bool MetodoDeAtualizacao(char *arqEntrada, char *nomeArqIndice, PARES_BUSCA *paresBusca, 
+    PARES_BUSCA *paresAtualizacoes, int qtdPares, int qtdAtualizacoes, char *campoIndexado, char *dado);
 
     /*Realiza uma busca binaria no arquivo de indices e depois verifica as outras buscas no arquivo binario
     imprime as buscas que passarem nos testes*/
@@ -56,7 +61,7 @@
 
     /*Realiza uma busca sequencial direto no arquivo binario
     imprime as buscas que passarem nos testes*/
-    bool BuscaSequencialBinario(char *nomeArqBin, PARES_BUSCA *paresBusca, int qtdPares);
+    DADOS** BuscaSequencialBinario(char *nomeArqBin, PARES_BUSCA *paresBusca, int qtdPares, int *qtdEncontrados);
 
     void VerificaTodosCriteriosBusca(int inicio, int qtdPares, DADOS *registro, int *passou, PARES_BUSCA *paresBusca);
     //=============================================================================================
