@@ -205,22 +205,84 @@ ValoresRetorno Insert(FILE*arqArvore, int CURRENT_RRN, CHAVE KEY, CHAVE *PROMO_K
 //===============================================================================
 //FUNCIONALIDADE 9
 
-buscaRetorno Pesquisa(FILE* arqArvore, int RRN, int chave, int encontra_RRN, int encontra_pos){
+int BuscaBinaria(BTPAGE* pagina, int posicaoInicial, int posicaoFinal, int chave, bool *encontrou){
+	while(posicaoInicial <= posicaoFinal){ //log n
+		int centro = (int)((posicaoInicial+posicaoFinal)/2);
+
+		if (chave == pagina->chaves[centro].C){
+            *encontrou = true;
+			return centro; //valor encontrado- retorna a posicao no vetor de chaves
+        }
+		if (chave < pagina->chaves[centro].C) //se o número existir estará na primeira metade
+			posicaoFinal = centro - 1;
+		if (chave > pagina->chaves[centro].C) //se o número existir estará na segunda metade
+			posicaoInicial = centro + 1;
+	}
+	//valor não encontrado = retorna a posicao no vetor de RRNs
+    *encontrou = false;
+    for (int i = 0; i < MAXCHAVES; i++)
+    {
+        if(chave < pagina->chaves[i].C){
+            return i;
+        }
+    }
+    
+    return MAXCHAVES;
+}
+
+bool ProcuraChavePagina(BTPAGE *pagina, int chave, int *posicao){
+    //Procura no vetor de chaves por busca binaria
+    bool encontrou;
+    *posicao = BuscaBinaria(pagina, 0, MAXCHAVES-1, chave, &encontrou);
+    return encontrou;
+}
+
+buscaRetorno Pesquisa(FILE* arqArvore, int RRN, int chave, int *encontra_RRN, int *encontra_pos){
     if(RRN == NIL)
         return NAO_ACHOU;
     else{
         BTPAGE *pagina = PaginaCriar(); 
         LerPagina(arqArvore, RRN, pagina);
         //procure KEY em PAGE, fazendo POS igual a posição em que KEY ocorre ou deveria ocorrer
-
-        if()
+        int pos = -1;
+        if(ProcuraChavePagina(pagina, chave, &pos)){
+            encontra_RRN = RRN;
+            encontra_pos = pos;
+            return ACHOU;
+        }else{
+            return Pesquisa(arqArvore, pagina->P[pos], chave, encontra_RRN, encontra_pos);
+        }
     }
 }
 
-
 long int BuscaArvore(char *nomeArqIndice, int valorBuscado){
+    FILE *arqArvore;
+    CABECALHO_B *cabecalhoArvoreAux = CabecalhoBCriar();
 
+    //abre o arquivo de indice
+    if(!AbreArquivo(&arqArvore, nomeArqIndice, "rb", NULL)) return -1;
 
+    CabecalhoBLer(cabecalhoArvoreAux, arqArvore);
+
+    int RRN_encontrado = -1;
+    int POS_encontrada = -1;
+    buscaRetorno retorno = Pesquisa(arqArvore, cabecalhoArvoreAux->noRaiz, 
+    valorBuscado, &RRN_encontrado, &POS_encontrada);
+
+    if(retorno == ACHOU){
+        BTPAGE *pagina = PaginaCriar();
+        LerPagina(arqArvore, RRN_encontrado, pagina);
+
+        CabecalhoBDesalocar(cabecalhoArvoreAux);
+        fclose(arqArvore);
+
+        return pagina->chaves[POS_encontrada].Pr;
+    }
+
+    
+    CabecalhoBDesalocar(cabecalhoArvoreAux);
+    fclose(arqArvore);
+    return -1;
 }
 
 
@@ -279,7 +341,6 @@ DADOS** BuscaIndiceArvore(char *nomeArqEntrada, char *nomeArqIndice, PARES_BUSCA
 
     if(qtdRegistrosEncontrados == 0) return NULL;
     
-        
     fclose(arqBin);
     return registrosProcurado;
 }

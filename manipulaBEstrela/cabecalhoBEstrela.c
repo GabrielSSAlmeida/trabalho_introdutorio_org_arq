@@ -33,6 +33,16 @@ void CabecalhoBEscreve(FILE *arqBin, CABECALHO_B *cabecalho){
     fwrite(&(cabecalho->lixo), sizeof(char), 59, arqBin);
 }
 
+void CabecalhoBLer(CABECALHO_B *cabecalho, FILE *arq){
+    fread(&(cabecalho->status), sizeof(char), 1, arq);
+    fread(&(cabecalho->noRaiz), sizeof(int), 1, arq);
+    fread(&(cabecalho->proxRRN), sizeof(int), 1, arq);
+    fread(&(cabecalho->nroNiveis), sizeof(int), 1, arq);
+    fread(&(cabecalho->nroChaves), sizeof(int), 1, arq);
+    fread((cabecalho->lixo), sizeof(char), 59, arq);
+}
+
+
 //Função para desalocar a struct cabecalho
 void CabecalhoBDesalocar(CABECALHO_B *cabecalho){
     if(cabecalho != NULL){
