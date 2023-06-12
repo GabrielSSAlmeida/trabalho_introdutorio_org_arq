@@ -4,6 +4,7 @@
     #include <stdlib.h>
     #include <string.h>
     #include "../cabecalho/cabecalho.h"
+    #include "../cabecalho/cabecalhoIndice.h"
     #include "../arquivos/arquivos.h"
 
     struct dados{

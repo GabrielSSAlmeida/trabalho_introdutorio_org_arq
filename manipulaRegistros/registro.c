@@ -1,6 +1,8 @@
 #include "registro.h"
 #include "../utils/utils.h"
 #include "../prints_e_erros/prints_e_erros.h"
+#include "../manipulaIndices/inteiro/indiceInteiro.h"
+#include "../manipulaIndices/string/indiceString.h"
 
 // struct dados{
 //         char removido;                  //indica se a struct foi removida (1 = removido, 0 = nao)

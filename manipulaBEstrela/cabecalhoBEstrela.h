@@ -21,6 +21,8 @@
     
     CABECALHO_B *CabecalhoBCriar(void);
 
+    void CabecalhoBLer(CABECALHO_B *cabecalho, FILE *arq);
+
     void CabecalhoBEscreve(FILE *arqBin, CABECALHO_B *cabecalho);
 
     void CabecalhoBDesalocar(CABECALHO_B *cabecalho);

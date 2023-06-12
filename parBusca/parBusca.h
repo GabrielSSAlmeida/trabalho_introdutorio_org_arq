@@ -7,6 +7,7 @@
     #include "../prints_e_erros/prints_e_erros.h"
     #include "../utils/utils.h"
     
+
     //Uma struct auxiliar para armazenar todos os pares de busca na funcionalidade 4
     struct paresBusca{
         char nomeCampo[15];

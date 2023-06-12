@@ -63,5 +63,5 @@ bool CabecalhoBVerificaStatus(CABECALHO_B *cabecalho){
 
 bool CabecalhoBReescreve(FILE *arqInd, CABECALHO_B *cabecalho){
     fseek(arqInd, 0, SEEK_SET); 
-    EscreveCabecalhoIndice(arqInd, cabecalho);
+    CabecalhoBEscreve(arqInd, cabecalho);
 }

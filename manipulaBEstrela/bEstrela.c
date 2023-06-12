@@ -72,9 +72,8 @@ void LerPagina(FILE* arqArvore, int CURRENT_RRN, BTPAGE* pagina){
         fread(&(pagina->chaves[i].Pr), 8, 1, arqArvore);
     }
     
-    if((pagina->n) == 4){
-        fread(&(pagina->chaves[4].Pr), 8, 1, arqArvore);
-    }
+    fread(&(pagina->P[4]), 4, 1, arqArvore);
+    
 
 
 }
@@ -140,7 +139,7 @@ bool ArvoreInserir(FILE *arvore, DADOS *registro, CABECALHO_B *cabecalho, long i
 
     int proxRRN = cabecalho->proxRRN;
 
-    if(Insert(arvore, root, key, &promo_key, &promo_r_child) == PROMOTION){
+    /* if(Insert(arvore, root, key, &promo_key, &promo_r_child) == PROMOTION){
         //crie nova página raiz com key:=PROMO_KEY, l_child:=ROOT, r_child:=PROMO_R_CHILD
         BTPAGE* novaPagina = PaginaCriarInicializado(promo_key, root, promo_r_child, 1, 1);
         //faça ROOT igual ao RRN da nova página raiz
@@ -152,7 +151,7 @@ bool ArvoreInserir(FILE *arvore, DADOS *registro, CABECALHO_B *cabecalho, long i
 
         free(novaPagina);
     }
-
+ */
 
     //atualiza RRN raiz
     cabecalho->noRaiz = root;
@@ -246,8 +245,8 @@ buscaRetorno Pesquisa(FILE* arqArvore, int RRN, int chave, int *encontra_RRN, in
         //procure KEY em PAGE, fazendo POS igual a posição em que KEY ocorre ou deveria ocorrer
         int pos = -1;
         if(ProcuraChavePagina(pagina, chave, &pos)){
-            encontra_RRN = RRN;
-            encontra_pos = pos;
+            *encontra_RRN = RRN;
+            *encontra_pos = pos;
             return ACHOU;
         }else{
             return Pesquisa(arqArvore, pagina->P[pos], chave, encontra_RRN, encontra_pos);
@@ -268,6 +267,8 @@ long int BuscaArvore(char *nomeArqIndice, int valorBuscado){
     int POS_encontrada = -1;
     buscaRetorno retorno = Pesquisa(arqArvore, cabecalhoArvoreAux->noRaiz, 
     valorBuscado, &RRN_encontrado, &POS_encontrada);
+
+    printf("%d", retorno);
 
     if(retorno == ACHOU){
         BTPAGE *pagina = PaginaCriar();

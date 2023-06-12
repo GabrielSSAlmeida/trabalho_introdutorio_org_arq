@@ -105,6 +105,16 @@ int main(){
                 break;
             }
         }
+        case 9:{
+            RecebeEntradaFuncs4a7(nomeArquivo1, nomeArquivo2, campoIndexado, dado, &n);
+
+            if(!(VerificaStatusArqBin(nomeArquivo1) && VerificaStatusArqBin(nomeArquivo2))){
+                ErroArquivo();
+                break;
+            }
+
+            funcionalidade9(nomeArquivo1, nomeArquivo2, campoIndexado, dado, n);
+        }
     }
 
     return 0;

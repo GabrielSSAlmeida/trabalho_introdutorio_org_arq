@@ -12,6 +12,7 @@
         "indicestring.h": "c",
         "parbusca.h": "c",
         "registro.h": "c",
-        "cstddef": "c"
+        "cstddef": "c",
+        "indiceinteiro.h": "c"
     }
 }

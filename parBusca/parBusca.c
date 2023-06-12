@@ -1,4 +1,6 @@
 #include "parBusca.h"
+#include "../manipulaIndices/inteiro/indiceInteiro.h"
+#include "../manipulaIndices/string/indiceString.h"
 
 //aloca um registro de indice do tipo inteiro
 PARES_BUSCA *VetorParesBuscaCriar(int tamanho){
@@ -8,7 +10,7 @@ PARES_BUSCA *VetorParesBuscaCriar(int tamanho){
         for (int i = 0; i < tamanho; i++)
         {
             vetor[i].valorCampoInt = -1;
-            vetor[i].tipoCampo = -1;
+            vetor[i].tipoCampo = erro;
             for(int j=0; j<200; j++)
                 vetor[i].valorCampoString[j] = '$';
         }

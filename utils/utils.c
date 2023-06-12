@@ -1,5 +1,7 @@
 #include "utils.h"
 #include "../prints_e_erros/prints_e_erros.h"
+#include "../manipulaIndices/inteiro/indiceInteiro.h"
+#include "../manipulaIndices/string/indiceString.h"
 
 
 //recebe nome dos arquivos na funcionalidade 1

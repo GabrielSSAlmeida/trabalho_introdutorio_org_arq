@@ -4,6 +4,8 @@
     #include <stdlib.h>
     #include <string.h>
     #include <stdbool.h>
+    #include "../manipulaRegistros/registro.h"
+    #include "../parBusca/parBusca.h"
 
     #define MAXCHAVES 4
     #define TAM_PAGE 76

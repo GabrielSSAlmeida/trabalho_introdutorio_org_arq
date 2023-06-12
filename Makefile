@@ -1,4 +1,4 @@
-all: prints_e_erros.o parBusca.o bEstrela.o cabecalhoBEstrela.o indiceString.o indiceInteiro.o cabecalhoIndice.o cabecalho.o arquivos.o funcionalidades.o registro.o fornecidas.o utils.o programaTrab.o
+all: utils.o prints_e_erros.o parBusca.o bEstrela.o cabecalhoBEstrela.o indiceString.o indiceInteiro.o cabecalhoIndice.o cabecalho.o arquivos.o funcionalidades.o registro.o fornecidas.o programaTrab.o
 	gcc *.o -o programaTrab -g -Wall
 
 prints_e_erros.o:
@@ -47,4 +47,4 @@ clean:
 	rm *.o programaTrab
 
 run:
-	./programaTrab
+	valgrind ./programaTrab < 5.in
