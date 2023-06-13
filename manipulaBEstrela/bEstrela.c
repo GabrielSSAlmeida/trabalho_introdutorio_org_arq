@@ -59,7 +59,8 @@ BTPAGE *PaginaCriarInicializado(CHAVE chave, int pEsquerdo, int pDireito, int ni
 
 void LerPagina(FILE* arqArvore, int CURRENT_RRN, BTPAGE* pagina){
     //Va ate a pagina
-    fseek(arqArvore, CURRENT_RRN*TAM_PAGE, SEEK_SET);
+    //Pula o cabecalho
+    fseek(arqArvore, TAM_PAGE+(CURRENT_RRN*TAM_PAGE), SEEK_SET);
 
 
     fread(&(pagina->nivel), 4, 1, arqArvore);
@@ -308,7 +309,7 @@ DADOS** BuscaIndiceArvore(char *nomeArqEntrada, char *nomeArqIndice, PARES_BUSCA
     }
 
     //Cria um vetor de registros
-    DADOS** registrosProcurado;
+    DADOS** registrosProcurado = VetorRegistrosCriar(1);
 
     int qtdRegistrosEncontrados=0;
     //Se tiver apenas 1 criterio de busca(no caso, a busca pelo indice) ja imprime

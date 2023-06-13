@@ -212,10 +212,11 @@ bool funcionalidade9(char *arqEntrada, char *nomeArqIndice, char *campoIndexado,
         DesalocaParesBusca(paresBusca);
 
         if(registros != NULL){
-            for (int i = 0; i < qtdRegistros; i++)
+            for (int j = 0; j < qtdRegistros; j++)
             {
-                ImprimeRegistroBinario(registros[i]);
+                ImprimeRegistroBinario(registros[j]);
             }
+            
             DesalocaVetorRegistro(registros, qtdRegistros);
         }
     }

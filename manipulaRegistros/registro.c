@@ -57,10 +57,10 @@ DADOS **VetorRegistrosCriar(int tamanho){
 
 void DesalocaVetorRegistro(DADOS** vetor, int tamanho){
     if(vetor != NULL){
-        for (int i = 0; i < tamanho; i++)
-        {
+        for (int i = 0; i < tamanho; i++){
             DesalocaRegistro(vetor[i]);
         }
+        
         free(vetor);
     }
     else{
@@ -247,7 +247,6 @@ void ImprimeRegistroBinario(DADOS *registro){
         ImprimeMarcaCelular(registro->marcaCelular);
 
     }
-    
 }
 
 
