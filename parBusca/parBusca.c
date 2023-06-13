@@ -189,7 +189,7 @@ DADOS** MetodoDeBusca(char *arqEntrada, char *nomeArqIndice, PARES_BUSCA *paresB
 
         if(registros == NULL){
             ErroRegistro();
-            return false;
+            return NULL;
         }
         return registros;
 
@@ -199,7 +199,7 @@ DADOS** MetodoDeBusca(char *arqEntrada, char *nomeArqIndice, PARES_BUSCA *paresB
 
         if(registros == NULL){
             ErroRegistro();
-            return false;
+            return NULL;
         }
         return registros;
     }

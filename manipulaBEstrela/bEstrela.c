@@ -317,7 +317,7 @@ DADOS** BuscaIndiceArvore(char *nomeArqEntrada, char *nomeArqIndice, PARES_BUSCA
         if(byteOffset != -1){
             DADOS *registroAux = LeRegistroPorByteOffset(arqBin, byteOffset);
             if(GetRegistroRemovido(registroAux) != '1'){
-                registrosProcurado = &registroAux;
+                registrosProcurado[qtdRegistrosEncontrados] = registroAux;
                 qtdRegistrosEncontrados++;
             }else{
                 DesalocaRegistro(registroAux);
@@ -336,7 +336,7 @@ DADOS** BuscaIndiceArvore(char *nomeArqEntrada, char *nomeArqIndice, PARES_BUSCA
             VerificaTodosCriteriosBusca(1, qtdPares, registroAux, &passou, paresBusca);
 
             if(passou && GetRegistroRemovido(registroAux) != '1'){
-                registrosProcurado = &registroAux;
+                registrosProcurado[qtdRegistrosEncontrados] = registroAux;
                 qtdRegistrosEncontrados++;
             }else{
                 DesalocaRegistro(registroAux);
@@ -348,8 +348,10 @@ DADOS** BuscaIndiceArvore(char *nomeArqEntrada, char *nomeArqIndice, PARES_BUSCA
 
     fclose(arqBin);
 
-    if(qtdRegistrosEncontrados == 0)
+    if(qtdRegistrosEncontrados == 0){
+        DesalocaVetorRegistro(registrosProcurado, qtdRegistrosEncontrados);
         return NULL;
+    }
 
     return registrosProcurado;
 }

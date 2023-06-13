@@ -214,7 +214,7 @@ bool funcionalidade9(char *arqEntrada, char *nomeArqIndice, char *campoIndexado,
         if(registros != NULL){
             for (int j = 0; j < qtdRegistros; j++)
             {
-                ImprimeRegistroBinario(registros[j]);
+                ImprimeRegistroBinario((registros)[j]);
             }
             
             DesalocaVetorRegistro(registros, qtdRegistros);
