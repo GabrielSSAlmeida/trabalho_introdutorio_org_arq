@@ -333,7 +333,7 @@ void InsereVetorIndicesOrdenadoINT(DADOS_INT *vetorIndices, DADOS_INT *registroI
             break;
         }
 
-        if(registroIndice->chaveBusca > vetorIndices[i].chaveBusca){
+        if(registroIndice->chaveBusca > vetorIndices[tamanho - 1].chaveBusca){
             pos = tamanho;
             break;
         }

@@ -50,6 +50,8 @@
 
     void avancaCursosEmCampoVariavel(FILE *arqBin);
 
+    int InsereOrdenadoVetor(int *vetor, int tamanho, int chave);
+
     //Ler e ignorar a primeira linha do arquivo
     void IgnoraLinha(FILE *arq);
 #endif

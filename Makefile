@@ -47,4 +47,4 @@ clean:
 	rm *.o programaTrab
 
 run:
-	valgrind -s --leak-check=full --show-leak-kinds=all --track-origins=yes ./programaTrab < 5.in > s.out
+	valgrind -s --leak-check=full --show-leak-kinds=all --track-origins=yes ./programaTrab < 6.in

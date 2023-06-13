@@ -162,7 +162,14 @@ bool ArvoreInserir(FILE *arvore, DADOS *registro, CABECALHO_B *cabecalho, long i
 
 }
 
-ValoresRetorno Insert(FILE*arqArvore, int CURRENT_RRN, CHAVE KEY, CHAVE *PROMO_KEY, int *PROMO_R_CHILD){
+bool ProcuraChavePagina(BTPAGE *pagina, int chave, int *posicao){
+    //Procura no vetor de chaves por busca binaria
+    bool encontrou;
+    *posicao = BuscaBinaria(pagina, 0, (pagina->n)-1, chave, &encontrou);
+    return encontrou;
+}
+
+ValoresRetorno Insert(FILE *arqArvore, int CURRENT_RRN, CHAVE KEY, CHAVE *PROMO_KEY, int *PROMO_R_CHILD){
 
     //Cria Paginas Vazias
     BTPAGE *pagina = PaginaCriar();
@@ -181,9 +188,26 @@ ValoresRetorno Insert(FILE*arqArvore, int CURRENT_RRN, CHAVE KEY, CHAVE *PROMO_K
     }else{
         //leia página CURRENT_RRN e armazene em PAGE
         LerPagina(arqArvore, CURRENT_RRN, pagina);
+
         //procure por KEY em PAGE
+        if(ProcuraChavePagina(pagina, KEY.C, &posicaoPagina)) return ERROR;
         
-        //faça POS igual a posição em que KEY ocorre ou deveria ocorrer
+        //passo recursivo
+        ValoresRetorno RETURN_VALUE = Insert(arqArvore, pagina->P[posicaoPagina], KEY, &chavePromovida, &rrnPromovido);
+
+        if(RETURN_VALUE == NO_PROMOTION || RETURN_VALUE == ERROR) return RETURN_VALUE;
+
+        //se ainda existe espaço na página
+        else if(pagina->n < 4){
+
+            //INSERIR CHAVEPROMOVIDA E RRN PROMOVIDO!!!!!!!
+            
+
+            return NO_PROMOTION;
+        }
+        else{
+            //redistribuicao / split
+        }
     }
 
 
@@ -191,9 +215,37 @@ ValoresRetorno Insert(FILE*arqArvore, int CURRENT_RRN, CHAVE KEY, CHAVE *PROMO_K
     free(novaPagina);
 }
 
+bool InserirChaveEmPagina(FILE *arqArvore, BTPAGE *pagina, CHAVE KEY, int RRN_Pagina, int RRN_Direita){
+    InsereOrdenadoVetor(pagina->chaves, );
+}
 
+int InsereChaveOrdenada(int *vetor, int tamanho, int chave){
+    //algoritmo usado esta disponivel em https://www.sanfoundry.com/c-program-insert-element-specified-position-array/
+    int pos;
 
+    for(int i=0; i<tamanho; i++){
+        if(vetor[i] == NIL){
+            vetor[i] = chave;
+            return i;
+        }
 
+        if(chave < vetor[i]){
+            pos = i;
+            break;
+        }
+    }
+
+    if(pos != tamanho){
+        int deslocamento = tamanho - pos - 1;
+
+        for(int i=0; i<deslocamento; i++){
+            vetor[tamanho - i - 1] = vetor[tamanho - i - 2];
+        }
+    }
+    vetor[pos] = chave;
+
+    return pos;
+}
 
 
 
@@ -208,8 +260,9 @@ ValoresRetorno Insert(FILE*arqArvore, int CURRENT_RRN, CHAVE KEY, CHAVE *PROMO_K
 //FUNCIONALIDADE 9
 
 int BuscaBinaria(BTPAGE* pagina, int posicaoInicial, int posicaoFinal, int chave, bool *encontrou){
-	while(posicaoInicial <= posicaoFinal){ //log n
-		int centro = (int)((posicaoInicial+posicaoFinal)/2);
+	int centro;
+    while(posicaoInicial <= posicaoFinal){ //log n
+		centro = (int)((posicaoInicial+posicaoFinal)/2);
 
 		if (chave == pagina->chaves[centro].C){
             *encontrou = true;
@@ -222,22 +275,13 @@ int BuscaBinaria(BTPAGE* pagina, int posicaoInicial, int posicaoFinal, int chave
 	}
 	//valor não encontrado = retorna a posicao no vetor de RRNs
     *encontrou = false;
-    for (int i = 0; i < MAXCHAVES; i++)
-    {
-        if(chave < pagina->chaves[i].C){
-            return i;
-        }
-    }
-    //O mais a direita, ou seja, o valor de n do registro
-    return (posicaoFinal+1);
+
+    if (chave < pagina->chaves[centro].C) //se o número existir estará na primeira metade
+		return (centro);
+	if (chave > pagina->chaves[centro].C) //se o número existir estará na segunda metade
+		return (centro+1);
 }
 
-bool ProcuraChavePagina(BTPAGE *pagina, int chave, int *posicao){
-    //Procura no vetor de chaves por busca binaria
-    bool encontrou;
-    *posicao = BuscaBinaria(pagina, 0, (pagina->n)-1, chave, &encontrou);
-    return encontrou;
-}
 
 buscaRetorno Pesquisa(FILE* arqArvore, int RRN, int chave, int *encontra_RRN, int *encontra_pos){
     if(RRN == NIL)
@@ -257,7 +301,6 @@ buscaRetorno Pesquisa(FILE* arqArvore, int RRN, int chave, int *encontra_RRN, in
             free(pagina);
             return Pesquisa(arqArvore, RRN_busca, chave, encontra_RRN, encontra_pos);
         }
-        
     }
 }
 

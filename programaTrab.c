@@ -115,6 +115,7 @@ int main(){
 
             funcionalidade9(nomeArquivo1, nomeArquivo2, campoIndexado, dado, n);
         }
+        
     }
 
     return 0;
