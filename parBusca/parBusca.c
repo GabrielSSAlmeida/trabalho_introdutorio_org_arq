@@ -61,6 +61,7 @@ void AtualizaValorCampoInt(PARES_BUSCA *vetor, int pos, int valor){
 //Desalocar o vetor de Pares Busca
 void DesalocaParesBusca(PARES_BUSCA *vetor){
     free(vetor);
+    vetor = NULL;
 }
 
 
@@ -301,7 +302,6 @@ DADOS** BuscaSequencialBinario(char *nomeArqBin, PARES_BUSCA *paresBusca, int qt
             DesalocaRegistro(registroAux);
         }
         
-        
         registroAux = RegistroCriar();
         flag = LerRegBinario(arqBin, registroAux, &boffAux); 
         if(flag == 0)
@@ -315,8 +315,8 @@ DADOS** BuscaSequencialBinario(char *nomeArqBin, PARES_BUSCA *paresBusca, int qt
     *qtdEncontrados = qtdRegistrosEncontrados;
 
     //se nao existem registros no arquivo
-    if(i==0 || qtdRegistrosEncontrados == 0) return NULL;
     fclose(arqBin);
+    if(i==0 || qtdRegistrosEncontrados == 0) return NULL;
     return vetorRegistros;
 }
 

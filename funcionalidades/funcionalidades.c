@@ -209,32 +209,15 @@ bool funcionalidade9(char *arqEntrada, char *nomeArqIndice, char *campoIndexado,
         int qtdRegistros = 0;
         DADOS** registros = MetodoDeBusca(arqEntrada, nomeArqIndice, paresBusca, qtdPares, campoIndexado, &qtdRegistros, BuscaIndiceArvore);
 
+        DesalocaParesBusca(paresBusca);
+
         if(registros != NULL){
             for (int i = 0; i < qtdRegistros; i++)
             {
                 ImprimeRegistroBinario(registros[i]);
             }
-            
+            DesalocaVetorRegistro(registros, qtdRegistros);
         }
-
-        TipoCampo campo = TipoChaveBusca(campoIndexado);
-        int tamanho;
-        if(campo == idCrime){
-            tamanho =1;
-        }else{
-            FILE *arqBin;
-            if(!AbreArquivo(&arqBin, arqEntrada, "rb", NULL)) return false;
-            CABECALHO *cabecalhoBinAux = CabecalhoCriar();
-            //le o cabecalho do arquivo binario
-            LeCabecalhoDoArqBinario(cabecalhoBinAux, arqBin);
-            tamanho = GetNroRegArq(cabecalhoBinAux) - GetNroRegRem(cabecalhoBinAux);
-            DesalocaCabecalho(cabecalhoBinAux);
-        }
-        
-
-
-        DesalocaVetorRegistro(registros, tamanho);
-        DesalocaParesBusca(paresBusca);
     }
     
     return true;

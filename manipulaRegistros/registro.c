@@ -61,6 +61,7 @@ void DesalocaVetorRegistro(DADOS** vetor, int tamanho){
         {
             DesalocaRegistro(vetor[i]);
         }
+        free(vetor);
     }
     else{
         ErroDesalocar();

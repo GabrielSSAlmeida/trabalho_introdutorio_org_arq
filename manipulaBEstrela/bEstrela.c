@@ -65,14 +65,16 @@ void LerPagina(FILE* arqArvore, int CURRENT_RRN, BTPAGE* pagina){
     fread(&(pagina->nivel), 4, 1, arqArvore);
     fread(&(pagina->n), 4, 1, arqArvore);
 
-    for (int i = 0; i < (pagina->n); i++)
+    int numPagina = (pagina->n);
+
+    for (int i = 0; i < numPagina; i++)
     {
         fread(&(pagina->P[i]), 4, 1, arqArvore);
         fread(&(pagina->chaves[i].C), 4, 1, arqArvore);
         fread(&(pagina->chaves[i].Pr), 8, 1, arqArvore);
     }
-    
-    fread(&(pagina->P[4]), 4, 1, arqArvore);
+
+    fread(&(pagina->P[numPagina]), 4, 1, arqArvore);
     
 
 
@@ -225,14 +227,14 @@ int BuscaBinaria(BTPAGE* pagina, int posicaoInicial, int posicaoFinal, int chave
             return i;
         }
     }
-    
-    return MAXCHAVES;
+    //O mais a direita, ou seja, o valor de n do registro
+    return (posicaoFinal+1);
 }
 
 bool ProcuraChavePagina(BTPAGE *pagina, int chave, int *posicao){
     //Procura no vetor de chaves por busca binaria
     bool encontrou;
-    *posicao = BuscaBinaria(pagina, 0, MAXCHAVES-1, chave, &encontrou);
+    *posicao = BuscaBinaria(pagina, 0, (pagina->n)-1, chave, &encontrou);
     return encontrou;
 }
 
@@ -247,10 +249,14 @@ buscaRetorno Pesquisa(FILE* arqArvore, int RRN, int chave, int *encontra_RRN, in
         if(ProcuraChavePagina(pagina, chave, &pos)){
             *encontra_RRN = RRN;
             *encontra_pos = pos;
+            free(pagina);
             return ACHOU;
         }else{
-            return Pesquisa(arqArvore, pagina->P[pos], chave, encontra_RRN, encontra_pos);
+            int RRN_busca = pagina->P[pos];
+            free(pagina);
+            return Pesquisa(arqArvore, RRN_busca, chave, encontra_RRN, encontra_pos);
         }
+        
     }
 }
 
@@ -268,16 +274,15 @@ long int BuscaArvore(char *nomeArqIndice, int valorBuscado){
     buscaRetorno retorno = Pesquisa(arqArvore, cabecalhoArvoreAux->noRaiz, 
     valorBuscado, &RRN_encontrado, &POS_encontrada);
 
-    printf("%d", retorno);
-
     if(retorno == ACHOU){
         BTPAGE *pagina = PaginaCriar();
         LerPagina(arqArvore, RRN_encontrado, pagina);
 
         CabecalhoBDesalocar(cabecalhoArvoreAux);
         fclose(arqArvore);
-
-        return pagina->chaves[POS_encontrada].Pr;
+        long int byteOffset = pagina->chaves[POS_encontrada].Pr;
+        free(pagina);
+        return byteOffset;
     }
 
     
@@ -340,9 +345,11 @@ DADOS** BuscaIndiceArvore(char *nomeArqEntrada, char *nomeArqIndice, PARES_BUSCA
 
     *qtdEncontrados = qtdRegistrosEncontrados;
 
-    if(qtdRegistrosEncontrados == 0) return NULL;
-    
     fclose(arqBin);
+
+    if(qtdRegistrosEncontrados == 0)
+        return NULL;
+
     return registrosProcurado;
 }
 
