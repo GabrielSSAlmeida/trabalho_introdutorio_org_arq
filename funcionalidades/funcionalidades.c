@@ -174,7 +174,7 @@ bool funcionalidade7(char *arqEntrada, char *nomeArqIndice, char *campoIndexado,
 }
 
 
-bool funcionalidade8(char *nomeArqEntrada, char *nomeArqSaida, char *campoIndexado, char *dado){
+bool funcionalidade8(char *nomeArqBinario, char *nomeArqIndice, char *dado){
 
     //verifica se o tipo de dado é string ou int
     TipoDados dadoVerificado = VerificaDado(dado);
@@ -182,7 +182,7 @@ bool funcionalidade8(char *nomeArqEntrada, char *nomeArqSaida, char *campoIndexa
     switch(dadoVerificado){
         //caso int
         case inteiro:{
-            (nomeArqEntrada, nomeArqSaida, campoIndexado);
+            return ArvoreCriar(nomeArqBinario, nomeArqIndice);
             break;
         }
         default:

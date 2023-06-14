@@ -96,6 +96,7 @@ int main(){
                 binarioNaTela(nomeArquivo1);
                 binarioNaTela(nomeArquivo2); 
             }
+            break;
         }
         case 8:{
             RecebeEntradaFunc3e8(nomeArquivo1, nomeArquivo2, campoIndexado, dado);
@@ -104,6 +105,9 @@ int main(){
                 ErroArquivo();
                 break;
             }
+
+            funcionalidade8(nomeArquivo1, nomeArquivo2, dado);
+            break;
         }
         case 9:{
             RecebeEntradaFuncs4a7(nomeArquivo1, nomeArquivo2, campoIndexado, dado, &n);
@@ -114,6 +118,7 @@ int main(){
             }
 
             funcionalidade9(nomeArquivo1, nomeArquivo2, campoIndexado, dado, n);
+            break;
         }
         
     }

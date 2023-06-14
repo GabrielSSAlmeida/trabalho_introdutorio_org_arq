@@ -6,6 +6,7 @@
     #include <stdbool.h>
     #include "../manipulaRegistros/registro.h"
     #include "../parBusca/parBusca.h"
+    #include "cabecalhoBEstrela.h"
 
     #define MAXCHAVES 4
     #define TAM_PAGE 76
@@ -29,5 +30,16 @@
     };
     typedef struct btPage BTPAGE;
     
+
+    bool ArvoreCriar(char nomeArqBin[], char arqIndiceArvore[]);
+
     DADOS** BuscaIndiceArvore(char *nomeArqEntrada, char *nomeArqIndice, PARES_BUSCA *paresBusca, int qtdPares, int *qtdEncontrados);
+
+    int InsereChave(BTPAGE *pagina, int tamanho, CHAVE chave, int RRN_Direita);
+
+    bool ArvoreInserir(FILE *arvore, DADOS *registro, CABECALHO_B *cabecalho, long int byteoffset);
+
+    ValoresRetorno Insert(FILE *arqArvore, int CURRENT_RRN, CHAVE KEY, CHAVE *PROMO_KEY, int *PROMO_R_CHILD);
+
+    int BuscaBinaria(BTPAGE* pagina, int posicaoInicial, int posicaoFinal, int chave, bool *encontrou);
 #endif
