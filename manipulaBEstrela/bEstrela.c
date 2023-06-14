@@ -1,6 +1,5 @@
 #include "bEstrela.h"
 #include "../arquivos/arquivos.h"
-#include "cabecalhoBEstrela.h"
 #include "../cabecalho/cabecalho.h"
 #include "../manipulaRegistros/registro.h"
 #include "../manipulaIndices/inteiro/indiceInteiro.h"
@@ -66,6 +65,7 @@ void LerPagina(FILE* arqArvore, int CURRENT_RRN, BTPAGE* pagina){
     fread(&(pagina->nivel), 4, 1, arqArvore);
     fread(&(pagina->n), 4, 1, arqArvore);
 
+    
     int numPagina = (pagina->n);
 
     for (int i = 0; i < numPagina; i++)
@@ -76,20 +76,37 @@ void LerPagina(FILE* arqArvore, int CURRENT_RRN, BTPAGE* pagina){
     }
 
     fread(&(pagina->P[numPagina]), 4, 1, arqArvore);
-    
+}
+
+void EscrevePagina(FILE* arqArvore, int CURRENT_RRN, BTPAGE* pagina){
+    //Va ate a pagina
+    //Pula o cabecalho
+    fseek(arqArvore, TAM_PAGE+(CURRENT_RRN*TAM_PAGE), SEEK_SET);
 
 
+    fwrite(&(pagina->nivel), 4, 1, arqArvore);
+    fwrite(&(pagina->n), 4, 1, arqArvore);
+
+
+    for (int i = 0; i < MAXCHAVES; i++)
+    {
+        fwrite(&(pagina->P[i]), 4, 1, arqArvore);
+        fwrite(&(pagina->chaves[i].C), 4, 1, arqArvore);
+        fwrite(&(pagina->chaves[i].Pr), 8, 1, arqArvore);
+    }
+
+    fread(&(pagina->P[MAXCHAVES]), 4, 1, arqArvore);
 }
 
 
-bool ArvoreCriar(char nomeArquivo[], char arquivoDados[]){
+bool ArvoreCriar(char nomeArqBin[], char arqIndiceArvore[]){
     FILE *arvore, *dados;
-    if(!AbreArquivo(&arvore, nomeArquivo, "wb", NULL)) return false;
+    if(!AbreArquivo(&arvore, arqIndiceArvore, "wb+", NULL)) return false;
 
     CABECALHO_B *cabecalhoArvore = CabecalhoBCriar();
     CabecalhoBEscreve(arvore, cabecalhoArvore);
 
-    if(!AbreArquivo(&dados, arquivoDados, "rb", NULL)) return false;
+    if(!AbreArquivo(&dados, nomeArqBin, "rb", NULL)) return false;
     CABECALHO *cabecalhoDados = CabecalhoCriar();
     LeCabecalhoDoArqBinario(cabecalhoDados, dados);
 
@@ -101,22 +118,14 @@ bool ArvoreCriar(char nomeArquivo[], char arquivoDados[]){
     //A flag verifica se o id foi lido e serve para saber se chegou no final do arquivo
     int flag = LerRegBinario(dados, registroAuxiliar, &offsetProximoRegistro);
 
-    //pos é utilizada para armazenar a posicao que o campo deve ser inserido
-    int pos = 0;
+
     int i;
     //le registros até o final do arquivo, inserindo no vetor de indices
     for(i = 0; flag != 0; i++){
         if(GetRegistroRemovido(registroAuxiliar) == '0'){
 
-
-
-
             //INSERCAO NA ARVORE!!!
-
-
-
-
-            pos++;
+            ArvoreInserir(arvore, registroAuxiliar, cabecalhoArvore, offsetInicioRegistro);
         }
 
         DesalocaCamposVariaveis(registroAuxiliar);
@@ -128,6 +137,16 @@ bool ArvoreCriar(char nomeArquivo[], char arquivoDados[]){
 
     //se nao existem registros no arquivo
     if(i==0) ErroArquivo();
+
+
+    DesalocaRegistro(registroAuxiliar);
+
+    fclose(arvore);
+    fclose(dados);
+    CabecalhoBDesalocar(cabecalhoArvore);
+    DesalocaCabecalho(cabecalhoDados);
+
+    return true;
 }
 
 bool ArvoreInserir(FILE *arvore, DADOS *registro, CABECALHO_B *cabecalho, long int byteoffset){
@@ -142,7 +161,7 @@ bool ArvoreInserir(FILE *arvore, DADOS *registro, CABECALHO_B *cabecalho, long i
 
     int proxRRN = cabecalho->proxRRN;
 
-    /* if(Insert(arvore, root, key, &promo_key, &promo_r_child) == PROMOTION){
+    if(Insert(arvore, root, key, &promo_key, &promo_r_child) == PROMOTION){
         //crie nova página raiz com key:=PROMO_KEY, l_child:=ROOT, r_child:=PROMO_R_CHILD
         BTPAGE* novaPagina = PaginaCriarInicializado(promo_key, root, promo_r_child, 1, 1);
         //faça ROOT igual ao RRN da nova página raiz
@@ -152,14 +171,14 @@ bool ArvoreInserir(FILE *arvore, DADOS *registro, CABECALHO_B *cabecalho, long i
         //Att proxRRN ddo cabecalho;
         cabecalho->proxRRN = (proxRRN+1);
 
+        EscrevePagina(arvore, root, novaPagina);
+
         free(novaPagina);
     }
- */
 
     //atualiza RRN raiz
     cabecalho->noRaiz = root;
     CabecalhoBReescreve(arvore, cabecalho);
-
 }
 
 bool ProcuraChavePagina(BTPAGE *pagina, int chave, int *posicao){
@@ -178,12 +197,13 @@ ValoresRetorno Insert(FILE *arqArvore, int CURRENT_RRN, CHAVE KEY, CHAVE *PROMO_
     CHAVE chavePromovida;
     int rrnPromovido;
 
-
     //se nó não existe, promove a chave
     if(CURRENT_RRN == NIL){
         *PROMO_KEY = KEY;
         *PROMO_R_CHILD = NIL;
 
+        free(pagina);
+        free(novaPagina);
         return PROMOTION;
     }else{
         //leia página CURRENT_RRN e armazene em PAGE
@@ -198,10 +218,12 @@ ValoresRetorno Insert(FILE *arqArvore, int CURRENT_RRN, CHAVE KEY, CHAVE *PROMO_
         if(RETURN_VALUE == NO_PROMOTION || RETURN_VALUE == ERROR) return RETURN_VALUE;
 
         //se ainda existe espaço na página
-        else if(pagina->n < 4){
-
-            //INSERIR CHAVEPROMOVIDA E RRN PROMOVIDO!!!!!!!
-            
+        else if(pagina->n < MAXCHAVES){
+            //Inserir Chave e RRN Promovidos
+            InsereChave(pagina, MAXCHAVES, KEY, rrnPromovido);
+            EscrevePagina(arqArvore, CURRENT_RRN, pagina);
+            free(pagina);
+            free(novaPagina);
 
             return NO_PROMOTION;
         }
@@ -211,25 +233,20 @@ ValoresRetorno Insert(FILE *arqArvore, int CURRENT_RRN, CHAVE KEY, CHAVE *PROMO_
     }
 
 
-    free(pagina);
-    free(novaPagina);
+    
 }
 
-bool InserirChaveEmPagina(FILE *arqArvore, BTPAGE *pagina, CHAVE KEY, int RRN_Pagina, int RRN_Direita){
-    InsereOrdenadoVetor(pagina->chaves, );
-}
-
-int InsereChaveOrdenada(int *vetor, int tamanho, int chave){
+int InsereChave(BTPAGE *pagina, int tamanho, CHAVE chave, int RRN_Direita){
     //algoritmo usado esta disponivel em https://www.sanfoundry.com/c-program-insert-element-specified-position-array/
     int pos;
 
     for(int i=0; i<tamanho; i++){
-        if(vetor[i] == NIL){
-            vetor[i] = chave;
+        if(pagina->chaves[i].C == NIL){
+            pagina->chaves[i] = chave;
             return i;
         }
 
-        if(chave < vetor[i]){
+        if(chave.C < pagina->chaves[i].C){
             pos = i;
             break;
         }
@@ -239,11 +256,13 @@ int InsereChaveOrdenada(int *vetor, int tamanho, int chave){
         int deslocamento = tamanho - pos - 1;
 
         for(int i=0; i<deslocamento; i++){
-            vetor[tamanho - i - 1] = vetor[tamanho - i - 2];
+           pagina->chaves[tamanho - i - 1] = pagina->chaves[tamanho - i - 2];
+           pagina->P[tamanho - i] = pagina->P[tamanho - i - 1];
         }
     }
-    vetor[pos] = chave;
-
+    pagina->chaves[pos] = chave;
+    pagina->P[pos+1] = RRN_Direita;
+    pagina->n = (pagina->n) + 1;
     return pos;
 }
 
@@ -254,13 +273,8 @@ int InsereChaveOrdenada(int *vetor, int tamanho, int chave){
 
 
 
-
-
-//===============================================================================
-//FUNCIONALIDADE 9
-
 int BuscaBinaria(BTPAGE* pagina, int posicaoInicial, int posicaoFinal, int chave, bool *encontrou){
-	int centro;
+	int centro  = (int)((posicaoInicial+posicaoFinal)/2);
     while(posicaoInicial <= posicaoFinal){ //log n
 		centro = (int)((posicaoInicial+posicaoFinal)/2);
 
@@ -275,7 +289,7 @@ int BuscaBinaria(BTPAGE* pagina, int posicaoInicial, int posicaoFinal, int chave
 	}
 	//valor não encontrado = retorna a posicao no vetor de RRNs
     *encontrou = false;
-
+    
     if (chave < pagina->chaves[centro].C) //se o número existir estará na primeira metade
 		return (centro);
 	if (chave > pagina->chaves[centro].C) //se o número existir estará na segunda metade
