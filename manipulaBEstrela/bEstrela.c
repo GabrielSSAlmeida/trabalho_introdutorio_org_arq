@@ -233,7 +233,17 @@ bool ProcuraChavePagina(BTPAGE *pagina, int chave, int *posicao){
     return encontrou;
 }
 
-bool Redistribuicao(FILE *arqArvore, CHAVE chave_in, int RRN_in, BTPAGE *pagina, int posPagina, CHAVE *PROMO_KEY, int *PROMO_R_CHILD, int RRN_pai,lado lado){
+
+void ConstroiVetorRedistribuicao(BTPAGE *paginaMenor, int qtdMenor, BTPAGE *paginaMaior, int qtdMaior, BTPAGE *pai, int posPai, CHAVE *destinoC, int *destinoP){
+    copiaVetorChave(paginaMenor->chaves, 0, qtdMenor-1, destinoC, 0);
+    destinoC[qtdMenor] = pai->chaves[posPai];
+    copiaVetorChave(paginaMaior->chaves, 0, qtdMaior-1, destinoC, qtdMenor+1);
+
+    copiaVetorPonteiro(paginaMenor->P, 0, qtdMenor, destinoP, 0);
+    copiaVetorPonteiro(paginaMaior->P, 0, qtdMaior, destinoP, qtdMenor+1);
+}
+
+bool Redistribuicao(FILE *arqArvore, CHAVE chave_in, int RRN_in, BTPAGE *pagina, int posPaginaPai, CHAVE *PROMO_KEY, int *PROMO_R_CHILD, int RRN_pai,lado lado){
     BTPAGE *paginaPai = PaginaCriar();
     BTPAGE *paginaIrma = PaginaCriar();
 
@@ -241,23 +251,43 @@ bool Redistribuicao(FILE *arqArvore, CHAVE chave_in, int RRN_in, BTPAGE *pagina,
 
     int rrnIrma;
     if(lado == ESQUERDA)
-        rrnIrma = paginaPai->P[posPagina];
+        rrnIrma = paginaPai->P[posPaginaPai];
     else
-        rrnIrma = paginaPai->P[posPagina+1];
+        rrnIrma = paginaPai->P[posPaginaPai+1];
     
     if(rrnIrma == -1)
         return false;
 
     LerPagina(arqArvore, rrnIrma, paginaIrma);
 
-    if(paginaIrma->n >= MAXCHAVES)
+    int qtdChavesPagina = pagina->n;
+    int qtdChavesPaginaIrma = paginaIrma->n;
+
+    if(qtdChavesPaginaIrma >= MAXCHAVES)
         return false;
     
-    
+    int tamanhoVetor = qtdChavesPagina + qtdChavesPaginaIrma + 2;
+    CHAVE chaveEst[tamanhoVetor];
+    int pEst[tamanhoVetor+1];
 
+    if(lado == ESQUERDA)
+        ConstroiVetorRedistribuicao(paginaIrma, qtdChavesPaginaIrma, 
+        pagina, qtdChavesPagina, paginaPai, posPaginaPai, chaveEst, pEst);
+    else
+        ConstroiVetorRedistribuicao(pagina, qtdChavesPagina, paginaIrma, qtdChavesPaginaIrma, 
+        paginaPai, posPaginaPai, chaveEst, pEst);
+    
+    InsereChave(chaveEst, pEst, tamanhoVetor, chave_in, RRN_in);
+
+    paginaPai->chaves[posPaginaPai] = chaveEst[tamanhoVetor/2];
+
+    //Fazer um for e inserir um a um
+    //OU
+    //Limpar a pagina e usar InserirVetorPagina()
 }
 
-void Split_1to2(FILE *arqArvore, CHAVE chave_in, int RRN_in, BTPAGE *pagina, CHAVE *PROMO_KEY, int *PROMO_R_CHILD, BTPAGE *novaPagina){
+void Split_1to2(FILE *arqArvore, CHAVE chave_in, int RRN_in, BTPAGE *pagina, 
+                CHAVE *PROMO_KEY, int *PROMO_R_CHILD, BTPAGE *novaPagina){
     int pEst[MAXCHAVES+2];
     CHAVE chavesEst[MAXCHAVES+1];
 
