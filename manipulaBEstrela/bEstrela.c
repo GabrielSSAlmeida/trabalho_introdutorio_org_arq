@@ -195,7 +195,7 @@ bool ArvoreInserir(FILE *arvore, DADOS *registro, CABECALHO_B *cabecalho, long i
     int promo_r_child;
 
 
-    ValoresRetorno retornoInsercao = Insert(arvore, root, key, &promo_key, &promo_r_child, root);
+    ValoresRetorno retornoInsercao = Insert(arvore, root, key, &promo_key, &promo_r_child, root, -1);
 
     fseek(arvore, 0, SEEK_SET);
     CabecalhoBLer(cabecalho, arvore);
@@ -233,6 +233,29 @@ bool ProcuraChavePagina(BTPAGE *pagina, int chave, int *posicao){
     return encontrou;
 }
 
+bool Redistribuicao(FILE *arqArvore, CHAVE chave_in, int RRN_in, BTPAGE *pagina, int posPagina, CHAVE *PROMO_KEY, int *PROMO_R_CHILD, int RRN_pai,lado lado){
+    BTPAGE *paginaPai = PaginaCriar();
+    BTPAGE *paginaIrma = PaginaCriar();
+
+    LerPagina(arqArvore, RRN_pai, paginaPai);
+
+    int rrnIrma;
+    if(lado == ESQUERDA)
+        rrnIrma = paginaPai->P[posPagina];
+    else
+        rrnIrma = paginaPai->P[posPagina+1];
+    
+    if(rrnIrma == -1)
+        return false;
+
+    LerPagina(arqArvore, rrnIrma, paginaIrma);
+
+    if(paginaIrma->n >= MAXCHAVES)
+        return false;
+    
+    
+
+}
 
 void Split_1to2(FILE *arqArvore, CHAVE chave_in, int RRN_in, BTPAGE *pagina, CHAVE *PROMO_KEY, int *PROMO_R_CHILD, BTPAGE *novaPagina){
     int pEst[MAXCHAVES+2];
@@ -278,7 +301,7 @@ void Split_1to2(FILE *arqArvore, CHAVE chave_in, int RRN_in, BTPAGE *pagina, CHA
 }
 
 
-ValoresRetorno Insert(FILE *arqArvore, int CURRENT_RRN, CHAVE KEY, CHAVE *PROMO_KEY, int *PROMO_R_CHILD, int RRN_raiz){
+ValoresRetorno Insert(FILE *arqArvore, int CURRENT_RRN, CHAVE KEY, CHAVE *PROMO_KEY, int *PROMO_R_CHILD, int RRN_raiz, int RRN_pai){
 
     //Cria Paginas Vazias
     BTPAGE *pagina = PaginaCriar();
@@ -307,7 +330,7 @@ ValoresRetorno Insert(FILE *arqArvore, int CURRENT_RRN, CHAVE KEY, CHAVE *PROMO_
         } 
         
         //passo recursivo
-        ValoresRetorno RETURN_VALUE = Insert(arqArvore, pagina->P[posicaoPagina], KEY, &chavePromovida, &rrnPromovido, RRN_raiz);
+        ValoresRetorno RETURN_VALUE = Insert(arqArvore, pagina->P[posicaoPagina], KEY, &chavePromovida, &rrnPromovido, RRN_raiz, CURRENT_RRN);
 
         if(RETURN_VALUE == NO_PROMOTION || RETURN_VALUE == ERROR){
             free(novaPagina);
@@ -328,27 +351,30 @@ ValoresRetorno Insert(FILE *arqArvore, int CURRENT_RRN, CHAVE KEY, CHAVE *PROMO_
         }
         else{
             //Tenta redistribuição à esquerda
-            //Se nn der, redistribuição à direita
-            
-            //Caso não seja possivel redistribuição
-            //split 1-to-2 (NÓ RAIZ) à direita
-            //se não der, split 1-to-2 (NÓ RAIZ) à esquerda
-            if(CURRENT_RRN == RRN_raiz){
-                Split_1to2(arqArvore, chavePromovida, rrnPromovido, pagina, PROMO_KEY, PROMO_R_CHILD, novaPagina);
-                //escreva PAGE no arquivo na posição CURRENT_RRN
-                //escreva NEWPAGE no arquivo na posição PROMO_R_CHILD
-                EscrevePagina(arqArvore, CURRENT_RRN, pagina);
-                EscrevePagina(arqArvore, *PROMO_R_CHILD, novaPagina);
+            if(!Redistribuicao(arqArvore, chavePromovida, rrnPromovido, pagina, 
+                posicaoPagina, PROMO_KEY, PROMO_R_CHILD, RRN_pai, ESQUERDA)){
 
-                //COMO FAZER PARA A PAGINA A ESQUERDA????
+                //Se nn der, redistribuição à direita
+                if(!Redistribuicao(arqArvore, chavePromovida, rrnPromovido, pagina, 
+                posicaoPagina, PROMO_KEY, PROMO_R_CHILD, RRN_pai, DIREITA)){
 
+
+                    //Caso não seja possivel redistribuição
+                    //split 1-to-2 (NÓ RAIZ)
+                    if(CURRENT_RRN == RRN_raiz){
+                        Split_1to2(arqArvore, chavePromovida, rrnPromovido, pagina, PROMO_KEY, PROMO_R_CHILD, novaPagina);
+                        //escreva PAGE no arquivo na posição CURRENT_RRN
+                        //escreva NEWPAGE no arquivo na posição PROMO_R_CHILD
+                        EscrevePagina(arqArvore, CURRENT_RRN, pagina);
+                        EscrevePagina(arqArvore, *PROMO_R_CHILD, novaPagina);
+                    }else{
+
+                    }
+                    
+                    //split 2-to-3 (DEMAIS NÓS) à direita
+                    //se não der, split 2-to-3 (DEMAIS NÓS) à esquerda
+                }
             }
-
-                //OU
-            
-            //split 2-to-3 (DEMAIS NÓS) à direita
-            //se não der, split 2-to-3 (DEMAIS NÓS) à esquerda
-
             free(novaPagina);
             free(pagina);
             return PROMOTION;

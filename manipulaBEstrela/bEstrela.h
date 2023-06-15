@@ -14,6 +14,7 @@
 
     typedef enum {PROMOTION, NO_PROMOTION, ERROR} ValoresRetorno;
     typedef enum { ACHOU, NAO_ACHOU } buscaRetorno;
+    typedef enum { ESQUERDA, DIREITA } lado;
     
     struct chave {
         int C;
@@ -41,7 +42,7 @@
 
     bool ArvoreInserir(FILE *arvore, DADOS *registro, CABECALHO_B *cabecalho, long int byteoffset);
 
-    ValoresRetorno Insert(FILE *arqArvore, int CURRENT_RRN, CHAVE KEY, CHAVE *PROMO_KEY, int *PROMO_R_CHILD, int RRN_raiz);
+    ValoresRetorno Insert(FILE *arqArvore, int CURRENT_RRN, CHAVE KEY, CHAVE *PROMO_KEY, int *PROMO_R_CHILD, int RRN_raiz, int RRN_pai);
 
     int BuscaBinaria(BTPAGE* pagina, int posicaoInicial, int posicaoFinal, int chave, bool *encontrou);
 
