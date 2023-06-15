@@ -56,6 +56,41 @@ BTPAGE *PaginaCriarInicializado(CHAVE chave, int pEsquerdo, int pDireito, int ni
     return pagina;
 }
 
+void ResetaPagina(BTPAGE *pagina){
+    pagina->n = 0;
+    for (int i = 0; i < MAXCHAVES+1; i++)
+    {
+        pagina->P[i] = -1;
+        
+        if(i < MAXCHAVES){
+            pagina->chaves[i].C = -1;
+            pagina->chaves[i].Pr = -1;
+        }
+    } 
+}
+
+//copia o conteudo de origem em destino
+void copiaVetorChave(CHAVE *vetorOrigem, int inicioOrigem, int fimOrigem, CHAVE *vetorDestino, int inicioDestino){
+    int j = inicioDestino;
+    for (int i = inicioOrigem; i <= fimOrigem; i++)
+    {
+        vetorDestino[j] = vetorOrigem[i];
+        j++;
+    }
+    
+}
+
+//copia o conteudo de origem em destino
+void copiaVetorPonteiro(int *vetorOrigem, int inicioOrigem, int fimOrigem, int *vetorDestino, int inicioDestino){
+    int j = inicioDestino;
+    for (int i = inicioOrigem; i <= fimOrigem; i++)
+    {
+        vetorDestino[j] = vetorOrigem[i];
+        j++;
+    }
+    
+}
+
 void LerPagina(FILE* arqArvore, int CURRENT_RRN, BTPAGE* pagina){
     //Va ate a pagina
     //Pula o cabecalho
@@ -95,7 +130,7 @@ void EscrevePagina(FILE* arqArvore, int CURRENT_RRN, BTPAGE* pagina){
         fwrite(&(pagina->chaves[i].Pr), 8, 1, arqArvore);
     }
 
-    fread(&(pagina->P[MAXCHAVES]), 4, 1, arqArvore);
+    fwrite(&(pagina->P[MAXCHAVES]), 4, 1, arqArvore);
 }
 
 
@@ -159,22 +194,32 @@ bool ArvoreInserir(FILE *arvore, DADOS *registro, CABECALHO_B *cabecalho, long i
     CHAVE promo_key;
     int promo_r_child;
 
-    int proxRRN = cabecalho->proxRRN;
 
-    if(Insert(arvore, root, key, &promo_key, &promo_r_child) == PROMOTION){
+    ValoresRetorno retornoInsercao = Insert(arvore, root, key, &promo_key, &promo_r_child, root);
+
+    fseek(arvore, 0, SEEK_SET);
+    CabecalhoBLer(cabecalho, arvore);
+
+    int proxRRN = cabecalho->proxRRN;
+    if(retornoInsercao == PROMOTION){
         //crie nova página raiz com key:=PROMO_KEY, l_child:=ROOT, r_child:=PROMO_R_CHILD
-        BTPAGE* novaPagina = PaginaCriarInicializado(promo_key, root, promo_r_child, 1, 1);
+        
+        BTPAGE* novaPagina = PaginaCriarInicializado(promo_key, root, promo_r_child, cabecalho->nroNiveis + 1, 1);
         //faça ROOT igual ao RRN da nova página raiz
         //Acho que o RRN da nova pagina é o prox RRN do cabecalho
         root = proxRRN;
 
         //Att proxRRN ddo cabecalho;
         cabecalho->proxRRN = (proxRRN+1);
+        cabecalho->nroNiveis = cabecalho->nroNiveis + 1;
 
         EscrevePagina(arvore, root, novaPagina);
 
         free(novaPagina);
     }
+
+    if(retornoInsercao != ERROR)
+        cabecalho->nroChaves = cabecalho->nroChaves + 1;
 
     //atualiza RRN raiz
     cabecalho->noRaiz = root;
@@ -188,7 +233,52 @@ bool ProcuraChavePagina(BTPAGE *pagina, int chave, int *posicao){
     return encontrou;
 }
 
-ValoresRetorno Insert(FILE *arqArvore, int CURRENT_RRN, CHAVE KEY, CHAVE *PROMO_KEY, int *PROMO_R_CHILD){
+
+void Split_1to2(FILE *arqArvore, CHAVE chave_in, int RRN_in, BTPAGE *pagina, CHAVE *PROMO_KEY, int *PROMO_R_CHILD, BTPAGE *novaPagina){
+    int pEst[MAXCHAVES+2];
+    CHAVE chavesEst[MAXCHAVES+1];
+
+    copiaVetorChave(pagina->chaves, 0, MAXCHAVES-1, chavesEst, 0);
+    copiaVetorPonteiro(pagina->P, 0, MAXCHAVES, pEst, 0);
+
+    InsereChave(chavesEst, pEst, MAXCHAVES+1, chave_in, RRN_in);
+
+    novaPagina->nivel = pagina->nivel;
+
+    CABECALHO_B *cabecalho = CabecalhoBCriar();
+    fseek(arqArvore, 0, SEEK_SET);
+    CabecalhoBLer(cabecalho, arqArvore);
+
+    int RRN_novapagina = cabecalho->proxRRN;
+
+    //Pega a chave do meio
+    int metade = (int)(MAXCHAVES+1)/2;
+    *PROMO_KEY = chavesEst[metade];
+    *PROMO_R_CHILD = RRN_novapagina;
+
+    //Deixa toda a pagina com -1
+    ResetaPagina(pagina);
+
+    //Primeiro ponteiro da pagina e da nova pagina
+    pagina->P[0] = pEst[0];
+    novaPagina->P[0] = pEst[metade+1];
+
+    //Insere as chaves nas paginas com seus ponteiros a direita
+    for (int i = 0; i < metade; i++)
+    {
+        InsereChavePagina(pagina, MAXCHAVES, chavesEst[i], pEst[i+1]);
+        InsereChavePagina(novaPagina, MAXCHAVES, chavesEst[metade+1+i], pEst[metade+2+i]);
+    }
+    
+
+    cabecalho->proxRRN = RRN_novapagina + 1;
+    CabecalhoBReescreve(arqArvore, cabecalho);
+
+    free(cabecalho);
+}
+
+
+ValoresRetorno Insert(FILE *arqArvore, int CURRENT_RRN, CHAVE KEY, CHAVE *PROMO_KEY, int *PROMO_R_CHILD, int RRN_raiz){
 
     //Cria Paginas Vazias
     BTPAGE *pagina = PaginaCriar();
@@ -202,33 +292,66 @@ ValoresRetorno Insert(FILE *arqArvore, int CURRENT_RRN, CHAVE KEY, CHAVE *PROMO_
         *PROMO_KEY = KEY;
         *PROMO_R_CHILD = NIL;
 
-        free(pagina);
         free(novaPagina);
+        free(pagina);
         return PROMOTION;
     }else{
         //leia página CURRENT_RRN e armazene em PAGE
         LerPagina(arqArvore, CURRENT_RRN, pagina);
 
         //procure por KEY em PAGE
-        if(ProcuraChavePagina(pagina, KEY.C, &posicaoPagina)) return ERROR;
+        if(ProcuraChavePagina(pagina, KEY.C, &posicaoPagina)){
+            free(novaPagina);
+            free(pagina);
+            return ERROR;
+        } 
         
         //passo recursivo
-        ValoresRetorno RETURN_VALUE = Insert(arqArvore, pagina->P[posicaoPagina], KEY, &chavePromovida, &rrnPromovido);
+        ValoresRetorno RETURN_VALUE = Insert(arqArvore, pagina->P[posicaoPagina], KEY, &chavePromovida, &rrnPromovido, RRN_raiz);
 
-        if(RETURN_VALUE == NO_PROMOTION || RETURN_VALUE == ERROR) return RETURN_VALUE;
+        if(RETURN_VALUE == NO_PROMOTION || RETURN_VALUE == ERROR){
+            free(novaPagina);
+            free(pagina);
+            return RETURN_VALUE;
+        }
 
         //se ainda existe espaço na página
         else if(pagina->n < MAXCHAVES){
             //Inserir Chave e RRN Promovidos
-            InsereChave(pagina, MAXCHAVES, KEY, rrnPromovido);
+            InsereChavePagina(pagina, MAXCHAVES, chavePromovida, rrnPromovido);
             EscrevePagina(arqArvore, CURRENT_RRN, pagina);
-            free(pagina);
+
             free(novaPagina);
+            free(pagina);
 
             return NO_PROMOTION;
         }
         else{
-            //redistribuicao / split
+            //Tenta redistribuição à esquerda
+            //Se nn der, redistribuição à direita
+            
+            //Caso não seja possivel redistribuição
+            //split 1-to-2 (NÓ RAIZ) à direita
+            //se não der, split 1-to-2 (NÓ RAIZ) à esquerda
+            if(CURRENT_RRN == RRN_raiz){
+                Split_1to2(arqArvore, chavePromovida, rrnPromovido, pagina, PROMO_KEY, PROMO_R_CHILD, novaPagina);
+                //escreva PAGE no arquivo na posição CURRENT_RRN
+                //escreva NEWPAGE no arquivo na posição PROMO_R_CHILD
+                EscrevePagina(arqArvore, CURRENT_RRN, pagina);
+                EscrevePagina(arqArvore, *PROMO_R_CHILD, novaPagina);
+
+                //COMO FAZER PARA A PAGINA A ESQUERDA????
+
+            }
+
+                //OU
+            
+            //split 2-to-3 (DEMAIS NÓS) à direita
+            //se não der, split 2-to-3 (DEMAIS NÓS) à esquerda
+
+            free(novaPagina);
+            free(pagina);
+            return PROMOTION;
         }
     }
 
@@ -236,36 +359,47 @@ ValoresRetorno Insert(FILE *arqArvore, int CURRENT_RRN, CHAVE KEY, CHAVE *PROMO_
     
 }
 
-int InsereChave(BTPAGE *pagina, int tamanho, CHAVE chave, int RRN_Direita){
+int InsereChave(CHAVE *chaves, int *ponteiros, int tamanho, CHAVE chave, int RRN_Direita){
     //algoritmo usado esta disponivel em https://www.sanfoundry.com/c-program-insert-element-specified-position-array/
     int pos;
 
     for(int i=0; i<tamanho; i++){
-        if(pagina->chaves[i].C == NIL){
-            pagina->chaves[i] = chave;
-            return i;
-        }
-
-        if(chave.C < pagina->chaves[i].C){
+        if(i == tamanho -1){
             pos = i;
             break;
         }
+
+        if(chaves[i].C == NIL){
+            chaves[i] = chave;
+            return i;
+        }
+
+        if(chave.C < chaves[i].C){
+            pos = i;
+            break;
+        }
+
     }
 
     if(pos != tamanho){
         int deslocamento = tamanho - pos - 1;
 
         for(int i=0; i<deslocamento; i++){
-           pagina->chaves[tamanho - i - 1] = pagina->chaves[tamanho - i - 2];
-           pagina->P[tamanho - i] = pagina->P[tamanho - i - 1];
+           chaves[tamanho - i - 1] = chaves[tamanho - i - 2];
+           ponteiros[tamanho - i] = ponteiros[tamanho - i - 1];
         }
     }
-    pagina->chaves[pos] = chave;
-    pagina->P[pos+1] = RRN_Direita;
-    pagina->n = (pagina->n) + 1;
+    chaves[pos] = chave;
+    ponteiros[pos+1] = RRN_Direita;
+    
     return pos;
 }
 
+int InsereChavePagina(BTPAGE *pagina, int tamanho, CHAVE chave, int RRN_Direita){
+    int retorno = InsereChave(pagina->chaves, pagina->P, tamanho, chave, RRN_Direita);
+    pagina->n = (pagina->n) + 1;
+    return retorno;
+}
 
 
 

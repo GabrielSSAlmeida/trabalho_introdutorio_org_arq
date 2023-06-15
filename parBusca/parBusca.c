@@ -316,7 +316,10 @@ DADOS** BuscaSequencialBinario(char *nomeArqBin, PARES_BUSCA *paresBusca, int qt
 
     //se nao existem registros no arquivo
     fclose(arqBin);
-    if(i==0 || qtdRegistrosEncontrados == 0) return NULL;
+    if(i==0 || qtdRegistrosEncontrados == 0){
+        DesalocaVetorRegistro(vetorRegistros, qtdRegistrosEncontrados);
+        return NULL;  
+    } 
     return vetorRegistros;
 }
 
