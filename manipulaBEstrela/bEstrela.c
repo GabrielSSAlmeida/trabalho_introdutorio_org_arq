@@ -176,6 +176,11 @@ bool ArvoreCriar(char nomeArqBin[], char arqIndiceArvore[]){
 
     DesalocaRegistro(registroAuxiliar);
 
+    fseek(arvore, 0, SEEK_SET);
+    CabecalhoBLer(cabecalhoArvore, arvore);
+    cabecalhoArvore->status = '1';
+    CabecalhoBReescreve(arvore, cabecalhoArvore);
+
     fclose(arvore);
     fclose(dados);
     CabecalhoBDesalocar(cabecalhoArvore);
@@ -243,28 +248,70 @@ void ConstroiVetorRedistribuicao(BTPAGE *paginaMenor, int qtdMenor, BTPAGE *pagi
     copiaVetorPonteiro(paginaMaior->P, 0, qtdMaior, destinoP, qtdMenor+1);
 }
 
-bool Redistribuicao(FILE *arqArvore, CHAVE chave_in, int RRN_in, BTPAGE *pagina, int posPaginaPai, CHAVE *PROMO_KEY, int *PROMO_R_CHILD, int RRN_pai,lado lado){
+void RedistribuiMetadeVetor(CHAVE *chaves, int ponteiros[], int tamanhoVetor, BTPAGE *paginaMenor, BTPAGE *paginaMaior){
+    paginaMenor->P[0] = ponteiros[0];
+    paginaMaior->P[0] = ponteiros[tamanhoVetor/2 + 1];
+
+    for (int i = 0; i < tamanhoVetor; i++)
+    {
+        if(i < (tamanhoVetor /2)){
+            InsereChavePagina(paginaMenor, MAXCHAVES, chaves[i], ponteiros[i+1]);
+        }
+        else if(i > (tamanhoVetor /2)){
+            InsereChavePagina(paginaMaior, MAXCHAVES, chaves[i], ponteiros[i+1]);
+        }
+    }
+}
+
+
+bool Redistribuicao(FILE *arqArvore, CHAVE chave_in, int RRN_in, BTPAGE *pagina, int CURRENT_RRN, int RRN_pai, lado lado){
     BTPAGE *paginaPai = PaginaCriar();
     BTPAGE *paginaIrma = PaginaCriar();
 
     LerPagina(arqArvore, RRN_pai, paginaPai);
+    int posicao;
+    ProcuraChavePagina(paginaPai, chave_in.C, &posicao);
 
-    int rrnIrma;
-    if(lado == ESQUERDA)
-        rrnIrma = paginaPai->P[posPaginaPai];
-    else
-        rrnIrma = paginaPai->P[posPaginaPai+1];
+    int posIrma;
+    int posPai;
+    int RRN_Irma;
+    if(lado == ESQUERDA){
+        posIrma = posicao-1;
+        posPai = posIrma;
+        if(posIrma < 0){
+            free(paginaPai);
+            free(paginaIrma);
+            return false;
+        }
+        RRN_Irma = paginaPai->P[posIrma];
+    }
+    else{
+        posIrma = posicao+1;
+        posPai = posIrma-1;
+        if(posIrma > MAXCHAVES){
+            free(paginaPai);
+            free(paginaIrma);  
+            return false;
+        }
+        RRN_Irma = paginaPai->P[posIrma];
+    }
     
-    if(rrnIrma == -1)
+    if(RRN_Irma == -1){
+        free(paginaPai);
+        free(paginaIrma); 
         return false;
+    }
 
-    LerPagina(arqArvore, rrnIrma, paginaIrma);
+    LerPagina(arqArvore, RRN_Irma, paginaIrma);
 
     int qtdChavesPagina = pagina->n;
     int qtdChavesPaginaIrma = paginaIrma->n;
 
-    if(qtdChavesPaginaIrma >= MAXCHAVES)
+    if(qtdChavesPaginaIrma >= MAXCHAVES){
+        free(paginaPai);
+        free(paginaIrma); 
         return false;
+    }
     
     int tamanhoVetor = qtdChavesPagina + qtdChavesPaginaIrma + 2;
     CHAVE chaveEst[tamanhoVetor];
@@ -272,18 +319,32 @@ bool Redistribuicao(FILE *arqArvore, CHAVE chave_in, int RRN_in, BTPAGE *pagina,
 
     if(lado == ESQUERDA)
         ConstroiVetorRedistribuicao(paginaIrma, qtdChavesPaginaIrma, 
-        pagina, qtdChavesPagina, paginaPai, posPaginaPai, chaveEst, pEst);
+        pagina, qtdChavesPagina, paginaPai, posPai, chaveEst, pEst);
     else
         ConstroiVetorRedistribuicao(pagina, qtdChavesPagina, paginaIrma, qtdChavesPaginaIrma, 
-        paginaPai, posPaginaPai, chaveEst, pEst);
+        paginaPai, posPai, chaveEst, pEst);
     
     InsereChave(chaveEst, pEst, tamanhoVetor, chave_in, RRN_in);
 
-    paginaPai->chaves[posPaginaPai] = chaveEst[tamanhoVetor/2];
+    paginaPai->chaves[posPai] = chaveEst[tamanhoVetor/2];
 
-    //Fazer um for e inserir um a um
-    //OU
-    //Limpar a pagina e usar InserirVetorPagina()
+    ResetaPagina(pagina);
+    ResetaPagina(paginaIrma);
+
+    if(lado == ESQUERDA)
+        RedistribuiMetadeVetor(chaveEst, pEst, tamanhoVetor, paginaIrma, pagina);
+    else
+        RedistribuiMetadeVetor(chaveEst, pEst, tamanhoVetor, pagina, paginaIrma);
+    
+
+    EscrevePagina(arqArvore, CURRENT_RRN, pagina);
+    EscrevePagina(arqArvore, RRN_Irma, paginaIrma);
+    EscrevePagina(arqArvore, RRN_pai, paginaPai);
+
+    free(paginaPai);
+    free(paginaIrma);
+
+    return true;
 }
 
 void Split_1to2(FILE *arqArvore, CHAVE chave_in, int RRN_in, BTPAGE *pagina, 
@@ -381,38 +442,40 @@ ValoresRetorno Insert(FILE *arqArvore, int CURRENT_RRN, CHAVE KEY, CHAVE *PROMO_
         }
         else{
             //Tenta redistribuição à esquerda
-            if(!Redistribuicao(arqArvore, chavePromovida, rrnPromovido, pagina, 
-                posicaoPagina, PROMO_KEY, PROMO_R_CHILD, RRN_pai, ESQUERDA)){
-
-                //Se nn der, redistribuição à direita
-                if(!Redistribuicao(arqArvore, chavePromovida, rrnPromovido, pagina, 
-                posicaoPagina, PROMO_KEY, PROMO_R_CHILD, RRN_pai, DIREITA)){
-
-
-                    //Caso não seja possivel redistribuição
-                    //split 1-to-2 (NÓ RAIZ)
-                    if(CURRENT_RRN == RRN_raiz){
-                        Split_1to2(arqArvore, chavePromovida, rrnPromovido, pagina, PROMO_KEY, PROMO_R_CHILD, novaPagina);
-                        //escreva PAGE no arquivo na posição CURRENT_RRN
-                        //escreva NEWPAGE no arquivo na posição PROMO_R_CHILD
-                        EscrevePagina(arqArvore, CURRENT_RRN, pagina);
-                        EscrevePagina(arqArvore, *PROMO_R_CHILD, novaPagina);
-                    }else{
-
-                    }
-                    
+            if(RRN_pai != -1 && Redistribuicao(arqArvore, chavePromovida, rrnPromovido, 
+                pagina, CURRENT_RRN, RRN_pai, ESQUERDA)){
+                free(novaPagina);
+                free(pagina);
+                return NO_PROMOTION;
+                
+            }
+            //Se nn der, redistribuição à direita
+            else if(RRN_pai != -1 && Redistribuicao(arqArvore, chavePromovida, rrnPromovido, 
+                    pagina, CURRENT_RRN, RRN_pai, DIREITA)){
+                free(novaPagina);
+                free(pagina);
+                return NO_PROMOTION;
+            }
+            else{
+                //Caso não seja possivel redistribuição
+                //split 1-to-2 (NÓ RAIZ)
+                if(CURRENT_RRN == RRN_raiz){
+                    Split_1to2(arqArvore, chavePromovida, rrnPromovido, pagina, PROMO_KEY, PROMO_R_CHILD, novaPagina);
+                    //escreva PAGE no arquivo na posição CURRENT_RRN
+                    //escreva NEWPAGE no arquivo na posição PROMO_R_CHILD
+                    EscrevePagina(arqArvore, CURRENT_RRN, pagina);
+                    EscrevePagina(arqArvore, *PROMO_R_CHILD, novaPagina);
+                }else{
                     //split 2-to-3 (DEMAIS NÓS) à direita
                     //se não der, split 2-to-3 (DEMAIS NÓS) à esquerda
                 }
+                
+                free(novaPagina);
+                free(pagina);
+                return PROMOTION;  
             }
-            free(novaPagina);
-            free(pagina);
-            return PROMOTION;
         }
-    }
-
-
-    
+    } 
 }
 
 int InsereChave(CHAVE *chaves, int *ponteiros, int tamanho, CHAVE chave, int RRN_Direita){
@@ -427,6 +490,7 @@ int InsereChave(CHAVE *chaves, int *ponteiros, int tamanho, CHAVE chave, int RRN
 
         if(chaves[i].C == NIL){
             chaves[i] = chave;
+            ponteiros[i+1] = RRN_Direita;
             return i;
         }
 
@@ -480,9 +544,9 @@ int BuscaBinaria(BTPAGE* pagina, int posicaoInicial, int posicaoFinal, int chave
 	//valor não encontrado = retorna a posicao no vetor de RRNs
     *encontrou = false;
     
-    if (chave < pagina->chaves[centro].C) //se o número existir estará na primeira metade
+    if (chave < pagina->chaves[centro].C)
 		return (centro);
-	if (chave > pagina->chaves[centro].C) //se o número existir estará na segunda metade
+	if (chave > pagina->chaves[centro].C)
 		return (centro+1);
 }
 
@@ -602,124 +666,3 @@ DADOS** BuscaIndiceArvore(char *nomeArqEntrada, char *nomeArqIndice, PARES_BUSCA
 
     return registrosProcurado;
 }
-
-
-
-
-/*
-//Escolhe se vai fazer uma busca binaria no arquivo de indices ou uma busca sequencial no binario
-bool MetodoDeBusca(char *arqEntrada, char *nomeArqIndice, PARES_BUSCA *paresBusca, int qtdPares, char *campoIndexado){
-    //Decide qual método de busca utilizar
-    if(DecideOrdemBusca(paresBusca, qtdPares, campoIndexado)){ 
-        //O metodo é a busca binaria
-        if(!BuscaBinariaIndices(arqEntrada, nomeArqIndice, paresBusca, qtdPares)) return false;
-    }else{ 
-        //o metodo é a busca sequencial
-        if(!BuscaSequencialBinario(arqEntrada, paresBusca, qtdPares)) return false;
-    }
-
-    return true;
-}
-
-//Realiza uma busca binaria no arquivo de indices e depois verifica as outras buscas no arquivo binario
-//imprime as buscas que passarem nos testes
-bool BuscaBinariaIndices(char *nomeArqEntrada, char *nomeArqIndice, PARES_BUSCA *paresBusca, int qtdPares){
-    //Vai indicar os byteOffset dos registros encontrados
-    //-1 indica o fim do vetor
-    long int *vetorByteOffset  = calloc(1, sizeof(long int));
-
-    FILE *arqBin;
-    if(!AbreArquivo(&arqBin, nomeArqEntrada, "rb", NULL)) return false;
-
-    //identifica qual campo será usado na busca por índice
-    int tipoCampo = GetTipoCampo(paresBusca, 0);
-
-    if (tipoCampo == 0 || tipoCampo == 1){ //O campo é do tipo int
-        vetorByteOffset =  BuscaBinariaIndiceInt(nomeArqIndice, GetValorCampoInt(paresBusca, 0), vetorByteOffset);
-
-    }else if(tipoCampo >= 2){ //O campo é do tipo string
-        vetorByteOffset =  BuscaBinariaIndiceString(nomeArqIndice, GetValorCampoString(paresBusca, 0), vetorByteOffset);
-    }
-
-   int qtdRegistrosImpressos=0;
-   //Se tiver apenas 1 criterio de busca(no caso, a busca pelo indice) ja imprime
-   if(qtdPares == 1){
-        for (int j = 0; vetorByteOffset[j] != -1; j++)
-        {
-            DADOS *registroAux = LeRegistroPorByteOffset(arqBin, vetorByteOffset[j]);
-            if(GetRegistroRemovido(registroAux) != '1'){
-                ImprimeRegistroBinario(registroAux);
-                qtdRegistrosImpressos++;
-            }
-            DesalocaRegistro(registroAux);
-        }
-        
-   }
-
-   else{
-        for (int j = 0; vetorByteOffset[j] != -1; j++){
-            int passou = 1;
-            
-            DADOS *registroAux = LeRegistroPorByteOffset(arqBin, vetorByteOffset[j]);
-
-            VerificaTodosCriteriosBusca(1, qtdPares, registroAux, &passou, paresBusca);
-
-            if(passou && GetRegistroRemovido(registroAux) != '1'){
-                ImprimeRegistroBinario(registroAux);
-                qtdRegistrosImpressos++;
-            }
-               
-            DesalocaRegistro(registroAux);
-        
-        }
-   }
-   if(qtdRegistrosImpressos == 0) ErroRegistro();
-   
-    
-    fclose(arqBin);
-    free(vetorByteOffset);
-    return true;
-}
-
-//Realiza uma busca sequencial direto no arquivo binario
-//imprime as buscas que passarem nos testes
-bool BuscaSequencialBinario(char *nomeArqBin, PARES_BUSCA *paresBusca, int qtdPares){
-    FILE *arqBin;
-    if(!AbreArquivo(&arqBin, nomeArqBin, "rb", NULL)) return false;
-
-    CABECALHO *cabecalhoBinAux = CabecalhoCriar();
-
-    //le o cabecalho do arquivo binario
-    LeCabecalhoDoArqBinario(cabecalhoBinAux, arqBin);
-
-    DADOS *registroAux = RegistroCriar();
-
-    long int boffAux;//Neste caso nn utiliza o numero de byteoffset lidos
-    int flag = LerRegBinario(arqBin, registroAux, &boffAux);
-    int i;
-    int qtdRegistrosImpressos = 0;
-    for(i=0; flag!=0; i++){
-        int passou = 1;//Verifica se passou em todos os criterios de busca
-        
-        VerificaTodosCriteriosBusca(0, qtdPares, registroAux, &passou, paresBusca);
-
-        if(passou && GetRegistroRemovido(registroAux) != '1'){
-            ImprimeRegistroBinario(registroAux);
-            qtdRegistrosImpressos++;
-        }
-        
-        DesalocaCamposVariaveis(registroAux);
-
-        flag = LerRegBinario(arqBin, registroAux, &boffAux); 
-    }
-
-
-    //desaloca os auxiliares criados
-    DesalocaCabecalho(cabecalhoBinAux);
-    DesalocaRegistro(registroAux);
-
-    //se nao existem registros no arquivo
-    if(i==0 || qtdRegistrosImpressos == 0) ErroRegistro();
-    fclose(arqBin);
-    return true;
-} */
