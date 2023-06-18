@@ -171,7 +171,7 @@ bool ArvoreCriar(char nomeArqBin[], char arqIndiceArvore[]){
     }
 
     //se nao existem registros no arquivo
-    if(i==0) ErroArquivo();
+    //if(i==0) ErroArquivo();
 
 
     DesalocaRegistro(registroAuxiliar);
@@ -186,6 +186,7 @@ bool ArvoreCriar(char nomeArqBin[], char arqIndiceArvore[]){
     CabecalhoBDesalocar(cabecalhoArvore);
     DesalocaCabecalho(cabecalhoDados);
 
+    binarioNaTela(arqIndiceArvore);
     return true;
 }
 
@@ -393,16 +394,19 @@ bool Redistribuicao(FILE *arqArvore, CHAVE chave_in, int RRN_in, BTPAGE *pagina,
 
 
 void Split3Vetores(CHAVE *chaves, int ponteiros[], int tamanhoVetor, BTPAGE *pagina1, BTPAGE *pagina2, BTPAGE* pagina3){
-    paginaMenor->P[0] = ponteiros[0];
-    paginaMaior->P[0] = ponteiros[tamanhoVetor/2 + 1];
+    pagina1->P[0] = ponteiros[0];
+    pagina2->P[0] = ponteiros[tamanhoVetor/3 + 1];
+    pagina3->P[0] = ponteiros[((tamanhoVetor/3)*2)+2];
 
     for (int i = 0; i < tamanhoVetor; i++)
     {
-        if(i < (tamanhoVetor /2)){
-            InsereChavePagina(paginaMenor, MAXCHAVES, chaves[i], ponteiros[i+1]);
+        if(i < (tamanhoVetor/3)){
+            InsereChavePagina(pagina1, MAXCHAVES, chaves[i], ponteiros[i+1]);
         }
-        else if(i > (tamanhoVetor /2)){
-            InsereChavePagina(paginaMaior, MAXCHAVES, chaves[i], ponteiros[i+1]);
+        else if(i > (tamanhoVetor/3) && i < ((tamanhoVetor/3)*2)+1){
+            InsereChavePagina(pagina2, MAXCHAVES, chaves[i], ponteiros[i+1]);
+        }else if (i > ((tamanhoVetor/3)*2)+1){
+            InsereChavePagina(pagina3, MAXCHAVES, chaves[i], ponteiros[i+1]);
         }
     }
 }
@@ -471,6 +475,7 @@ bool Split_2to3(FILE *arqArvore, CHAVE chave_in, int RRN_in, CHAVE *PROMO_KEY, i
     CabecalhoBLer(cabecalho, arqArvore);
 
     int RRN_novapagina = cabecalho->proxRRN;
+    cabecalho->proxRRN = RRN_novapagina + 1;
 
     //Primeiro promovido
     paginaPai->chaves[posPai] = chaveEst[tamanhoVetor/3];
@@ -483,12 +488,21 @@ bool Split_2to3(FILE *arqArvore, CHAVE chave_in, int RRN_in, CHAVE *PROMO_KEY, i
     ResetaPagina(paginaIrma);
 
     if(lado == ESQUERDA)
-        Split3Vetores(chaveEst, pEst, tamanhoVetor, paginaIrma, pagina);
+        Split3Vetores(chaveEst, pEst, tamanhoVetor, paginaIrma, pagina, novaPagina);
     else
-        Split3Vetores(chaveEst, pEst, tamanhoVetor, pagina, paginaIrma);
+        Split3Vetores(chaveEst, pEst, tamanhoVetor, pagina, paginaIrma, novaPagina);
 
+    EscrevePagina(arqArvore, CURRENT_RRN, pagina);
+    EscrevePagina(arqArvore, RRN_Irma, paginaIrma);
+    EscrevePagina(arqArvore, RRN_pai, paginaPai);
+    EscrevePagina(arqArvore, RRN_novapagina, novaPagina);
+    
+    free(paginaIrma);
+    free(paginaPai);
 
+    CabecalhoBReescreve(arqArvore, cabecalho);
     free(cabecalho);
+    return true;
 }
 
 ValoresRetorno Insert(FILE *arqArvore, int CURRENT_RRN, CHAVE KEY, CHAVE *PROMO_KEY, int *PROMO_R_CHILD, int RRN_pai){
@@ -521,13 +535,13 @@ ValoresRetorno Insert(FILE *arqArvore, int CURRENT_RRN, CHAVE KEY, CHAVE *PROMO_
         
         //passo recursivo
         ValoresRetorno RETURN_VALUE = Insert(arqArvore, pagina->P[posicaoPagina], KEY, &chavePromovida, &rrnPromovido, CURRENT_RRN);
+        LerPagina(arqArvore, CURRENT_RRN, pagina);
 
         if(RETURN_VALUE == NO_PROMOTION || RETURN_VALUE == ERROR){
             free(novaPagina);
             free(pagina);
             return RETURN_VALUE;
         }
-
         //se ainda existe espaço na página
         else if(pagina->n < MAXCHAVES){
             //Inserir Chave e RRN Promovidos
