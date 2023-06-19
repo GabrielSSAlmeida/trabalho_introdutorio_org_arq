@@ -146,7 +146,7 @@ bool ArvoreCriar(char nomeArqBin[], char arqIndiceArvore[]){
     for(i = 0; flag != 0; i++){
         if(GetRegistroRemovido(registroAuxiliar) == '0'){
 
-            //INSERCAO NA ARVORE!!!
+            //Insercao na arvore
             ArvoreInserir(arvore, registroAuxiliar, cabecalhoArvore, offsetInicioRegistro);
         }
 
@@ -605,8 +605,8 @@ ValoresRetorno Insert(FILE *arqArvore, int RRN_Atual, CHAVE KEY, CHAVE *promoCha
         }
         else{
             LerPagina(arqArvore, RRN_Atual, pagina);
+            
             //Tenta redistribuição à esquerda
-
             if(RRN_pai != -1 && Redistribuicao(arqArvore, chavePromovida, rrnPromovido, 
                 pagina, RRN_Atual, RRN_pai, ESQUERDA)){
                 free(novaPagina);
