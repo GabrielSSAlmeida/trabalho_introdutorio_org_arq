@@ -120,6 +120,19 @@ int main(){
             funcionalidade9(nomeArquivo1, nomeArquivo2, campoIndexado, dado, n);
             break;
         }
+        case 10:{
+            RecebeEntradaFuncs4a7(nomeArquivo1, nomeArquivo2, campoIndexado, dado, &n);
+
+            if(!(VerificaStatusArqBin(nomeArquivo1) && VerificaStatusArqBin(nomeArquivo2))){
+                ErroArquivo();
+                break;
+            }
+
+            funcionalidade10(nomeArquivo1, nomeArquivo2, campoIndexado, dado, n);
+            binarioNaTela(nomeArquivo1);
+            binarioNaTela(nomeArquivo2);
+            break;
+        }
         
     }
 

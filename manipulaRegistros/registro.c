@@ -3,17 +3,7 @@
 #include "../prints_e_erros/prints_e_erros.h"
 #include "../manipulaIndices/inteiro/indiceInteiro.h"
 #include "../manipulaIndices/string/indiceString.h"
-
-// struct dados{
-//         char removido;                  //indica se a struct foi removida (1 = removido, 0 = nao)
-//         int idCrime;                    
-//         char dataCrime[10];
-//         int numeroArtigo;
-//         char marcaCelular[12];
-//         char *lugarCrime;
-//         char *descricaoCrime;
-//         char delimitador;               //delimitador do fim da struct
-// };
+#include "../manipulaBEstrela/bEstrela.h"
 
 
 DADOS *RegistroCriar(void){
@@ -538,7 +528,7 @@ bool TestaNulo(DADOS *registro, int tipoCampo){
     return false;
 }
 
-bool InsereRegistro(DADOS *registro, char *arqEntrada, char *nomeArqIndice, char *campo, char *dado){
+bool InsereRegistro(DADOS *registro, char *arqEntrada, char *nomeArqIndice, char *campo, char *dado, TipoIndice tipoArquivo){
     //salva o byteoffset do registro após inserido no arq bin (sera usado no arquivo de indices)
     long int byteoffsetanterior = 0;
 
@@ -552,7 +542,23 @@ bool InsereRegistro(DADOS *registro, char *arqEntrada, char *nomeArqIndice, char
     if(TestaNulo(registro, tipoCampo))
         return true;
     
-    bool testeArqInd = InsereRegistroNoArqInd(registro, nomeArqIndice, dado, tipoCampo, byteoffsetanterior);
+    bool testeArqInd = false;
+
+    if(tipoArquivo == INDICE)
+        testeArqInd = InsereRegistroNoArqInd(registro, nomeArqIndice, dado, tipoCampo, byteoffsetanterior);
+    else if(tipoArquivo == ARVORE){
+        FILE *arvore;
+        if(!AbreArquivo(&arvore, nomeArqIndice, "rb+", NULL)) return false;
+
+        CABECALHO_B *cabecalhoArvore = CabecalhoBCriar();
+        CabecalhoBLer(cabecalhoArvore, arvore);
+
+        testeArqInd = ArvoreInserir(arvore, registro, cabecalhoArvore, byteoffsetanterior);
+
+        fclose(arvore);
+        CabecalhoBDesalocar(cabecalhoArvore);
+    }
+        
 
     if(testeArqBin && testeArqInd) return true;
     else return false;

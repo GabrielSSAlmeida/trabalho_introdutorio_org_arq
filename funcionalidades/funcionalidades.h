@@ -24,5 +24,6 @@
     bool funcionalidade7(char *arqEntrada, char *nomeArqIndice, char *campoIndexado, char *dado, int n);
     bool funcionalidade8(char *nomeArqBinario, char *nomeArqIndice, char *dado);
     bool funcionalidade9(char *arqEntrada, char *nomeArqIndice, char *campoIndexado, char *dado, int qtdBuscas);
+    bool funcionalidade10(char *arqEntrada, char *nomeArqIndice, char *campoIndexado, char *dado, int n);
 
 #endif

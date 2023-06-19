@@ -136,7 +136,7 @@ bool funcionalidade6(char *arqEntrada, char *nomeArqIndice, char *campoIndexado,
     for(int i=0; i<n; i++){
         DADOS *registro_auxiliar = RegistroCriar();
         RecebeRegistro(registro_auxiliar);
-        InsereRegistro(registro_auxiliar, arqEntrada, nomeArqIndice, campoIndexado, dado);
+        InsereRegistro(registro_auxiliar, arqEntrada, nomeArqIndice, campoIndexado, dado, INDICE);
 
         DesalocaCamposVariaveis(registro_auxiliar);
         DesalocaRegistro(registro_auxiliar);
@@ -222,4 +222,15 @@ bool funcionalidade9(char *arqEntrada, char *nomeArqIndice, char *campoIndexado,
     }
     
     return true;
+}
+
+bool funcionalidade10(char *arqEntrada, char *nomeArqIndice, char *campoIndexado, char *dado, int n){
+    for(int i=0; i<n; i++){
+        DADOS *registro_auxiliar = RegistroCriar();
+        RecebeRegistro(registro_auxiliar);
+        InsereRegistro(registro_auxiliar, arqEntrada, nomeArqIndice, campoIndexado, dado, ARVORE);
+
+        DesalocaCamposVariaveis(registro_auxiliar);
+        DesalocaRegistro(registro_auxiliar);
+    }
 }

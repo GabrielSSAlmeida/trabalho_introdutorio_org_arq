@@ -651,7 +651,7 @@ PARES_BUSCA *paresBusca, PARES_BUSCA *atualizacoes, int qtdPares, int qtdAtualiz
                     MetodoDeRemocao(arqEntrada, nomeArqIndice, paresbuscaAUX, 1, campoIndexado);
                 
                     //insere registro
-                    InsereRegistro(registro_aux, arqEntrada, nomeArqIndice, campoIndexado, dado);
+                    InsereRegistro(registro_aux, arqEntrada, nomeArqIndice, campoIndexado, dado, INDICE);
 
                     
                     free(paresbuscaAUX);
@@ -723,7 +723,7 @@ PARES_BUSCA *paresBusca, PARES_BUSCA *atualizacoes, int qtdPares, int qtdAtualiz
                     MetodoDeRemocao(arqEntrada, nomeArqIndice, paresbuscaAUX, 1, campoIndexado);
 
                     //insere registro
-                    InsereRegistro(registro_aux, arqEntrada, nomeArqIndice, campoIndexado, dado);
+                    InsereRegistro(registro_aux, arqEntrada, nomeArqIndice, campoIndexado, dado, INDICE);
                     
                     free(paresbuscaAUX);
 
@@ -822,7 +822,7 @@ bool AtualizacaoSequencialBinario(char *nomeArqBin, char *nomeArqIndice, char *c
 
 
                 //insere registro
-                InsereRegistro(registro, nomeArqBin, nomeArqIndice, campoIndexado, dado);
+                InsereRegistro(registro, nomeArqBin, nomeArqIndice, campoIndexado, dado, INDICE);
 
                 free(paresbuscaAUX);
                 

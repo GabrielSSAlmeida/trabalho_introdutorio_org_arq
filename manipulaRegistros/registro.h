@@ -20,6 +20,8 @@
 
     typedef struct dados DADOS;
 
+    typedef enum {INDICE, ARVORE} TipoIndice; 
+
     DADOS *RegistroCriar(void);
     DADOS **VetorRegistrosCriar(int tamanho);
     int LerRegBinario(FILE *arqBin, DADOS *registro, long int *offsetlido);
@@ -43,7 +45,7 @@
 
     //Funcionalidade 6
     void RecebeRegistro(DADOS *registro);
-    bool InsereRegistro(DADOS *registro, char *arqEntrada, char *arqIndice, char *campo, char *dado);
+    bool InsereRegistro(DADOS *registro, char *arqEntrada, char *nomeArqIndice, char *campo, char *dado, TipoIndice tipoArquivo);
 
     //Func5
     void avancaCursorSemRemovido(FILE *arqBin, DADOS *registro);
