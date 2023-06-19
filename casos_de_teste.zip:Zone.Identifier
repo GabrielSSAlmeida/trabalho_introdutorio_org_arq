@@ -1,4 +1,0 @@
-[ZoneTransfer]
-ZoneId=3
-ReferrerUrl=https://run.codes/
-HostUrl=https://s3-us-west-2.amazonaws.com/prod-runcodes-files/exercisefiles/30204/casos_de_teste.zip?X-Amz-Content-Sha256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIARLQD65TFYSHZBHG6%2F20230618%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20230618T141351Z&X-Amz-SignedHeaders=Host&X-Amz-Expires=120&X-Amz-Signature=46009ca644bbac89d33e01bbc584b12181d124ab6ca8ac3eba5177013d56c1e2
