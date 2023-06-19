@@ -31,19 +31,24 @@
     };
     typedef struct btPage BTPAGE;
     
-
+    //Cria arquivo de Arvore B* a partir do arquivo de dados
     bool ArvoreCriar(char nomeArqBin[], char arqIndiceArvore[]);
 
     DADOS** BuscaIndiceArvore(char *nomeArqEntrada, char *nomeArqIndice, PARES_BUSCA *paresBusca, int qtdPares, int *qtdEncontrados);
 
+    //Insere chave nos vetores respectivos
     int InsereChave(CHAVE *chaves, int *ponteiros, int tamanho, CHAVE chave, int RRN_Direita);
 
+    //Insere chave na página
     int InsereChavePagina(BTPAGE *pagina, int tamanho, CHAVE chave, int RRN_Direita);
 
+    //Insere registro na árvore
     bool ArvoreInserir(FILE *arvore, DADOS *registro, CABECALHO_B *cabecalho, long int byteoffset);
 
-    ValoresRetorno Insert(FILE *arqArvore, int CURRENT_RRN, CHAVE KEY, CHAVE *PROMO_KEY, int *PROMO_R_CHILD, int RRN_pai);
+    //Função recursiva da inserção da árvore
+    ValoresRetorno Insert(FILE *arqArvore, int RRN_ATUAL, CHAVE Chave, CHAVE *promoChave, int *promoFilho, int RRN_pai);
 
+    //busca na página de disco
     int BuscaBinaria(BTPAGE* pagina, int posicaoInicial, int posicaoFinal, int chave, bool *encontrou);
 
      //copia o conteudo de origem em destino

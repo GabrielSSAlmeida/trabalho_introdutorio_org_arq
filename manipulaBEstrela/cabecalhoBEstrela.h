@@ -19,16 +19,22 @@
     
     typedef struct cabecalhoBestrela CABECALHO_B;
     
+    //Cria Cabecalho do arquivo de indice da Arvore B*
     CABECALHO_B *CabecalhoBCriar(void);
 
+    //Leitura do Cabecalho do arquivo de indice da Arvore B*
     void CabecalhoBLer(CABECALHO_B *cabecalho, FILE *arq);
 
+    //Escrita do Cabecalho do arquivo de indice da Arvore B*
     void CabecalhoBEscreve(FILE *arqBin, CABECALHO_B *cabecalho);
 
+    //Desaloca Cabecalho do arquivo de indice da Arvore B*
     void CabecalhoBDesalocar(CABECALHO_B *cabecalho);
 
+    //Verifica consistência do arquivo de indice da Arvore B*
     bool CabecalhoBVerificaStatus(CABECALHO_B *cabecalho);
 
+    //Reescreve consistência do arquivo de indice da Arvore B*
     bool CabecalhoBReescreve(FILE *arqInd, CABECALHO_B *cabecalho);
     
 #endif
