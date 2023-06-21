@@ -196,7 +196,6 @@ bool ArvoreInserir(FILE *arvore, DADOS *registro, CABECALHO_B *cabecalho, long i
         
         BTPAGE* novaPagina = PaginaCriarInicializado(promoChave, root, promoFilho, cabecalho->nroNiveis + 1, 1);
         //faça ROOT igual ao RRN da nova página raiz
-        //Acho que o RRN da nova pagina é o prox RRN do cabecalho
         root = proxRRN;
 
         //Att proxRRN ddo cabecalho;
