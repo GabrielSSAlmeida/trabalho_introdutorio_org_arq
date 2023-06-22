@@ -207,7 +207,8 @@ bool funcionalidade9(char *arqEntrada, char *nomeArqIndice, char *campoIndexado,
         printf("Resposta para a busca %d\n", i+1);
 
         int qtdRegistros = 0;
-        DADOS** registros = MetodoDeBusca(arqEntrada, nomeArqIndice, paresBusca, qtdPares, campoIndexado, &qtdRegistros, BuscaIndiceArvore);
+        DADOS** registros = MetodoDeBusca(arqEntrada, nomeArqIndice, paresBusca, 
+        qtdPares, campoIndexado, &qtdRegistros, BuscaIndiceArvore);
 
         DesalocaParesBusca(paresBusca);
 

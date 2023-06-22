@@ -431,7 +431,8 @@ bool Redistribuicao(FILE *arqArvore, CHAVE chave_in, int RRN_in, BTPAGE *pagina,
 //FUNÇÕES DO SPLIT 2 PARA 3
 
 //Distribui chaves do split 2 para 3
-void Split3Vetores(CHAVE *chaves, int ponteiros[], int tamanhoVetor, BTPAGE *pagina1, BTPAGE *pagina2, BTPAGE* pagina3){
+void Split3Vetores(CHAVE *chaves, int ponteiros[], int tamanhoVetor, 
+                BTPAGE *pagina1, BTPAGE *pagina2, BTPAGE* pagina3){
     pagina1->P[0] = ponteiros[0];
     pagina2->P[0] = ponteiros[tamanhoVetor/3 + 1];
     pagina3->P[0] = ponteiros[((tamanhoVetor/3)*2)+2];
@@ -449,11 +450,11 @@ void Split3Vetores(CHAVE *chaves, int ponteiros[], int tamanhoVetor, BTPAGE *pag
     }
 }
 
-bool Split_2to3(FILE *arqArvore, CHAVE chave_in, int RRN_in, CHAVE *promoChave, int *promoFilho, BTPAGE* novaPagina,
-                 BTPAGE *pagina, int RRN_Atual, int RRN_pai, lado lado){
+bool Split_2to3(FILE *arqArvore, CHAVE chave_in, int RRN_in, CHAVE *promoChave, int *promoFilho, 
+                BTPAGE* novaPagina, BTPAGE *pagina, int RRN_Atual, int RRN_pai, lado lado){
+    
     BTPAGE *paginaPai = PaginaCriar();
     LerPagina(arqArvore, RRN_pai, paginaPai);
-
 
     int posicao;
     ProcuraChavePagina(paginaPai, chave_in.C, &posicao);
@@ -554,7 +555,8 @@ bool Split_2to3(FILE *arqArvore, CHAVE chave_in, int RRN_in, CHAVE *promoChave, 
 //FUNÇÕES DE INSERÇÃO
 
 //Função recursiva da inserção na árvore
-ValoresRetorno Insert(FILE *arqArvore, int RRN_Atual, CHAVE KEY, CHAVE *promoChave, int *promoFilho, int RRN_pai){
+ValoresRetorno Insert(FILE *arqArvore, int RRN_Atual, CHAVE KEY, 
+                    CHAVE *promoChave, int *promoFilho, int RRN_pai){
 
     //Cria Paginas Vazias
     BTPAGE *pagina = PaginaCriar();
@@ -634,17 +636,21 @@ ValoresRetorno Insert(FILE *arqArvore, int RRN_Atual, CHAVE KEY, CHAVE *promoCha
                     //split 2-to-3 (DEMAIS NÓS) à direita
                     if(Split_2to3(arqArvore, chavePromovida, rrnPromovido, promoChave, promoFilho, 
                         novaPagina, pagina, RRN_Atual, RRN_pai, DIREITA)){
-                        
+
+                        free(novaPagina);
+                        free(pagina);
+                        return PROMOTION;
                     }
                     //se não der, split 2-to-3 (DEMAIS NÓS) à esquerda
                     else if(Split_2to3(arqArvore, chavePromovida, rrnPromovido, promoChave, promoFilho,
                         novaPagina, pagina, RRN_Atual, RRN_pai, ESQUERDA)){
 
+                        free(novaPagina);
+                        free(pagina);
+                        return PROMOTION;
                     }
                 }       
-                free(novaPagina);
-                free(pagina);
-                return PROMOTION;  
+                  
             }
         }
     } 
@@ -736,11 +742,13 @@ buscaRetorno Pesquisa(FILE* arqArvore, int RRN, int chave, int *encontra_RRN, in
         //procure KEY em PAGE, fazendo POS igual a posição em que KEY ocorre ou deveria ocorrer
         int pos = -1;
         if(ProcuraChavePagina(pagina, chave, &pos)){
+            //se encontrar, pos eh a posição no vetor e chaves
             *encontra_RRN = RRN;
             *encontra_pos = pos;
             free(pagina);
             return ACHOU;
         }else{
+            //se não encontrar, pos eh a posição no vetor de Ponteiros
             int RRN_busca = pagina->P[pos];
             free(pagina);
             return Pesquisa(arqArvore, RRN_busca, chave, encontra_RRN, encontra_pos);
@@ -759,6 +767,7 @@ long int BuscaArvore(char *nomeArqIndice, int valorBuscado){
 
     int RRN_encontrado = -1;
     int POS_encontrada = -1;
+    //função recursiva para pesquisar na arvore b*
     buscaRetorno retorno = Pesquisa(arqArvore, cabecalhoArvoreAux->noRaiz, 
     valorBuscado, &RRN_encontrado, &POS_encontrada);
 
