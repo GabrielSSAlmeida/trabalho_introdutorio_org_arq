@@ -631,6 +631,10 @@ ValoresRetorno Insert(FILE *arqArvore, int RRN_Atual, CHAVE KEY,
                     //escreva NEWPAGE no arquivo na posição promoFilho
                     EscrevePagina(arqArvore, RRN_Atual, pagina);
                     EscrevePagina(arqArvore, *promoFilho, novaPagina);
+
+                    free(novaPagina);
+                    free(pagina);
+                    return PROMOTION;
                 }else{
 
                     //split 2-to-3 (DEMAIS NÓS) à direita
