@@ -1,4 +1,4 @@
-# (SCC0215) File Organization - Final Project
+# (SCC0215) File Organization - B* Tree database indexing
 
 ### Developers 
 * Gabriel Sousa Santos de Almeida
