@@ -14,7 +14,7 @@
 
 ### Introduction
 
-This project presents a C program, without the use of any external libraries other than the standard C libraries. The program manipulates binary files in disk storage.
+This project presents a C program, without the use of any external libraries other than the standard C libraries. The program implements a B*Tree indexing structure, that manipulates binary files in disk storage.
 
 ### Objectives
 
